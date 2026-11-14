@@ -51,6 +51,26 @@ body{background:#060913;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFo
 /* Settings drawer */
 .drawer{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(10,15,30,0.98);border-top:1px solid rgba(255,255,255,0.08);border-radius:22px 22px 0 0;transform:translateY(100%);transition:transform .3s ease;max-height:80vh;overflow-y:auto;padding:14px 18px 28px;}
 .drawer.open{transform:translateY(0);}
+.drawer{max-height:50vh;transition:transform .3s ease,max-height .3s ease;}
+.drawer.tall{max-height:88vh;}
+.handle{position:sticky;top:-14px;z-index:3;display:flex;justify-content:center;padding:2px 0 8px;margin-top:-6px;background:rgba(10,15,30,0.98);cursor:pointer;}
+.handle i{display:block;width:42px;height:5px;border-radius:3px;background:rgba(255,255,255,0.25);}
+.acc{border:1px solid rgba(255,255,255,0.07);border-radius:12px;margin-bottom:8px;background:rgba(15,23,42,0.45);}
+.acc summary{list-style:none;padding:12px 14px;font-size:12px;font-weight:800;letter-spacing:0.6px;color:#e2e8f0;display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:uppercase;}
+.acc summary::-webkit-details-marker{display:none;}
+.acc summary::after{content:'▸';margin-left:auto;color:#64748b;transition:transform .2s;}
+.acc[open] summary::after{transform:rotate(90deg);}
+.acc .sum{font-size:11px;font-weight:600;color:var(--p);text-transform:none;letter-spacing:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.acc > *:not(summary){margin-left:12px;margin-right:12px;}
+.acc > *:last-child{margin-bottom:12px;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chips + .chips{margin-top:8px;}
+.chips .opt-btn{padding:7px 11px;font-size:11px;border-radius:16px;}
+.chips .sec-label{flex-basis:100%;}
+#sceneGroups .opt-btn{background:transparent;border-style:dashed;}
+#sceneGroups .opt-btn.act{border-style:solid;}
+.mini-label{font-size:10px;font-weight:700;letter-spacing:1px;color:#64748b;margin:10px 0 6px;text-transform:uppercase;}
+.tabs{top:12px;}
 #drawerToggle{position:fixed;right:18px;top:84px;z-index:21;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(15,23,42,0.85);color:var(--p);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .3s;}
 #drawerToggle.open{transform:rotate(90deg);}
 .tabs{display:flex;gap:6px;position:sticky;top:-14px;background:rgba(10,15,30,0.98);padding:4px 0 10px;z-index:2;}
@@ -93,7 +113,7 @@ textarea.inp{min-height:70px;resize:vertical;}
 .cswatch.act{border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,0.4);}
 #clockColor{width:34px;height:34px;border:0;background:none;padding:0;}
 #clock{position:fixed;left:0;right:0;z-index:5;text-align:center;pointer-events:none;color:var(--c);transition:top .3s,bottom .3s,opacity .3s;}
-body.drawer-open #clock{opacity:0.12;}
+body.drawer-open #clock,body.drawer-open .hud-top,body.drawer-open #hotkeys,body.drawer-open .quick-dock{opacity:0;pointer-events:none;}
 #clock.pos-top{top:13%;}
 #clock.pos-middle{top:50%;transform:translateY(-50%);}
 #clock.pos-bottom{bottom:17%;}
@@ -137,6 +157,7 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
 <button id="drawerToggle"><span id="drawerArrow">⚙</span></button>
 
 <div class="drawer" id="drawer">
+  <div class="handle" id="sheetHandle" title="Drag or tap to resize"><i></i></div>
   <div class="tabs">
     <button data-tab="look" class="act">LOOK</button>
     <button data-tab="clock">TEXT</button>
@@ -147,88 +168,95 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
 
   <!-- LOOK -->
   <div class="tab act" id="tab-look">
-    <div class="sec-label">Theme</div>
-    <div class="swatch-row" id="swatches"></div>
+    <details class="acc" open>
+      <summary>Scene <span class="sum" data-sum="scene"></span></summary>
+      <div class="chips" id="sceneGroups"></div>
+      <div class="chips" id="sceneBtns"></div>
+    </details>
 
-    <div class="sec-label">Scene</div>
-    <div class="grid-3" id="sceneBtns"></div>
+    <details class="acc">
+      <summary>Theme <span class="sum" data-sum="theme"></span></summary>
+      <div class="swatch-row" id="swatches"></div>
+    </details>
 
-    <div class="sec-label">Layers (mix your own)</div>
-    <div class="grid-2" id="layerBtns"></div>
+    <details class="acc">
+      <summary>Layers <span class="sum" data-sum="layers"></span></summary>
+      <div class="note" style="margin:0 0 8px">Mix your own: tap to switch any layer on or off.</div>
+      <div class="chips" id="layerBtns"></div>
+    </details>
 
-    <div class="sec-label">Personality</div>
-    <div class="grid-3">
-      <button class="opt-btn" data-persona="quirky">Quirky</button>
-      <button class="opt-btn" data-persona="calm">Calm</button>
-      <button class="opt-btn" data-persona="off">Off</button>
-    </div>
-    <div class="grid-2">
-      <button class="opt-btn" data-face="1">Show face</button>
-      <button class="opt-btn" data-face="0">No face</button>
-    </div>
-    <div class="sec-label">Core style (Nova's body)</div>
-    <div class="grid-2" id="coreBtns"></div>
+    <details class="acc">
+      <summary>Nova's body &amp; face <span class="sum" data-sum="body"></span></summary>
+      <div class="mini-label">Core style</div>
+      <div class="chips" id="coreBtns"></div>
+      <div class="mini-label">Personality</div>
+      <div class="chips">
+        <button class="opt-btn" data-persona="quirky">Quirky</button>
+        <button class="opt-btn" data-persona="calm">Calm</button>
+        <button class="opt-btn" data-persona="off">Off</button>
+        <button class="opt-btn" data-face="1">Face on</button>
+        <button class="opt-btn" data-face="0">Face off</button>
+      </div>
+      <div class="mini-label">Eyes</div>
+      <div class="chips" id="eyeBtns"></div>
+      <div class="mini-label">Try an expression</div>
+      <div class="chips" id="moodBtns"></div>
+    </details>
 
-    <div class="sec-label">Eye style</div>
-    <div class="grid-3" id="eyeBtns"></div>
-    <div class="sec-label">Try an expression</div>
-    <div class="grid-3" id="moodBtns"></div>
-    <div class="note">Quirky Nova hops, wobbles, sneezes, gets dizzy, dozes off when ignored, and can't resist watching every button you press.</div>
+    <details class="acc">
+      <summary>Motion <span class="sum" data-sum="motion"></span></summary>
+      <div class="mini-label">Camera</div>
+      <div class="chips">
+        <button class="opt-btn" data-camera="still">Still</button>
+        <button class="opt-btn" data-camera="drift">Drift</button>
+        <button class="opt-btn" data-camera="orbit">Orbit</button>
+        <button class="opt-btn" data-camera="wild">Wild</button>
+      </div>
+      <div class="mini-label">3D gyroscope</div>
+      <div class="chips">
+        <button class="opt-btn" data-gyro="off">Flat</button>
+        <button class="opt-btn" data-gyro="gentle">Gentle</button>
+        <button class="opt-btn" data-gyro="full">Full</button>
+      </div>
+      <div class="mini-label">Tuning</div>
+      <div class="slider-row"><span>Speed</span><input type="range" id="rngSpeed" min="0.2" max="3" step="0.1"><b id="valSpeed"></b></div>
+      <div class="slider-row"><span>Size</span><input type="range" id="rngSize" min="0.5" max="1.8" step="0.05"><b id="valSize"></b></div>
+      <div class="mini-label">Preview state</div>
+      <div class="chips" id="stateBtns"></div>
+    </details>
 
-    <div class="sec-label">Touch effect</div>
-    <div class="grid-3">
-      <button class="opt-btn" data-touch="burst">Spark burst</button>
-      <button class="opt-btn" data-touch="bolt">Energy bolt</button>
-      <button class="opt-btn" data-touch="vortex">Vortex</button>
-      <button class="opt-btn" data-touch="ripple">Ripple</button>
-      <button class="opt-btn" data-touch="shock">Shockwave</button>
-      <button class="opt-btn" data-touch="random">Random</button>
-      <button class="opt-btn" data-touch="pulse">Classic pulse</button>
-    </div>
-    <div class="note">Tap anywhere to trigger it. Drag your finger to leave a light trail; the core leans toward your touch.</div>
+    <details class="acc">
+      <summary>Effects <span class="sum" data-sum="effects"></span></summary>
+      <div class="mini-label">Touch effect</div>
+      <div class="chips">
+        <button class="opt-btn" data-touch="random">Random</button>
+        <button class="opt-btn" data-touch="burst">Sparks</button>
+        <button class="opt-btn" data-touch="bolt">Bolt</button>
+        <button class="opt-btn" data-touch="vortex">Vortex</button>
+        <button class="opt-btn" data-touch="ripple">Ripple</button>
+        <button class="opt-btn" data-touch="shock">Shockwave</button>
+        <button class="opt-btn" data-touch="pulse">Pulse</button>
+      </div>
+      <div class="mini-label">Snow</div>
+      <div class="chips">
+        <button class="opt-btn" data-snow="0">Off</button>
+        <button class="opt-btn" data-snow="1">Light</button>
+        <button class="opt-btn" data-snow="2">Medium</button>
+        <button class="opt-btn" data-snow="3">Blizzard</button>
+      </div>
+      <div class="slider-row" style="margin-top:10px"><span>Particles</span><input type="range" id="rngParticles" min="0" max="300" step="10"><b id="valParticles"></b></div>
+      <div class="slider-row"><span>Arcs</span><input type="range" id="rngArcs" min="0" max="1" step="0.05"><b id="valArcs"></b></div>
+    </details>
 
-    <div class="sec-label">Falling snow</div>
-    <div class="grid-2">
-      <button class="opt-btn" data-snow="0">Snow off</button>
-      <button class="opt-btn" data-snow="1">Light snow</button>
-      <button class="opt-btn" data-snow="2">Medium snow</button>
-      <button class="opt-btn" data-snow="3">Blizzard</button>
-    </div>
-    <div class="note">Snow stays on when you switch scenes. Say "let it snow" or "snow off", or use the hotkey.</div>
-
-    <div class="sec-label">State</div>
-    <div class="grid-2" id="stateBtns"></div>
-
-    <div class="sec-label">Tuning</div>
-    <div class="slider-row"><span>Speed</span><input type="range" id="rngSpeed" min="0.2" max="3" step="0.1"><b id="valSpeed"></b></div>
-    <div class="slider-row"><span>Particles</span><input type="range" id="rngParticles" min="0" max="300" step="10"><b id="valParticles"></b></div>
-    <div class="slider-row"><span>Arcs</span><input type="range" id="rngArcs" min="0" max="1" step="0.05"><b id="valArcs"></b></div>
-    <div class="slider-row"><span>Size</span><input type="range" id="rngSize" min="0.5" max="1.8" step="0.05"><b id="valSize"></b></div>
-
-    <div class="sec-label">Camera motion</div>
-    <div class="grid-2">
-      <button class="opt-btn" data-camera="still">Still</button>
-      <button class="opt-btn" data-camera="drift">Drift</button>
-      <button class="opt-btn" data-camera="orbit">Orbit</button>
-      <button class="opt-btn" data-camera="wild">Wild</button>
-    </div>
-    <div class="note">Keeps the whole scene gliding, swaying and zooming so it's always in motion, even while Nova is idle.</div>
-
-    <div class="sec-label">3D gyroscope</div>
-    <div class="grid-3">
-      <button class="opt-btn" data-gyro="off">Flat</button>
-      <button class="opt-btn" data-gyro="gentle">Gentle</button>
-      <button class="opt-btn" data-gyro="full">Full</button>
-    </div>
-    <div class="note">Rings around the core tilt on their own axes and tumble in 3D like a gyroscope, faster while Nova is thinking.</div>
-
-    <div class="sec-label">Wallpaper quality</div>
-    <div class="grid-3">
-      <button class="opt-btn" data-quality="battery">Battery</button>
-      <button class="opt-btn" data-quality="balanced">Balanced</button>
-      <button class="opt-btn" data-quality="ultra">Ultra</button>
-    </div>
-    <div class="note">Battery runs at 30 fps, Balanced at 60 fps, and Ultra as fast as your screen allows with extra detail. If the phone falls behind, Nova lowers the resolution a little on its own to stay smooth.</div>
+    <details class="acc">
+      <summary>Performance <span class="sum" data-sum="perf"></span></summary>
+      <div class="chips">
+        <button class="opt-btn" data-quality="battery">Battery · 30fps</button>
+        <button class="opt-btn" data-quality="balanced">Balanced · 60fps</button>
+        <button class="opt-btn" data-quality="ultra">Ultra</button>
+      </div>
+      <div class="note">If the phone falls behind, Nova lowers the resolution a little on its own to stay smooth.</div>
+    </details>
   </div>
 
   <!-- CLOCK -->
@@ -1398,6 +1426,15 @@ function drawOrbitals(t, cx, cy, R) {
   ctx.globalAlpha = 1;
 }
 
+// ===== Live preview: with settings open, the scene shrinks into the space above the sheet =====
+const view = { s: 1, cy: 0, sheet: 0 };
+function measureSheet() {
+  setTimeout(() => { view.sheet = document.body.classList.contains('drawer-open') ? $('drawer').getBoundingClientRect().height : 0; }, 320);
+}
+function toWorld(x, y) {
+  return [W / 2 + (x - W / 2) / view.s, H / 2 + (y - view.cy) / view.s];
+}
+
 // ===== 3D gyroscope =====
 // Draws a flat ring layer as if its plane were tilted in 3D: each ring gets its own
 // tilt axis that slowly turns, so circles swing into ellipses and back like gimbals.
@@ -1520,6 +1557,7 @@ function hop(v) { if (pers.hop <= 0.01) { pers.vhop = v; pers.vq -= 0.12; } }
 // Something caught Nova's attention at screen point (x, y)
 function notice(x, y, strength, fromButton) {
   if (!persOn()) return;
+  [x, y] = toWorld(x, y);
   const coreX = camX + lean.x + pers.dx, coreY = camY + lean.y + pers.dy;
   if (pers.mood === 'sleep') { setMood('surprised', 0.8); emote('!'); hop(8); }
   pers.idle = 0;
@@ -1567,7 +1605,7 @@ function updatePersona(dt, R) {
   pers.vz += (-pers.z * 0.16 - pers.vz * 0.12) * k; pers.z += pers.vz * k;
 
   // peek up above the settings drawer to watch the buttons
-  const open = document.body.classList.contains('drawer-open');
+  const open = false;
   const tdy = open ? -(H / 2 - H * 0.105) : 0, ts = open ? 0.42 : 1;
   pers.dy += (tdy - pers.dy) * 0.12 * k;
   pers.s += (ts - pers.s) * 0.12 * k;
@@ -2103,13 +2141,15 @@ function coreTap(x, y, cx, cy) {
 }
 
 function touchAt(x, y) {
+  const sx = x, sy = y;
+  [x, y] = toWorld(x, y);
   // tapped right on the core? It reacts with personality instead of the touch effect
   if (persOn()) {
     const cx = camX + lean.x + pers.dx + pers.wx, cy = camY + lean.y + pers.dy + pers.wy - pers.hop;
     const hit = Math.max(44, (26 + level * 14) * cfg.size * pers.s * 1.7);
     if (Math.hypot(x - cx, y - cy) < hit) { coreTap(x, y, cx, cy); return; }
   }
-  notice(x, y, 1, false);
+  notice(sx, sy, 1, false);
   let kind = cfg.touch || 'random';
   if (kind === 'random') kind = TOUCH_KINDS[(Math.random() * TOUCH_KINDS.length) | 0];
   // the core leans toward the touch for a moment
@@ -3191,6 +3231,13 @@ function render(dt) {
 
   // background is CSS; the canvas only clears and draws what moves
   ctx.clearRect(0, 0, W, H);
+  // live preview while editing: fit the scene into the space above the settings sheet
+  const visH = H - view.sheet;
+  const tS = view.sheet ? Math.max(0.32, Math.min(1, visH / H * 1.12)) : 1, tY = view.sheet ? visH / 2 + 6 : H / 2;
+  if (!view.cy) view.cy = H / 2;
+  view.s += (tS - view.s) * Math.min(1, 0.15 * dt); view.cy += (tY - view.cy) * Math.min(1, 0.15 * dt);
+  ctx.save();
+  ctx.translate(W / 2, view.cy); ctx.scale(view.s, view.s); ctx.translate(-W / 2, -H / 2);
   // camera moves on real time, so the scene never sits still
   clock += 0.016 * dt;
   const cam = CAMERA[cfg.camera || 'drift'];
@@ -3273,6 +3320,7 @@ function render(dt) {
   drawTouch(t, dt);
   drawPersonaFx(t);
   drawSnow(dt);
+  ctx.restore();
 }
 
 // Frame loop: fps cap from the quality setting, pause switch, and automatic
@@ -3328,9 +3376,10 @@ window.addEventListener('pointermove', e => {
   drag.x = e.clientX; drag.y = e.clientY;
   // glowing finger trail
   if (drag.moved) {
-    trail.push({ x: e.clientX, y: e.clientY, life: 1 });
+    const [wx2, wy2] = toWorld(e.clientX, e.clientY);
+    trail.push({ x: wx2, y: wy2, life: 1 });
     if (trail.length > 40) trail.shift();
-    lean.tx = (e.clientX - W / 2) * 0.08; lean.ty = (e.clientY - H / 2) * 0.08;
+    lean.tx = (wx2 - W / 2) * 0.08; lean.ty = (wy2 - H / 2) * 0.08;
   }
 });
 window.addEventListener('pointerup', () => {
@@ -3464,6 +3513,20 @@ function updateUI() {
   $('rngClockSize').value = k.size;
   $('valClockSize').textContent = k.size + 'x';
   renderHotkeys();
+  // section summaries so you can see settings without opening them
+  const sum = (k, v) => { const el = document.querySelector('[data-sum="' + k + '"]'); if (el) el.textContent = v; };
+  sum('scene', cfg.scene === 'custom' ? 'Custom mix' : (SCENES[cfg.scene] || {}).label || '');
+  sum('theme', cfg.theme);
+  sum('layers', Object.values(cfg.layers).filter(Boolean).length + ' on');
+  sum('body', (CORE_STYLES[cfg.coreStyle || 'nucleus'] || '') + ' · ' + (EYE_STYLES[cfg.eyes || 'capsule'] || '') + ' eyes');
+  sum('motion', (cfg.camera || 'drift') + ' · gyro ' + (cfg.gyro || 'full'));
+  sum('effects', (cfg.touch || 'random') + (cfg.snow ? ' · snow' : ''));
+  sum('perf', cfg.quality);
+}
+
+function showSceneGroup(g) {
+  document.querySelectorAll('#sceneBtns [data-scene]').forEach(b => b.style.display = b.dataset.group === g ? '' : 'none');
+  document.querySelectorAll('[data-scene-group]').forEach(b => b.classList.toggle('act', b.dataset.sceneGroup === g));
 }
 
 function makeBtn(parent, text, data, onclick) {
@@ -3485,20 +3548,11 @@ function buildUI() {
     d.onclick = () => set('theme', k);
     $('swatches').appendChild(d);
   });
-  let lastGroup = '';
-  SCENE_KEYS.forEach(k => {
-    if (SCENES[k].group !== lastGroup) {
-      lastGroup = SCENES[k].group;
-      const h = document.createElement('div');
-      h.className = 'sec-label';
-      h.style.cssText = 'grid-column:1/-1;margin:6px 0 0';
-      h.textContent = lastGroup;
-      $('sceneBtns').appendChild(h);
-    }
-    makeBtn($('sceneBtns'), SCENES[k].label, { scene: k }, () => setScene(k));
-  });
-  makeBtn($('sceneBtns'), 'Custom', { scene: 'custom' }, null).style.opacity = '0.6';
-  Object.keys(LAYERS).forEach(k => makeBtn($('layerBtns'), LAYERS[k], { layer: k }, () => toggleLayer(k)));
+  const groups = [];
+  SCENE_KEYS.forEach(k => { if (!groups.includes(SCENES[k].group)) groups.push(SCENES[k].group); });
+  groups.forEach(g => makeBtn($('sceneGroups'), g, { sceneGroup: g }, () => showSceneGroup(g)));
+  SCENE_KEYS.forEach(k => makeBtn($('sceneBtns'), SCENES[k].label, { scene: k, group: SCENES[k].group }, () => setScene(k)));
+  showSceneGroup((SCENES[cfg.scene] || SCENES.neural).group);  Object.keys(LAYERS).forEach(k => makeBtn($('layerBtns'), LAYERS[k], { layer: k }, () => toggleLayer(k)));
   STATE_KEYS.forEach(k => makeBtn($('stateBtns'), STATES[k].label, { state: k }, () => set('state', k)));
   document.querySelectorAll('[data-ai]').forEach(b => b.onclick = () => set('ai', b.dataset.ai));
   document.querySelectorAll('[data-quality]').forEach(b => b.onclick = () => set('quality', b.dataset.quality));
@@ -3623,7 +3677,15 @@ function buildUI() {
     $('drawer').classList.toggle('open');
     $('drawerToggle').classList.toggle('open');
     document.body.classList.toggle('drawer-open', $('drawer').classList.contains('open'));
+    if (SCENES[cfg.scene]) showSceneGroup(SCENES[cfg.scene].group);
+    measureSheet();
   };
+  $('sheetHandle').onclick = () => { $('drawer').classList.toggle('tall'); measureSheet(); };
+  document.querySelectorAll('details.acc').forEach(d => d.addEventListener('toggle', () => {
+    if (d.open) document.querySelectorAll('details.acc').forEach(o => { if (o !== d) o.open = false; });
+    measureSheet();
+  }));
+  document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', measureSheet));
   $('applyBtn').onclick = () => runAction('apply', '', true);
   $('btnCheckUpdate').onclick = () => checkUpdate(false);
   $('btnInstallUpdate').onclick = installUpdate;
@@ -4177,7 +4239,7 @@ window.syncConfig = function () {
   updateUI();
 };
 
-window.addEventListener('resize', () => { resize(); buildParticles(); buildExtras(); buildMotion(); buildHud(); buildSnow(); });
+window.addEventListener('resize', () => { measureSheet(); resize(); buildParticles(); buildExtras(); buildMotion(); buildHud(); buildSnow(); });
 resize();
 buildNodes();
 buildParticles();
