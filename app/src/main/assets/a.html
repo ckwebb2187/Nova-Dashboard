@@ -447,7 +447,9 @@ const LAYERS = {
   hudrings: 'HUD core rings', hudpanels: 'HUD side panels', hologlobe: 'Holo globe', targeting: 'Target lock',
   dataring: 'Data ring', voiceprint: 'Voice print', schematic: 'Blueprint grid', icosa: 'Hyper crystal', glitch: 'Holo glitch',
   membrane: 'Cell membrane', organelles: 'Organelles', chromatin: 'Chromatin', cilia: 'Cilia', spikes: 'Spike proteins',
-  neurons: 'Neurons', mitosis: 'Mitosis'
+  neurons: 'Neurons', mitosis: 'Mitosis',
+  quarkrings: 'Quark rings', plasmatorus: 'Plasma torus', dnaring: 'DNA ring', cellrings: 'Cell rings',
+  synapsering: 'Synapse ring', decayrings: 'Decay rings', orbitals: 'Electron orbitals'
 };
 // Each scene lists the layers it turns on; everything else is off
 const SCENE_LIST = [
@@ -476,6 +478,14 @@ const SCENE_LIST = [
   ['cybercell', 'Cyber Cell', 'membrane circuit hex spikes', 'Living Cell'],
   ['livingspark', 'Living Spark', 'chromatin cilia membrane wave', 'Living Cell'],
   ['plankton', 'Plankton', 'organelles bubbles fireflies membrane', 'Living Cell'],
+  ['fusioncore', 'Fusion Core', 'plasmatorus quarkrings', 'Nuclear Gyro', 'spark'],
+  ['atomicgyro', 'Atomic Gyro', 'orbitals quarkrings', 'Nuclear Gyro', 'atom'],
+  ['genegyro', 'Gene Gyroscope', 'dnaring cellrings', 'Nuclear Gyro', 'nucleus'],
+  ['cellgimbal', 'Cell Gimbal', 'cellrings organelles', 'Nuclear Gyro', 'cell'],
+  ['synapsegyro', 'Synapse Gyro', 'synapsering neurons', 'Nuclear Gyro', 'spark'],
+  ['decayreactor', 'Decay Reactor', 'decayrings plasmatorus hudrings', 'Nuclear Gyro', 'crystal'],
+  ['quantumspin', 'Quantum Spin', 'orbitals dnaring quarkrings', 'Nuclear Gyro', 'plasma'],
+  ['biogyro', 'Bio Gyro', 'cellrings synapsering chromatin', 'Nuclear Gyro', 'jelly'],
   ['neural', 'Neural Atom', 'sphere'],
   ['quantum', 'Quantum', 'orbits wave'],
   ['reactor', 'Arc Reactor', 'rings wave'],
@@ -527,11 +537,11 @@ const SCENE_LIST = [
   ['hyperrave', 'Hyper Rave', 'tunnel lasers spectrum']
 ];
 const SCENES = {};
-SCENE_LIST.forEach(([key, label, on, group]) => {
+SCENE_LIST.forEach(([key, label, on, group, core]) => {
   const layers = {};
   Object.keys(LAYERS).forEach(l => layers[l] = 0);
   on.split(' ').forEach(l => layers[l] = 1);
-  SCENES[key] = { label: label, layers: layers, group: group || 'More scenes' };
+  SCENES[key] = { label: label, layers: layers, group: group || 'More scenes', core: core };
 });
 const SCENE_KEYS = Object.keys(SCENES);
 const QUALITY = {
@@ -1228,6 +1238,164 @@ function drawCoreInner(t, cx, cy) {
     ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+}
+
+// ===== Nuclear / cellular gyroscope rings (each ring on its own gimbal) =====
+let decayParts = [], orbitalDots = null;
+
+function drawQuarkRings(t, cx, cy, R) {
+  [0.72, 0.95, 1.18].forEach((f, i) => gyro(120 + i, cx, cy, () => {
+    const r = R * f;
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1; ctx.globalAlpha = 0.35;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    const sp = (1.2 + i * 0.5) * (i % 2 ? -1 : 1) * (1 + level);
+    for (let q = 0; q < 3; q++) {
+      const a = phase * sp + q * 2.094;
+      const col = q === 0 ? '#ffffff' : q === 1 ? t.p : t.a;
+      for (let s2 = 0; s2 < 5; s2++) {
+        const a0 = a - Math.sign(sp) * s2 * 0.08, a1 = a - Math.sign(sp) * (s2 + 1) * 0.08;
+        ctx.strokeStyle = col; ctx.lineWidth = 3 - s2 * 0.5; ctx.globalAlpha = 0.9 - s2 * 0.17;
+        ctx.beginPath(); ctx.arc(cx, cy, r, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke();
+      }
+      ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10; ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }));
+  ctx.globalAlpha = 1;
+}
+
+function drawPlasmaTorus(t, cx, cy, R) {
+  [0.88, 1.28].forEach((f, i) => gyro(130 + i, cx, cy, () => {
+    const r = R * f;
+    ctx.strokeStyle = i ? t.a : t.p;
+    ctx.lineWidth = 14 + level * 10; ctx.globalAlpha = 0.1; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.lineWidth = 5; ctx.globalAlpha = 0.3; ctx.stroke();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.globalAlpha = 0.85;
+    ctx.setLineDash([r * 0.35, r * 0.2, r * 0.08, r * 0.2]);
+    ctx.lineDashOffset = -phase * r * (0.8 + i * 0.5) * (i ? -1 : 1) * (1 + level * 2);
+    ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  }));
+  ctx.globalAlpha = 1;
+}
+
+function drawDnaRing(t, cx, cy, R) {
+  [[1.05, 14, 0.075], [0.7, 9, 0.06]].forEach(([f, twists, amp], i) => gyro(140 + i, cx, cy, () => {
+    const r = R * f, n = 120, tw = phase * (2 + i) * (i ? -1 : 1);
+    const s1 = [], s2 = [];
+    for (let j = 0; j <= n; j++) {
+      const a = j / n * Math.PI * 2, off = Math.sin(a * twists + tw) * R * amp;
+      s1.push([cx + Math.cos(a) * (r + off), cy + Math.sin(a) * (r + off), Math.cos(a * twists + tw)]);
+      s2.push([cx + Math.cos(a) * (r - off), cy + Math.sin(a) * (r - off), -Math.cos(a * twists + tw)]);
+    }
+    ctx.strokeStyle = t.a; ctx.lineWidth = 1; ctx.globalAlpha = 0.4; ctx.beginPath();
+    for (let j = 0; j < n; j += 4) { ctx.moveTo(s1[j][0], s1[j][1]); ctx.lineTo(s2[j][0], s2[j][1]); }
+    ctx.stroke();
+    [[s1, t.p], [s2, t.a]].forEach(([pts, col]) => {
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.globalAlpha = 0.85; ctx.beginPath();
+      pts.forEach((p, j) => j ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke();
+    });
+    ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.9; ctx.beginPath();
+    for (let j = 0; j < n; j += 4) for (const p of [s1[j], s2[j]]) if (p[2] > 0.5) { ctx.moveTo(p[0] + 1.8, p[1]); ctx.arc(p[0], p[1], 1.8, 0, Math.PI * 2); }
+    ctx.fill();
+  }));
+  ctx.globalAlpha = 1;
+}
+
+function drawCellRings(t, cx, cy, R) {
+  [1.0, 1.32].forEach((f, i) => gyro(150 + i, cx, cy, () => {
+    const shape = a => R * f * (1 + 0.05 * Math.sin(4 * a + phase * (1.4 + i)) + 0.035 * Math.sin(7 * a - phase * 2) + level * 0.06 * Math.sin(5 * a + phase * 7));
+    const p = blobPath(cx, cy, shape, 40);
+    ctx.strokeStyle = i ? t.a : t.p; ctx.lineWidth = 8; ctx.globalAlpha = 0.12; ctx.stroke(p);
+    ctx.lineWidth = 2; ctx.globalAlpha = 0.8; ctx.stroke(p);
+    ctx.lineWidth = 1; ctx.globalAlpha = 0.35; ctx.stroke(blobPath(cx, cy, a => shape(a) * 0.94, 40));
+    // vesicles riding along the membrane
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.8; ctx.beginPath();
+    for (let v = 0; v < 6; v++) {
+      const a = phase * (0.5 + i * 0.3) * (i ? -1 : 1) + v * 1.047, rr = shape(a) * 0.97, vr = R * 0.035 * (1 + (v % 3) * 0.4);
+      const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+      ctx.moveTo(x + vr, y); ctx.arc(x, y, vr, 0, Math.PI * 2);
+    }
+    ctx.stroke();
+  }));
+  ctx.globalAlpha = 1;
+}
+
+function drawSynapseRing(t, cx, cy, R) {
+  [[1.15, 14, 1], [0.8, 10, -1]].forEach(([f, n, dir], i) => gyro(160 + i, cx, cy, () => {
+    const r = R * f, nodes2 = [];
+    for (let j = 0; j < n; j++) { const a = j / n * Math.PI * 2 + phase * 0.1 * dir; nodes2.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, a]); }
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.5; ctx.beginPath();
+    for (let j = 0; j < n; j++) {
+      const a = nodes2[j], b = nodes2[(j + 1) % n], mid = (a[2] + (b[2] < a[2] ? b[2] + Math.PI * 2 : b[2])) / 2;
+      ctx.moveTo(a[0], a[1]);
+      ctx.quadraticCurveTo(cx + Math.cos(mid) * r * (1.08 + Math.sin(phase * 2 + j) * 0.04), cy + Math.sin(mid) * r * (1.08 + Math.sin(phase * 2 + j) * 0.04), b[0], b[1]);
+    }
+    ctx.stroke();
+    ctx.fillStyle = t.a; ctx.globalAlpha = 0.9; ctx.beginPath();
+    for (const nd of nodes2) { ctx.moveTo(nd[0] + 3.5, nd[1]); ctx.arc(nd[0], nd[1], 3.5, 0, Math.PI * 2); }
+    ctx.fill();
+    // impulses chasing around the loop
+    const sp = (curState() === 'thinking' ? 2.5 : 1) * (1 + level * 2);
+    ctx.fillStyle = '#ffffff'; ctx.shadowColor = t.p; ctx.shadowBlur = 12; ctx.globalAlpha = 1; ctx.beginPath();
+    for (let q = 0; q < 3; q++) {
+      const a = phase * sp * 1.4 * dir + q * 2.094 + phase * 0.1 * dir;
+      ctx.moveTo(cx + Math.cos(a) * r * 1.04 + 3, cy + Math.sin(a) * r * 1.04);
+      ctx.arc(cx + Math.cos(a) * r * 1.04, cy + Math.sin(a) * r * 1.04, 3, 0, Math.PI * 2);
+    }
+    ctx.fill(); ctx.shadowBlur = 0;
+  }));
+  ctx.globalAlpha = 1;
+}
+
+function drawDecayRings(t, cx, cy, R, k) {
+  const r = R * 0.92;
+  gyro(170, cx, cy, () => {
+    ctx.strokeStyle = t.p; ctx.lineWidth = 3; ctx.globalAlpha = 0.8;
+    ctx.setLineDash([6, 8]); ctx.lineDashOffset = -phase * 30;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+    // particles shot out of the ring, flying in the ring's own plane
+    const rate = 0.25 + level * 0.6 + (curState() === 'thinking' ? 0.4 : 0);
+    if (decayParts.length < 60 && Math.random() < rate * k) decayParts.push({ a: Math.random() * Math.PI * 2, d: r, v: 2 + Math.random() * 3, life: 1, c: Math.random() < 0.5 });
+    for (const pp of decayParts) {
+      pp.d += pp.v * k; pp.life -= 0.015 * k;
+      const x = cx + Math.cos(pp.a) * pp.d, y = cy + Math.sin(pp.a) * pp.d;
+      ctx.strokeStyle = pp.c ? t.a : '#ffffff'; ctx.lineWidth = 2; ctx.globalAlpha = Math.max(0, pp.life);
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - Math.cos(pp.a) * 10, y - Math.sin(pp.a) * 10); ctx.stroke();
+    }
+    decayParts = decayParts.filter(pp => pp.life > 0);
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawOrbitals(t, cx, cy, R) {
+  if (!orbitalDots) {
+    orbitalDots = [];
+    for (let i = 0; i < 70; i++) {
+      // points inside a lobe (unit ellipse centered at x = 1)
+      const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random());
+      orbitalDots.push([1 + Math.cos(a) * rr, Math.sin(a) * rr * 0.45, Math.random() * 6]);
+    }
+  }
+  for (let i = 0; i < 3; i++) gyro(180 + i, cx, cy, () => {
+    const L = R * 0.6;
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(i * Math.PI / 3);
+    for (const side of [-1, 1]) {
+      const g = ctx.createRadialGradient(side * L, 0, 0, side * L, 0, L);
+      g.addColorStop(0, (i === 1 ? t.a : t.p) + '55'); g.addColorStop(1, (i === 1 ? t.a : t.p) + '00');
+      ctx.fillStyle = g; ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.ellipse(side * L, 0, L, L * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = '#ffffff';
+    for (const [dx, dy, ph] of orbitalDots) {
+      ctx.globalAlpha = 0.25 + 0.6 * Math.max(0, Math.sin(clock * 3 + ph + i));
+      for (const side of [-1, 1]) ctx.fillRect(side * dx * L - 1, dy * L - 1, 2, 2);
+    }
+    ctx.restore();
+  });
+  ctx.globalAlpha = 1;
 }
 
 // ===== 3D gyroscope =====
@@ -3065,6 +3233,13 @@ function render(dt) {
   if (L.spikes) drawSpikes(t, cx, cy, R);
   if (L.organelles) drawOrganelles(t, cx, cy, R);
   if (L.chromatin) drawChromatin(t, cx, cy, R);
+  if (L.orbitals) drawOrbitals(t, cx, cy, R);
+  if (L.cellrings) drawCellRings(t, cx, cy, R);
+  if (L.plasmatorus) drawPlasmaTorus(t, cx, cy, R);
+  if (L.dnaring) drawDnaRing(t, cx, cy, R);
+  if (L.synapsering) drawSynapseRing(t, cx, cy, R);
+  if (L.decayrings) drawDecayRings(t, cx, cy, R, k);
+  if (L.quarkrings) drawQuarkRings(t, cx, cy, R);
   if (L.rings) drawRings(t, cx, cy, R);
   if (L.sphere) drawSphere(t, cx, cy, R);
   if (L.orbits) drawOrbits(t, cx, cy, R);
@@ -3224,6 +3399,7 @@ function set(k, v) {
 function setScene(name) {
   cfg.scene = name;
   cfg.layers = Object.assign({}, SCENES[name].layers);
+  if (SCENES[name].core) cfg.coreStyle = SCENES[name].core;   // some scenes come with a matching core style
   saveCfg(); updateUI();
 }
 
