@@ -442,7 +442,9 @@ const LAYERS = {
   lightning: 'Lightning', mandala: 'Mandala', circuit: 'Circuit board', fireworks: 'Fireworks', bubbles: 'Bubbles',
   planets: 'Solar system', spiro: 'Spirograph', fireflies: 'Fireflies', comets: 'Comets',
   hudrings: 'HUD core rings', hudpanels: 'HUD side panels', hologlobe: 'Holo globe', targeting: 'Target lock',
-  dataring: 'Data ring', voiceprint: 'Voice print', schematic: 'Blueprint grid', icosa: 'Hyper crystal', glitch: 'Holo glitch'
+  dataring: 'Data ring', voiceprint: 'Voice print', schematic: 'Blueprint grid', icosa: 'Hyper crystal', glitch: 'Holo glitch',
+  membrane: 'Cell membrane', organelles: 'Organelles', chromatin: 'Chromatin', cilia: 'Cilia', spikes: 'Spike proteins',
+  neurons: 'Neurons', mitosis: 'Mitosis'
 };
 // Each scene lists the layers it turns on; everything else is off
 const SCENE_LIST = [
@@ -460,6 +462,17 @@ const SCENE_LIST = [
   ['cyberbrain', 'Cyber Brain', 'sphere circuit hudpanels', 'AI HUD'],
   ['tesseract', 'Tesseract', 'icosa tunnel', 'AI HUD'],
   ['datacore', 'Data Core', 'dataring spectrum hudrings', 'AI HUD'],
+  ['livingcell', 'Living Cell', 'membrane organelles chromatin cilia', 'Living Cell'],
+  ['nucleus', 'Nucleus', 'chromatin membrane beat', 'Living Cell'],
+  ['neuron', 'Neuron', 'neurons chromatin', 'Living Cell'],
+  ['microbe', 'Microbe', 'membrane cilia organelles', 'Living Cell'],
+  ['viruscore', 'Virus Core', 'spikes membrane chromatin', 'Living Cell'],
+  ['mitosis', 'Mitosis', 'membrane mitosis chromatin organelles', 'Living Cell'],
+  ['bioreactor', 'Bio Reactor', 'membrane hudrings organelles', 'Living Cell'],
+  ['synapse', 'Synapse Storm', 'neurons tendrils lightning', 'Living Cell'],
+  ['cybercell', 'Cyber Cell', 'membrane circuit hex spikes', 'Living Cell'],
+  ['livingspark', 'Living Spark', 'chromatin cilia membrane wave', 'Living Cell'],
+  ['plankton', 'Plankton', 'organelles bubbles fireflies membrane', 'Living Cell'],
   ['neural', 'Neural Atom', 'sphere'],
   ['quantum', 'Quantum', 'orbits wave'],
   ['reactor', 'Arc Reactor', 'rings wave'],
@@ -834,6 +847,220 @@ const RINGS = [
   { f: 0.9,  dir: 0.7,  w: 1.6, dash: r => [r * 0.6, r * 0.15, r * 0.05, r * 0.15] },
   { f: 1.08, dir: -0.3, w: 1,   dash: () => [] }
 ];
+// ===== Living cell layers =====
+let cellOrg = [], neuronTrees = [], neuronPulses = [], neuronR = 0, bud = null, budTimer = 4;
+
+function membraneR(a, R) {
+  return R * 0.95 * (1 + 0.06 * Math.sin(3 * a + phase * 0.9) + 0.04 * Math.sin(5 * a - phase * 1.3)
+    + 0.03 * Math.sin(7 * a + phase * 2.1) + level * 0.1 * Math.sin(4 * a + phase * 6));
+}
+
+function blobPath(cx, cy, rf, n) {
+  const pts = [];
+  for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, r = rf(a); pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); }
+  const p = new Path2D();
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  let m = mid(pts[n - 1], pts[0]);
+  p.moveTo(m[0], m[1]);
+  for (let i = 0; i < n; i++) { const c = pts[i], nm = mid(c, pts[(i + 1) % n]); p.quadraticCurveTo(c[0], c[1], nm[0], nm[1]); }
+  p.closePath();
+  return p;
+}
+
+// Breathing cell wall: translucent cytoplasm, bright outer layer and a fainter inner layer
+function drawMembrane(t, cx, cy, R) {
+  const outer = blobPath(cx, cy, a => membraneR(a, R), 48);
+  const g = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.05);
+  g.addColorStop(0, t.a + '10'); g.addColorStop(0.75, t.a + '22'); g.addColorStop(1, t.p + '44');
+  ctx.fillStyle = g; ctx.globalAlpha = 1; ctx.fill(outer);
+  ctx.strokeStyle = t.p; ctx.lineWidth = 9; ctx.globalAlpha = 0.12; ctx.stroke(outer);
+  ctx.lineWidth = 2.4; ctx.globalAlpha = 0.85; ctx.stroke(outer);
+  const inner = blobPath(cx, cy, a => membraneR(a, R) * 0.93, 48);
+  ctx.strokeStyle = t.a; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.45; ctx.stroke(inner);
+  ctx.globalAlpha = 1;
+}
+
+function drawCilia(t, cx, cy, R) {
+  ctx.strokeStyle = t.p; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.6; ctx.lineCap = 'round';
+  ctx.beginPath();
+  const n = 72, len = R * (0.13 + level * 0.08);
+  for (let i = 0; i < n; i++) {
+    const a = i / n * Math.PI * 2, r = membraneR(a, R);
+    const sway = Math.sin(phase * 4 + i * 0.55) * 0.5;
+    const x0 = cx + Math.cos(a) * r, y0 = cy + Math.sin(a) * r;
+    const x1 = cx + Math.cos(a + sway * 0.12) * (r + len), y1 = cy + Math.sin(a + sway * 0.12) * (r + len);
+    const mx = cx + Math.cos(a - sway * 0.1) * (r + len * 0.5), my = cy + Math.sin(a - sway * 0.1) * (r + len * 0.5);
+    ctx.moveTo(x0, y0); ctx.quadraticCurveTo(mx, my, x1, y1);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1; ctx.lineCap = 'butt';
+}
+
+function drawSpikes(t, cx, cy, R) {
+  const n = 20, rot = phase * 0.08;
+  ctx.strokeStyle = t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
+  ctx.beginPath();
+  const tips = [];
+  for (let i = 0; i < n; i++) {
+    const a = rot + i / n * Math.PI * 2, r = membraneR(a, R), l = R * (0.17 + Math.sin(phase * 2 + i) * 0.02);
+    ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+    const tx = cx + Math.cos(a) * (r + l), ty = cy + Math.sin(a) * (r + l);
+    ctx.lineTo(tx, ty); tips.push([tx, ty]);
+  }
+  ctx.stroke();
+  ctx.fillStyle = t.a; ctx.globalAlpha = 0.95;
+  ctx.beginPath();
+  for (const [x, y] of tips) { ctx.moveTo(x + 5, y); ctx.arc(x, y, 5, 0, Math.PI * 2); }
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function buildCell() {
+  cellOrg = [];
+  for (let i = 0; i < 6; i++) cellOrg.push({ k: 'mito', a: Math.random() * 6.3, d: 0.45 + Math.random() * 0.35, sp: (Math.random() - 0.5) * 0.25, rot: Math.random() * 6, rs: (Math.random() - 0.5) * 0.6 });
+  for (let i = 0; i < 14; i++) cellOrg.push({ k: 'ves', a: Math.random() * 6.3, d: 0.3 + Math.random() * 0.55, sp: (Math.random() - 0.5) * 0.4, s: 0.4 + Math.random() * 0.8 });
+  for (let i = 0; i < 46; i++) cellOrg.push({ k: 'rib', a: Math.random() * 6.3, d: 0.3 + Math.random() * 0.6, sp: (Math.random() - 0.5) * 0.5 });
+  neuronR = 0; neuronTrees = []; neuronPulses = []; bud = null;
+}
+
+function drawOrganelles(t, cx, cy, R) {
+  // ribosome specks
+  ctx.fillStyle = t.p; ctx.globalAlpha = 0.6;
+  ctx.beginPath();
+  for (const o of cellOrg) {
+    if (o.k !== 'rib') continue;
+    const a = o.a + phase * o.sp, r = o.d * membraneR(a, R) * 0.92;
+    ctx.rect(cx + Math.cos(a) * r - 1, cy + Math.sin(a) * r - 1, 2, 2);
+  }
+  ctx.fill();
+  // vesicles
+  ctx.strokeStyle = t.a; ctx.lineWidth = 1.3; ctx.globalAlpha = 0.7;
+  ctx.beginPath();
+  for (const o of cellOrg) {
+    if (o.k !== 'ves') continue;
+    const a = o.a + phase * o.sp * 0.6, r = o.d * membraneR(a, R) * 0.9, vr = R * 0.05 * o.s * (1 + Math.sin(phase * 2 + o.a) * 0.15);
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r;
+    ctx.moveTo(x + vr, y); ctx.arc(x, y, vr, 0, Math.PI * 2);
+  }
+  ctx.stroke();
+  // mitochondria: glowing capsules with folded inner membranes
+  for (const o of cellOrg) {
+    if (o.k !== 'mito') continue;
+    const a = o.a + phase * o.sp * 0.4, r = o.d * membraneR(a, R) * 0.88;
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r, L = R * 0.2, Wd = R * 0.08;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(o.rot + phase * o.rs * 0.3);
+    ctx.fillStyle = t.a; ctx.globalAlpha = 0.18;
+    ctx.beginPath(); ctx.ellipse(0, 0, L / 2, Wd / 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.85; ctx.stroke();
+    ctx.lineWidth = 1; ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    for (let j = 0; j <= 10; j++) { const xx = -L * 0.38 + j / 10 * L * 0.76, yy = (j % 2 ? 1 : -1) * Wd * 0.3; j ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); }
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// Tangled glowing gene strands around the nucleus
+function drawChromatin(t, cx, cy, R) {
+  ctx.lineWidth = 1.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (let s2 = 0; s2 < 4; s2++) {
+    ctx.strokeStyle = s2 % 2 ? t.a : t.p; ctx.globalAlpha = 0.65;
+    ctx.beginPath();
+    for (let j = 0; j <= 90; j++) {
+      const a = j / 90 * Math.PI * 2;
+      const r = R * (0.2 + 0.09 * Math.sin(a * (3 + s2) + phase * (0.6 + s2 * 0.2) + s2 * 1.7) + 0.05 * Math.sin(a * 7 - phase * 1.1 + s2) + level * 0.06 * Math.sin(a * 9 + phase * 8));
+      const x = cx + Math.cos(a + s2 * 0.4) * r, y = cy + Math.sin(a + s2 * 0.4) * r;
+      j ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+}
+
+// Branching dendrites with electrical impulses racing outward
+function growTree(x, y, a, len, depth, out, path) {
+  const ex = x + Math.cos(a) * len, ey = y + Math.sin(a) * len;
+  const seg = { x1: x, y1: y, x2: ex, y2: ey, d: depth };
+  out.segs.push(seg);
+  const p2 = path.concat([seg]);
+  if (depth >= 3) { out.paths.push(p2); return; }
+  const kids = 2 + (Math.random() < 0.4 ? 1 : 0);
+  for (let k = 0; k < kids; k++) growTree(ex, ey, a + (Math.random() - 0.5) * 1.1, len * (0.62 + Math.random() * 0.15), depth + 1, out, p2);
+}
+function drawNeurons(t, cx, cy, R, k) {
+  if (Math.abs(neuronR - R) > 2 || !neuronTrees.length) {
+    neuronR = R; neuronTrees = [];
+    for (let i = 0; i < 7; i++) {
+      const a = i / 7 * Math.PI * 2 + Math.random() * 0.4, tr = { segs: [], paths: [], a: a };
+      growTree(Math.cos(a) * R * 0.32, Math.sin(a) * R * 0.32, a, R * 0.42, 0, tr, []);
+      neuronTrees.push(tr);
+    }
+    neuronPulses = [];
+  }
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.sin(phase * 0.2) * 0.08);
+  ctx.lineCap = 'round';
+  for (let d = 0; d < 4; d++) {
+    ctx.strokeStyle = d % 2 ? t.a : t.p; ctx.lineWidth = 3 - d * 0.6; ctx.globalAlpha = 0.45 - d * 0.06;
+    ctx.beginPath();
+    for (const tr of neuronTrees) for (const s2 of tr.segs) if (s2.d === d) { ctx.moveTo(s2.x1, s2.y1); ctx.lineTo(s2.x2, s2.y2); }
+    ctx.stroke();
+  }
+  // impulses
+  const rate = curState() === 'thinking' ? 0.25 : 0.06 + level * 0.2;
+  if (neuronPulses.length < 24 && Math.random() < rate * k) {
+    const tr = pick(neuronTrees);
+    neuronPulses.push({ path: pick(tr.paths), f: 0 });
+  }
+  ctx.fillStyle = '#ffffff'; ctx.shadowColor = t.p; ctx.shadowBlur = 10; ctx.globalAlpha = 1;
+  ctx.beginPath();
+  neuronPulses = neuronPulses.filter(pl => {
+    pl.f += 0.025 * k * (curState() === 'thinking' ? 2 : 1);
+    if (pl.f >= pl.path.length) return false;
+    const s2 = pl.path[Math.floor(pl.f)], u = pl.f % 1;
+    const x = s2.x1 + (s2.x2 - s2.x1) * u, y = s2.y1 + (s2.y2 - s2.y1) * u;
+    ctx.moveTo(x + 2.6, y); ctx.arc(x, y, 2.6, 0, Math.PI * 2);
+    return true;
+  });
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.globalAlpha = 1; ctx.lineCap = 'butt';
+  ctx.restore();
+}
+
+// Every so often the cell buds off a little daughter cell that pinches off and drifts away
+function drawMitosis(t, cx, cy, R, k) {
+  budTimer -= 0.016 * k;
+  if (!bud && budTimer <= 0) bud = { a: Math.random() * Math.PI * 2, f: 0 };
+  if (!bud) return;
+  bud.f += 0.0045 * k;
+  const f = bud.f, a = bud.a;
+  const grow = Math.min(1, f / 0.45);                 // bud swells
+  const out = f < 0.45 ? grow * 0.5 : 0.5 + (f - 0.45) * 1.8;   // then pinches off and drifts
+  const br = R * 0.32 * grow;
+  const base = membraneR(a, R);
+  const bx = cx + Math.cos(a) * (base + br * 0.6 + R * out), by = cy + Math.sin(a) * (base + br * 0.6 + R * out);
+  const fade = f < 0.75 ? 1 : Math.max(0, 1 - (f - 0.75) / 0.25);
+  // neck connecting the bud while it's still attached
+  if (f < 0.6) {
+    const nx = cx + Math.cos(a) * base, ny = cy + Math.sin(a) * base, pinch = 1 - Math.max(0, (f - 0.35) / 0.25);
+    const nw = br * 0.55 * pinch, px = -Math.sin(a), py = Math.cos(a);
+    ctx.fillStyle = t.a + '33'; ctx.strokeStyle = t.p; ctx.lineWidth = 1.6; ctx.globalAlpha = 0.8 * fade;
+    ctx.beginPath();
+    ctx.moveTo(nx + px * nw, ny + py * nw); ctx.quadraticCurveTo((nx + bx) / 2 + px * nw * 0.4, (ny + by) / 2 + py * nw * 0.4, bx + px * br * 0.7, by + py * br * 0.7);
+    ctx.lineTo(bx - px * br * 0.7, by - py * br * 0.7);
+    ctx.quadraticCurveTo((nx + bx) / 2 - px * nw * 0.4, (ny + by) / 2 - py * nw * 0.4, nx - px * nw, ny - py * nw);
+    ctx.fill(); ctx.stroke();
+  }
+  if (br > 1) {
+    const p = blobPath(bx, by, aa => br * (1 + 0.08 * Math.sin(3 * aa + phase * 2) + 0.05 * Math.sin(5 * aa - phase * 3)), 24);
+    ctx.fillStyle = t.a + '30'; ctx.globalAlpha = fade; ctx.fill(p);
+    ctx.strokeStyle = t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.9 * fade; ctx.stroke(p);
+    if (coreSprite) { ctx.globalAlpha = 0.8 * fade; const cs = br * 1.1; ctx.drawImage(coreSprite, bx - cs / 2, by - cs / 2, cs, cs); }
+  }
+  ctx.globalAlpha = 1;
+  if (f >= 1) { bud = null; budTimer = rnd(6, 12); }
+}
+
 // ===== 3D gyroscope =====
 // Draws a flat ring layer as if its plane were tilted in 3D: each ring gets its own
 // tilt axis that slowly turns, so circles swing into ellipses and back like gimbals.
@@ -2659,6 +2886,13 @@ function render(dt) {
   if (L.schematic) drawSchematic(t, k);
   if (L.warp) drawWarp(t, k, cx, cy);
   drawParticles(t, k);
+  if (L.neurons) drawNeurons(t, cx, cy, R, k);
+  if (L.mitosis) drawMitosis(t, cx, cy, R, k);
+  if (L.membrane) drawMembrane(t, cx, cy, R);
+  if (L.cilia) drawCilia(t, cx, cy, R);
+  if (L.spikes) drawSpikes(t, cx, cy, R);
+  if (L.organelles) drawOrganelles(t, cx, cy, R);
+  if (L.chromatin) drawChromatin(t, cx, cy, R);
   if (L.rings) drawRings(t, cx, cy, R);
   if (L.sphere) drawSphere(t, cx, cy, R);
   if (L.orbits) drawOrbits(t, cx, cy, R);
@@ -3601,6 +3835,7 @@ buildStars();
 buildExtras();
 buildMotion();
 buildHud();
+buildCell();
 buildSnow();
 if (!isWall) buildUI();
 updateUI();
