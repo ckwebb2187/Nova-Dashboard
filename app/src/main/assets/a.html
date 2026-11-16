@@ -113,6 +113,46 @@ textarea.inp{min-height:70px;resize:vertical;}
 .cswatch.act{border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,0.4);}
 #clockColor{width:34px;height:34px;border:0;background:none;padding:0;}
 #clock{position:fixed;left:0;right:0;z-index:5;text-align:center;pointer-events:none;color:var(--c);transition:top .3s,bottom .3s,opacity .3s;}
+/* clock animations */
+#clockTime,#clockDate{position:relative;}
+#clock.ca-pulse #clockTime{animation:ckPulse 3s ease-in-out infinite;}
+@keyframes ckPulse{50%{transform:scale(1.07);filter:brightness(1.35);}}
+#clock.ca-flicker #clockTime{animation:ckFlicker 5s linear infinite;}
+@keyframes ckFlicker{0%,45%,49%,53%,100%{opacity:1;}47%,51%{opacity:.25;}}
+#clock.ca-glitch #clockTime{animation:ckGlitch 3s steps(1) infinite;}
+@keyframes ckGlitch{0%,88%,100%{transform:none;text-shadow:inherit;}90%{transform:translate(3px,-1px) skewX(-8deg);text-shadow:-3px 0 #f43f5e,3px 0 #22d3ee;}93%{transform:translate(-3px,1px);text-shadow:3px 0 #f43f5e,-3px 0 #22d3ee;}96%{transform:translate(1px,0) skewX(6deg);}}
+#clock.ca-float #clockTime,#clock.ca-float #clockDate{animation:ckFloat 4.5s ease-in-out infinite;}
+#clock.ca-float #clockDate{animation-delay:-.6s;}
+@keyframes ckFloat{50%{transform:translateY(-9px);}}
+#clock.ca-wave #clockTime span{display:inline-block;animation:ckWave 2.2s ease-in-out infinite;animation-delay:calc(var(--i) * .13s);}
+@keyframes ckWave{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-10px);}}
+#clock.ca-flip #clockTime.flip{animation:ckFlip .65s ease-out;}
+@keyframes ckFlip{0%{transform:perspective(400px) rotateX(90deg);opacity:0;}100%{transform:none;opacity:1;}}
+#clock.ca-rainbow #clockTime,#clock.ca-rainbow #clockDate{animation:ckHue 6s linear infinite;}
+@keyframes ckHue{to{filter:hue-rotate(360deg);}}
+/* clock auras (pure CSS, cheap) */
+#clockAura{position:absolute;left:50%;top:50%;width:calc(250px * var(--cs));height:calc(130px * var(--cs));transform:translate(-50%,-50%);pointer-events:none;z-index:-1;display:none;}
+#clock.au-halo #clockAura{display:block;background:radial-gradient(ellipse at center,var(--c) 0%,transparent 68%);opacity:.5;animation:auPulse 4s ease-in-out infinite;}
+@keyframes auPulse{50%{opacity:.8;transform:translate(-50%,-50%) scale(1.08);}}
+#clock.au-ring #clockAura{display:block;border:2px dashed var(--c);border-radius:50%;box-shadow:0 0 18px var(--c),inset 0 0 18px var(--c2);opacity:.6;animation:auSpin 14s linear infinite;}
+@keyframes auSpin{to{transform:translate(-50%,-50%) rotate(360deg);}}
+#clock.au-rays #clockAura{display:block;width:calc(300px * var(--cs));height:calc(300px * var(--cs));border-radius:50%;background:repeating-conic-gradient(var(--c) 0deg 5deg,transparent 5deg 18deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 68%);mask:radial-gradient(circle,#000 18%,transparent 68%);opacity:.35;animation:auSpin 22s linear infinite;}
+#clock.au-orbit #clockAura{display:block;border:1px solid var(--c);border-radius:50%;opacity:.8;box-shadow:0 0 10px var(--c);}
+#clock.au-orbit #clockAura::before,#clock.au-orbit #clockAura::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:#fff;box-shadow:0 0 12px var(--c),0 0 24px var(--c);animation:auOrbit 3.2s linear infinite;}
+#clock.au-orbit #clockAura::after{background:var(--c2);animation-duration:5.1s;animation-direction:reverse;}
+@keyframes auOrbit{from{transform:rotate(0) translateX(calc(125px * var(--cs))) scaleY(2);}to{transform:rotate(360deg) translateX(calc(125px * var(--cs))) scaleY(2);}}
+#clock.au-plasma #clockAura{display:block;width:calc(280px * var(--cs));background:radial-gradient(circle at 30% 50%,var(--c) 0%,transparent 42%),radial-gradient(circle at 70% 50%,var(--c2) 0%,transparent 42%);filter:blur(16px);opacity:.55;animation:auPlasma 7s ease-in-out infinite;}
+@keyframes auPlasma{33%{transform:translate(-50%,-50%) rotate(120deg) scale(1.1);}66%{transform:translate(-50%,-50%) rotate(240deg) scale(.92);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+#clock.au-scan #clockAura{display:block;border-top:1px solid var(--c);border-bottom:1px solid var(--c);overflow:hidden;opacity:.85;}
+#clock.au-scan #clockAura::before{content:'';position:absolute;left:0;right:0;height:30%;background:linear-gradient(to bottom,transparent,var(--c),transparent);opacity:.35;animation:auScan 2.6s ease-in-out infinite;}
+@keyframes auScan{0%{top:-30%;}100%{top:100%;}}
+#clock.au-frame #clockAura{display:block;opacity:.9;background:
+  linear-gradient(var(--c),var(--c)) top left/22px 2px no-repeat,linear-gradient(var(--c),var(--c)) top left/2px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) top right/22px 2px no-repeat,linear-gradient(var(--c),var(--c)) top right/2px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) bottom left/22px 2px no-repeat,linear-gradient(var(--c),var(--c)) bottom left/2px 22px no-repeat,
+  linear-gradient(var(--c),var(--c)) bottom right/22px 2px no-repeat,linear-gradient(var(--c),var(--c)) bottom right/2px 22px no-repeat;
+  filter:drop-shadow(0 0 6px var(--c));animation:auBlink 3s ease-in-out infinite;}
+@keyframes auBlink{50%{opacity:.45;}}
 body.drawer-open #clock,body.drawer-open .hud-top,body.drawer-open #hotkeys,body.drawer-open .quick-dock{opacity:0;pointer-events:none;}
 #clock.pos-top{top:13%;}
 #clock.pos-middle{top:50%;transform:translateY(-50%);}
@@ -136,7 +176,7 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
 <canvas id="bgCanvas"></canvas>
 <div id="scan"></div>
 
-<div id="clock"><div id="clockTime"></div><div id="clockDate"></div></div>
+<div id="clock"><div id="clockAura"></div><div id="clockTime"></div><div id="clockDate"></div></div>
 
 <div class="hud-top">
   <div class="pill" id="statePill"><span class="dot" id="stateDot"></span><span id="stateLabel">IDLE</span></div>
@@ -199,6 +239,46 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
       </div>
       <div class="mini-label">Eyes</div>
       <div class="chips" id="eyeBtns"></div>
+      <div class="mini-label">Eye tuning</div>
+      <div class="slider-row"><span>Size</span><input type="range" data-eye-rng="size" min="0.5" max="1.9" step="0.05"><b></b></div>
+      <div class="slider-row"><span>Spacing</span><input type="range" data-eye-rng="gap" min="0.5" max="1.7" step="0.05"><b></b></div>
+      <div class="slider-row"><span>Height</span><input type="range" data-eye-rng="height" min="0.4" max="1.7" step="0.05"><b></b></div>
+      <div class="slider-row"><span>Glow</span><input type="range" data-eye-rng="glow" min="0.3" max="3.5" step="0.1"><b></b></div>
+      <div class="slider-row"><span>Tilt</span><input type="range" data-eye-rng="tilt" min="-0.6" max="0.6" step="0.05"><b></b></div>
+      <div class="mini-label">Eye color</div>
+      <div class="chips">
+        <button class="opt-btn" data-eye-opt="color" data-val="accent">Theme accent</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="primary">Theme main</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="white">White</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="ice">Ice</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="toxic">Toxic</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="fire">Fire</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="rainbow">Rainbow</button>
+        <button class="opt-btn" data-eye-opt="color" data-val="custom">Custom</button>
+        <input type="color" id="eyeColor" style="width:34px;height:30px;border:0;background:none;padding:0">
+      </div>
+      <div class="mini-label">Pupils</div>
+      <div class="chips">
+        <button class="opt-btn" data-eye-opt="pupil" data-val="auto">Auto</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="none">None</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="dot">Dot</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="slit">Slit</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="ring">Ring</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="star">Star</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="heart">Heart</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="cross">Cross</button>
+        <button class="opt-btn" data-eye-opt="pupil" data-val="spiral">Spiral</button>
+      </div>
+      <div class="mini-label">Blinking &amp; extras</div>
+      <div class="chips">
+        <button class="opt-btn" data-eye-opt="blink" data-val="normal">Normal blink</button>
+        <button class="opt-btn" data-eye-opt="blink" data-val="rapid">Rapid</button>
+        <button class="opt-btn" data-eye-opt="blink" data-val="sleepy">Slow &amp; sleepy</button>
+        <button class="opt-btn" data-eye-opt="blink" data-val="never">Never</button>
+        <button class="opt-btn" data-eye-tog="lashes">Lashes</button>
+        <button class="opt-btn" data-eye-tog="brows">Brows</button>
+        <button class="opt-btn" id="eyeReset">Reset eyes</button>
+      </div>
       <div class="mini-label">Try an expression</div>
       <div class="chips" id="moodBtns"></div>
     </details>
@@ -265,6 +345,30 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
     <div class="grid-2">
       <button class="opt-btn" data-clk="on" data-val="true">Clock on</button>
       <button class="opt-btn" data-clk="on" data-val="false">Clock off</button>
+    </div>
+
+    <div class="sec-label">Clock animation</div>
+    <div class="chips">
+      <button class="opt-btn" data-clk="anim" data-val="none">None</button>
+      <button class="opt-btn" data-clk="anim" data-val="pulse">Pulse</button>
+      <button class="opt-btn" data-clk="anim" data-val="flicker">Neon flicker</button>
+      <button class="opt-btn" data-clk="anim" data-val="glitch">Glitch</button>
+      <button class="opt-btn" data-clk="anim" data-val="float">Float</button>
+      <button class="opt-btn" data-clk="anim" data-val="wave">Wave</button>
+      <button class="opt-btn" data-clk="anim" data-val="flip">Tick flip</button>
+      <button class="opt-btn" data-clk="anim" data-val="rainbow">Rainbow</button>
+    </div>
+
+    <div class="sec-label">Clock aura</div>
+    <div class="chips">
+      <button class="opt-btn" data-clk="aura" data-val="none">None</button>
+      <button class="opt-btn" data-clk="aura" data-val="halo">Glow halo</button>
+      <button class="opt-btn" data-clk="aura" data-val="ring">Spinning ring</button>
+      <button class="opt-btn" data-clk="aura" data-val="rays">Light rays</button>
+      <button class="opt-btn" data-clk="aura" data-val="orbit">Orbiting sparks</button>
+      <button class="opt-btn" data-clk="aura" data-val="plasma">Plasma cloud</button>
+      <button class="opt-btn" data-clk="aura" data-val="scan">Scan bar</button>
+      <button class="opt-btn" data-clk="aura" data-val="frame">HUD frame</button>
     </div>
 
     <div class="sec-label">Clock style</div>
@@ -455,7 +559,20 @@ const THEMES = {
   hud:       { p: '#00e5ff', a: '#ffb703' },
   hologram:  { p: '#67e8f9', a: '#c084fc' },
   stealth:   { p: '#cbd5e1', a: '#f43f5e' },
-  ultron:    { p: '#ff3b3b', a: '#ffd166' }
+  ultron:    { p: '#ff3b3b', a: '#ffd166' },
+  // more colors
+  neonpink:  { p: '#ff2d95', a: '#7c3aed' },
+  lime:      { p: '#a3e635', a: '#22d3ee' },
+  midnight:  { p: '#818cf8', a: '#1e40af' },
+  cobalt:    { p: '#3b82f6', a: '#06b6d4' },
+  coral:     { p: '#fb7185', a: '#fdba74' },
+  lavender:  { p: '#c4b5fd', a: '#f0abfc' },
+  mint:      { p: '#6ee7b7', a: '#a7f3d0' },
+  amber:     { p: '#fbbf24', a: '#f59e0b' },
+  blood:     { p: '#ef4444', a: '#7f1d1d' },
+  ocean:     { p: '#0ea5e9', a: '#14b8a6' },
+  sakura:    { p: '#f9a8d4', a: '#fbcfe8' },
+  cyber:     { p: '#fde047', a: '#ec4899' }
 };
 const STATES = {
   idle:      { label: 'IDLE',      rate: 0.6, dot: '#10b981' },
@@ -477,7 +594,9 @@ const LAYERS = {
   membrane: 'Cell membrane', organelles: 'Organelles', chromatin: 'Chromatin', cilia: 'Cilia', spikes: 'Spike proteins',
   neurons: 'Neurons', mitosis: 'Mitosis',
   quarkrings: 'Quark rings', plasmatorus: 'Plasma torus', dnaring: 'DNA ring', cellrings: 'Cell rings',
-  synapsering: 'Synapse ring', decayrings: 'Decay rings', orbitals: 'Electron orbitals'
+  synapsering: 'Synapse ring', decayrings: 'Decay rings', orbitals: 'Electron orbitals',
+  beadring: 'Bead chain', hexband: 'Hex band', saturn: 'Saturn disc', boltring: 'Lightning ring', triring: 'Tri rings',
+  godrays: 'Light rays', skyline: 'Neon city', rainfall: 'Rainstorm', petals: 'Sakura petals', crystals: 'Crystal cave', clouds: 'Drifting clouds'
 };
 // Each scene lists the layers it turns on; everything else is off
 const SCENE_LIST = [
@@ -514,6 +633,20 @@ const SCENE_LIST = [
   ['decayreactor', 'Decay Reactor', 'decayrings plasmatorus hudrings', 'Nuclear Gyro', 'crystal'],
   ['quantumspin', 'Quantum Spin', 'orbitals dnaring quarkrings', 'Nuclear Gyro', 'plasma'],
   ['biogyro', 'Bio Gyro', 'cellrings synapsering chromatin', 'Nuclear Gyro', 'jelly'],
+  ['protein', 'Protein Chain', 'beadring dnaring', 'Nuclear Gyro', 'honeycomb'],
+  ['ringworld', 'Ringworld', 'saturn quarkrings', 'Nuclear Gyro', 'galaxycore'],
+  ['tesla', 'Tesla Gyro', 'boltring plasmatorus', 'Nuclear Gyro', 'spark'],
+  ['hexforge', 'Hex Forge', 'hexband triring', 'Nuclear Gyro', 'magma'],
+  ['stormeye', 'Storm Eye', 'triring boltring orbitals', 'Nuclear Gyro', 'vortex'],
+  ['solarcore', 'Solar Core', 'saturn beadring', 'Nuclear Gyro', 'sun'],
+  ['sunkentemple', 'Sunken Temple', 'godrays bubbles fireflies', 'Habitats'],
+  ['neoncity', 'Neon City', 'skyline grid rain', 'Habitats'],
+  ['rainynight', 'Rainy Night', 'rainfall skyline', 'Habitats'],
+  ['sakura', 'Sakura Garden', 'petals fireflies', 'Habitats'],
+  ['crystalcave', 'Crystal Cave', 'crystals fireflies', 'Habitats', 'crystal'],
+  ['stormcity', 'Storm City', 'skyline lightning rainfall', 'Habitats'],
+  ['deepocean', 'Deep Ocean', 'godrays ocean bubbles', 'Habitats', 'jelly'],
+  ['skyrealm', 'Sky Realm', 'clouds godrays petals', 'Habitats'],
   ['neural', 'Neural Atom', 'sphere'],
   ['quantum', 'Quantum', 'orbits wave'],
   ['reactor', 'Arc Reactor', 'rings wave'],
@@ -585,7 +718,7 @@ const CLOCK_STYLES = {
   bold:    { label: 'Bold',    font: 'heavy', glow: false, size: 1.3, secs: false, date: true },
   classic: { label: 'Classic', font: 'serif', glow: false, size: 1.1, secs: false, date: true }
 };
-const CLOCK_DEFAULTS = { on: true, style: 'neon', pos: 'top', h24: false, secs: false, date: true, glow: true, font: 'sans', size: 1, color: 'theme' };
+const CLOCK_DEFAULTS = { anim: 'none', aura: 'halo', on: true, style: 'neon', pos: 'top', h24: false, secs: false, date: true, glow: true, font: 'sans', size: 1, color: 'theme' };
 const CAPTION_DEFAULTS = { style: 'bubble', pos: 'bottom', font: 'sans', color: 'theme', size: 1, secs: 12, you: true };
 const CAPTION_FONTS = {
   thin:  { f: 'inherit', w: 200, s: 'normal' },
@@ -610,7 +743,7 @@ const DEFAULT_COMMANDS = [
 ];
 const DEFAULTS = {
   theme: 'cyan', ai: 'gemini', state: 'idle', speed: 1, particles: 120, arcs: 0.35, size: 1,
-  quality: 'balanced', camera: 'drift', gyro: 'full', persona: 'quirky', face: true, eyes: 'capsule', coreStyle: 'nucleus', touch: 'random', snow: 0, scene: 'neural', layers: Object.assign({}, SCENES.neural.layers)
+  quality: 'balanced', camera: 'drift', gyro: 'full', persona: 'quirky', face: true, eyes: 'capsule', eye: {}, coreStyle: 'nucleus', touch: 'random', snow: 0, scene: 'neural', layers: Object.assign({}, SCENES.neural.layers)
 };
 const KEY = 'novaApexCfg';
 const KEYS_KEY = 'novaApexKeys';
@@ -638,7 +771,7 @@ function loadCfg() {
     c.snowCmds = true;
     DEFAULT_COMMANDS.filter(d => /snow/i.test(d.a) && !c.commands.some(x => x.p === d.p)).forEach(d => c.commands.push(Object.assign({}, d)));
   }
-  if (!THEMES[c.theme]) c.theme = DEFAULTS.theme;
+  if (!THEMES[c.theme] && !DYNAMIC_THEMES[c.theme]) c.theme = DEFAULTS.theme;
   if (!STATES[c.state]) c.state = DEFAULTS.state;
   if (!QUALITY[c.quality]) c.quality = DEFAULTS.quality;
   return c;
@@ -666,7 +799,32 @@ let live = null;                    // temporary state while talking (listening/
 let renderScale = 1;                // drops automatically if the phone can't keep up
 let coreSprite = null, gridGrad = null, spriteTheme = '';
 
-function th() { return THEMES[cfg.theme]; }
+// Animated themes: colors drift over time (rebuilt in small hue steps so caches stay cheap)
+const DYNAMIC_THEMES = {
+  rainbow: { name: 'Rainbow',      css: 'conic-gradient(#f43f5e,#f59e0b,#84cc16,#06b6d4,#8b5cf6,#f43f5e)', f: x => [x * 360, x * 360 + 150] },
+  shift:   { name: 'Aurora shift', css: 'linear-gradient(135deg,#34d399,#22d3ee,#a78bfa)', f: x => [150 + Math.sin(x * 6.28) * 40, 280 + Math.sin(x * 6.28 + 1) * 30] },
+  firecyc: { name: 'Fire cycle',   css: 'linear-gradient(135deg,#ef4444,#f59e0b,#fde047)', f: x => [15 + Math.sin(x * 6.28) * 18, 40 + Math.sin(x * 6.28 + 2) * 15] },
+  oceancyc:{ name: 'Ocean drift',  css: 'linear-gradient(135deg,#0ea5e9,#14b8a6,#6366f1)', f: x => [195 + Math.sin(x * 6.28) * 25, 240 + Math.sin(x * 6.28 + 1.5) * 25] }
+};
+let dynCache = { key: '' };
+function hslHex(h, s2, l) {
+  h = ((h % 360) + 360) % 360; s2 /= 100; l /= 100;
+  const k = n => (n + h / 30) % 12, a = s2 * Math.min(l, 1 - l);
+  const f = n => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))))).toString(16).padStart(2, '0');
+  return '#' + f(0) + f(8) + f(4);
+}
+function th() {
+  const d = DYNAMIC_THEMES[cfg.theme];
+  if (!d) return THEMES[cfg.theme] || THEMES.cyan;
+  const step = Math.floor(clock / 0.8);                 // a new color step every 0.8 s
+  const key = cfg.theme + ':' + step;
+  if (dynCache.key !== key) {
+    const [h1, h2] = d.f((step * 0.8 / 30) % 1);       // one full cycle every 30 s
+    dynCache = { key: key, p: hslHex(h1, 90, 62), a: hslHex(h2, 85, 58) };
+  }
+  return dynCache;
+}
+function themeKey() { return DYNAMIC_THEMES[cfg.theme] ? (th(), dynCache.key) : cfg.theme; }
 function Q() { return QUALITY[cfg.quality]; }
 function curState() { return live || cfg.state; }
 
@@ -681,7 +839,7 @@ function resize() {
 // Things that only change with the theme are drawn once and reused every frame
 function buildThemeCache() {
   const t = th();
-  spriteTheme = cfg.theme;
+  spriteTheme = themeKey();
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const x = c.getContext('2d');
@@ -695,6 +853,8 @@ function buildThemeCache() {
   coreSprite = c;
   gridGrad = null;
   document.documentElement.style.setProperty('--a33', t.a + '33');
+  document.documentElement.style.setProperty('--p', t.p);
+  if (DYNAMIC_THEMES[cfg.theme] && typeof styleClock === 'function') { styleClock(); styleCaption(); }
   document.documentElement.style.setProperty('--p1f', t.p + '1f');
 }
 
@@ -1105,7 +1265,8 @@ function drawMitosis(t, cx, cy, R, k) {
 // ===== Core styles: Nova's own inner structure (moves with its personality) =====
 const CORE_STYLES = {
   nucleus: 'Nucleus', spark: 'Living spark', cell: 'Mini cell', plasma: 'Plasma orb',
-  jelly: 'Jelly', atom: 'Atom', crystal: 'Crystal', glow: 'Classic glow'
+  jelly: 'Jelly', atom: 'Atom', crystal: 'Crystal', vortex: 'Vortex', magma: 'Magma', honeycomb: 'Honeycomb',
+  sun: 'Sun', galaxycore: 'Galaxy', circuitcore: 'Circuit', glow: 'Classic glow'
 };
 let coreEmbers = null, coreBubbles = null;
 
@@ -1264,6 +1425,108 @@ function drawCoreInner(t, cx, cy) {
     ctx.beginPath(); ctx.moveTo(gx, gy - 6); ctx.lineTo(gx + 2, gy); ctx.lineTo(gx, gy + 6); ctx.lineTo(gx - 2, gy); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(gx - 6, gy); ctx.lineTo(gx, gy + 2); ctx.lineTo(gx + 6, gy); ctx.lineTo(gx, gy - 2); ctx.closePath(); ctx.fill();
     ctx.shadowBlur = 0;
+  }
+
+  else if (style === 'vortex') {
+    // a swirling eye-of-the-storm whirlpool
+    for (let k = 0; k < 5; k++) {
+      ctx.strokeStyle = k % 2 ? t.a : t.p; ctx.lineWidth = 2.2 - k * 0.25; ctx.globalAlpha = 0.75;
+      ctx.beginPath();
+      for (let j = 0; j <= 40; j++) {
+        const f = j / 40, a = T * (2.2 + level * 3) + k * 1.257 + f * 5.5, rr = r * 1.25 * Math.pow(f, 0.8);
+        j ? ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.85) : ctx.moveTo(cx, cy);
+      }
+      ctx.stroke();
+    }
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.ellipse(cx, cy, r * 1.25, r * 1.06, T * 0.3, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  else if (style === 'magma') {
+    // lava blobs rolling inside a cracked molten shell
+    const shell = blobPath(cx, cy, a => r * 1.18 * (1 + 0.05 * Math.sin(5 * a + T * 1.2)), 24);
+    ctx.fillStyle = '#7f1d1d55'; ctx.fill(shell);
+    for (let i = 0; i < 6; i++) {
+      const a = T * (0.4 + i * 0.07) + i * 1.05, rr = r * (0.35 + 0.35 * Math.sin(T * 0.6 + i)), br = r * (0.28 + 0.08 * Math.sin(T * 2 + i));
+      const g = ctx.createRadialGradient(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 0, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, br);
+      g.addColorStop(0, '#fde047'); g.addColorStop(0.5, '#f97316cc'); g.addColorStop(1, '#ef444400');
+      ctx.fillStyle = g; ctx.globalAlpha = 0.85;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, br, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    for (let i = 0; i < 7; i++) { const a = i * 0.9 + 0.3, r1 = r * 0.5, r2 = r * 1.15; ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); ctx.lineTo(cx + Math.cos(a + 0.15) * (r1 + r2) / 2, cy + Math.sin(a + 0.15) * (r1 + r2) / 2); ctx.lineTo(cx + Math.cos(a - 0.05) * r2, cy + Math.sin(a - 0.05) * r2); }
+    ctx.stroke();
+    ctx.strokeStyle = t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.9; ctx.stroke(shell);
+  }
+
+  else if (style === 'honeycomb') {
+    // glowing hex cells that light up in a ripple
+    const s2 = r * 0.28;
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r * 1.2, 0, Math.PI * 2); ctx.clip();
+    for (let q = -4; q <= 4; q++) for (let w2 = -4; w2 <= 4; w2++) {
+      const x = cx + s2 * 1.5 * q, y = cy + s2 * Math.sqrt(3) * (w2 + q / 2), d = Math.hypot(x - cx, y - cy);
+      if (d > r * 1.3) continue;
+      const lit = Math.max(0, Math.sin(d / r * 4 - T * 3 - level * 4));
+      ctx.beginPath();
+      for (let j = 0; j <= 6; j++) { const a = j / 6 * Math.PI * 2; j ? ctx.lineTo(x + Math.cos(a) * s2 * 0.9, y + Math.sin(a) * s2 * 0.9) : ctx.moveTo(x + s2 * 0.9, y); }
+      ctx.fillStyle = t.a; ctx.globalAlpha = 0.1 + lit * 0.45; ctx.fill();
+      ctx.strokeStyle = t.p; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.35 + lit * 0.6; ctx.stroke();
+    }
+    ctx.restore();
+    ctx.strokeStyle = t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.arc(cx, cy, r * 1.2, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  else if (style === 'sun') {
+    // a tiny star: flaring corona rays and slow surface granules
+    ctx.strokeStyle = t.a; ctx.lineWidth = 2;
+    for (let i = 0; i < 18; i++) {
+      const a = i / 18 * Math.PI * 2 + T * 0.2, len = r * (0.35 + 0.25 * Math.sin(T * 3 + i * 1.7) + level * 0.4);
+      ctx.globalAlpha = 0.5 + 0.4 * Math.sin(T * 2 + i);
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r * 1.05, cy + Math.sin(a) * r * 1.05); ctx.lineTo(cx + Math.cos(a) * (r * 1.05 + len), cy + Math.sin(a) * (r * 1.05 + len)); ctx.stroke();
+    }
+    ctx.fillStyle = t.p; ctx.globalAlpha = 0.5; ctx.beginPath();
+    for (let i = 0; i < 14; i++) { const a = i * 2.4 + T * 0.15, rr = r * (0.2 + (i % 4) * 0.2), gs = r * 0.08; ctx.moveTo(cx + Math.cos(a) * rr + gs, cy + Math.sin(a) * rr); ctx.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, gs, 0, Math.PI * 2); }
+    ctx.fill();
+    ctx.strokeStyle = t.p; ctx.lineWidth = 2.5; ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.arc(cx, cy, r * 1.05, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  else if (style === 'galaxycore') {
+    // a miniature spiral galaxy turning inside the core
+    for (let arm = 0; arm < 2; arm++) {
+      ctx.fillStyle = arm ? t.a : t.p;
+      for (let j = 0; j < 40; j++) {
+        const f = j / 40, a = T * 0.9 + arm * Math.PI + f * 4.5, rr = r * 1.25 * f;
+        ctx.globalAlpha = 0.9 - f * 0.6;
+        ctx.beginPath(); ctx.arc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.6, 1.6 + (1 - f) * 1.6, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.ellipse(cx, cy, r * 1.3, r * 0.78, 0, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  else if (style === 'circuitcore') {
+    // a microchip: traces with data pulses around a glowing die
+    const sq = r * 0.7;
+    ctx.strokeStyle = t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.9;
+    ctx.strokeRect(cx - sq / 2, cy - sq / 2, sq, sq);
+    ctx.lineWidth = 1.2; ctx.globalAlpha = 0.6; ctx.beginPath();
+    const traces = [];
+    for (let i = 0; i < 12; i++) {
+      const side = i % 4, off = (Math.floor(i / 4) - 1) * sq * 0.3;
+      const x0 = side === 0 ? cx - sq / 2 : side === 1 ? cx + sq / 2 : cx + off, y0 = side === 2 ? cy - sq / 2 : side === 3 ? cy + sq / 2 : cy + off;
+      const dx = side === 0 ? -1 : side === 1 ? 1 : 0, dy = side === 2 ? -1 : side === 3 ? 1 : 0;
+      const x1 = x0 + dx * r * 0.35, y1 = y0 + dy * r * 0.35, x2 = x1 + (dy ? r * 0.2 * (i % 2 ? 1 : -1) : 0), y2 = y1 + (dx ? r * 0.2 * (i % 2 ? 1 : -1) : 0);
+      ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2);
+      traces.push([x0, y0, x1, y1, x2, y2]);
+    }
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.shadowColor = t.p; ctx.shadowBlur = 8; ctx.globalAlpha = 1; ctx.beginPath();
+    traces.forEach((tr, i) => {
+      const f = (T * (0.8 + level * 2) + i * 0.37) % 1, x = f < 0.6 ? tr[0] + (tr[2] - tr[0]) * f / 0.6 : tr[2] + (tr[4] - tr[2]) * (f - 0.6) / 0.4, y = f < 0.6 ? tr[1] + (tr[3] - tr[1]) * f / 0.6 : tr[3] + (tr[5] - tr[3]) * (f - 0.6) / 0.4;
+      ctx.moveTo(x + 2, y); ctx.arc(x, y, 2, 0, Math.PI * 2);
+    });
+    ctx.fill(); ctx.shadowBlur = 0;
   }
   ctx.globalAlpha = 1; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
 }
@@ -1433,6 +1696,182 @@ function measureSheet() {
 }
 function toWorld(x, y) {
   return [W / 2 + (x - W / 2) / view.s, H / 2 + (y - view.cy) / view.s];
+}
+
+function drawBeadRing(t, cx, cy, R) {
+  [[1.08, 36, 1], [0.78, 24, -1]].forEach(([f, n, dir], i) => gyro(190 + i, cx, cy, () => {
+    const r = R * f;
+    for (let j = 0; j < n; j++) {
+      const a = j / n * Math.PI * 2 + phase * 0.4 * dir, wave = 0.5 + 0.5 * Math.sin(j * 0.7 - phase * 4 * dir + level * 6);
+      ctx.fillStyle = j % 3 ? t.p : t.a; ctx.globalAlpha = 0.45 + wave * 0.5;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 2.5 + wave * 3, 0, Math.PI * 2); ctx.fill();
+    }
+  }));
+  ctx.globalAlpha = 1;
+}
+function drawHexBand(t, cx, cy, R) {
+  [1.0, 1.3].forEach((f, i) => gyro(195 + i, cx, cy, () => {
+    const r = R * f, n = 6, rot = phase * 0.3 * (i ? -1 : 1);
+    for (const [rr, lw, al, col] of [[r, 10, 0.12, t.p], [r, 2, 0.85, t.p], [r * 0.92, 1, 0.5, t.a]]) {
+      ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.globalAlpha = al; ctx.beginPath();
+      for (let j = 0; j <= n; j++) { const a = rot + j / n * Math.PI * 2; j ? ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr) : ctx.moveTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.9; ctx.beginPath();
+    for (let j = 0; j < n; j++) { const a = rot + j / n * Math.PI * 2; ctx.moveTo(cx + Math.cos(a) * r + 3, cy + Math.sin(a) * r); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 3, 0, Math.PI * 2); }
+    ctx.fill();
+  }));
+  ctx.globalAlpha = 1;
+}
+function drawSaturn(t, cx, cy, R) {
+  gyro(200, cx, cy, () => {
+    // banded disc made of many thin rings
+    for (let j = 0; j < 14; j++) {
+      const r = R * (0.95 + j * 0.035);
+      ctx.strokeStyle = j % 3 === 0 ? t.a : t.p; ctx.lineWidth = 2.2; ctx.globalAlpha = 0.15 + 0.25 * Math.abs(Math.sin(j * 1.7));
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+    }
+    // a few moonlets riding the rings
+    ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.9;
+    for (let m = 0; m < 4; m++) { const a = phase * (0.3 + m * 0.1) + m * 1.6, r = R * (1.0 + m * 0.12); ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 2.6, 0, Math.PI * 2); ctx.fill(); }
+  });
+  ctx.globalAlpha = 1;
+}
+function drawBoltRing(t, cx, cy, R) {
+  [1.05, 1.35].forEach((f, i) => gyro(205 + i, cx, cy, () => {
+    const r = R * f, n = 48;
+    ctx.shadowColor = t.p; ctx.shadowBlur = 10;
+    [[t.p, 3, 0.5], ['#ffffff', 1.2, 0.9]].forEach(([col, lw, al]) => {
+      ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.globalAlpha = al; ctx.beginPath();
+      for (let j = 0; j <= n; j++) { const a = j / n * Math.PI * 2, jr = r + (Math.random() - 0.5) * R * (0.06 + level * 0.12); j ? ctx.lineTo(cx + Math.cos(a) * jr, cy + Math.sin(a) * jr) : ctx.moveTo(cx + Math.cos(a) * jr, cy + Math.sin(a) * jr); }
+      ctx.closePath(); ctx.stroke();
+    });
+    ctx.shadowBlur = 0;
+  }));
+  ctx.globalAlpha = 1;
+}
+function drawTriRing(t, cx, cy, R) {
+  [0.9, 1.15, 1.4].forEach((f, i) => gyro(210 + i, cx, cy, () => {
+    const r = R * f, rot = phase * (0.5 - i * 0.2) * (i % 2 ? -1 : 1);
+    ctx.strokeStyle = i % 2 ? t.a : t.p; ctx.lineWidth = 2; ctx.globalAlpha = 0.75; ctx.beginPath();
+    for (let j = 0; j <= 3; j++) { const a = rot + j / 3 * Math.PI * 2 - Math.PI / 2; j ? ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r) : ctx.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); }
+    ctx.stroke();
+    ctx.fillStyle = t.a; ctx.globalAlpha = 0.95; ctx.beginPath();
+    for (let j = 0; j < 3; j++) { const a = rot + j / 3 * Math.PI * 2 - Math.PI / 2; ctx.moveTo(cx + Math.cos(a) * r + 4, cy + Math.sin(a) * r); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, 4, 0, Math.PI * 2); }
+    ctx.fill();
+  }));
+  ctx.globalAlpha = 1;
+}
+
+// ===== Screen habitats: whole-screen environments =====
+let rainDrops = [], splashes = [], petalList = [], cityLayers = null, crystalList = null, cloudList = [];
+
+function drawGodRays(t, k) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 7; i++) {
+    const x = W * (0.1 + i * 0.14) + Math.sin(clock * 0.3 + i) * W * 0.06, sway = Math.sin(clock * 0.25 + i * 1.3) * W * 0.12;
+    const g = ctx.createLinearGradient(0, 0, 0, H * 0.9);
+    g.addColorStop(0, (i % 2 ? t.p : t.a) + '30'); g.addColorStop(1, (i % 2 ? t.p : t.a) + '00');
+    ctx.fillStyle = g; ctx.globalAlpha = 0.6 + 0.4 * Math.sin(clock * 0.8 + i * 2);
+    const wTop = W * 0.03, wBot = W * (0.09 + (i % 3) * 0.03);
+    ctx.beginPath(); ctx.moveTo(x - wTop, 0); ctx.lineTo(x + wTop, 0); ctx.lineTo(x + sway + wBot, H * 0.9); ctx.lineTo(x + sway - wBot, H * 0.9); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawSkyline(t, k) {
+  if (!cityLayers || cityLayers.w !== W) {
+    cityLayers = { w: W, layers: [] };
+    for (let L2 = 0; L2 < 3; L2++) {
+      const bs = []; let x = 0;
+      while (x < W * 2) { const bw = 18 + Math.random() * 40 * (1 + L2 * 0.4), bh = H * (0.08 + Math.random() * 0.18) * (1 + L2 * 0.35); bs.push({ x: x, w: bw, h: bh, win: Math.random() }); x += bw + 2 + Math.random() * 6; }
+      cityLayers.layers.push({ bs: bs, span: x, sp: 0.15 + L2 * 0.25 });
+    }
+  }
+  cityLayers.layers.forEach((Ly, L2) => {
+    const off = (clock * 12 * Ly.sp) % Ly.span, base = H;
+    ctx.fillStyle = L2 === 2 ? '#050810' : L2 === 1 ? '#0a1020' : '#111a30';
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    for (const b of Ly.bs) { let x = b.x - off; if (x + b.w < 0) x += Ly.span; if (x > W) continue; ctx.rect(x, base - b.h, b.w, b.h); }
+    ctx.fill();
+    // neon edges and lit windows
+    ctx.strokeStyle = L2 === 2 ? t.p : t.a; ctx.lineWidth = 1; ctx.globalAlpha = 0.4 + L2 * 0.2; ctx.beginPath();
+    for (const b of Ly.bs) { let x = b.x - off; if (x + b.w < 0) x += Ly.span; if (x > W) continue; ctx.moveTo(x, base - b.h); ctx.lineTo(x + b.w, base - b.h); }
+    ctx.stroke();
+    if (L2 === 2) {
+      ctx.fillStyle = t.p; ctx.beginPath();
+      for (const b of Ly.bs) {
+        let x = b.x - off; if (x + b.w < 0) x += Ly.span; if (x > W) continue;
+        for (let wy = base - b.h + 6; wy < base - 6; wy += 9) for (let wx = x + 4; wx < x + b.w - 4; wx += 7) {
+          const seed = Math.sin(wx * 12.9 + wy * 78.2 + b.win * 100) * 43758.5;
+          if (seed - Math.floor(seed) > 0.72 + 0.1 * Math.sin(clock * 0.5 + wy)) ctx.rect(wx, wy, 3, 4);
+        }
+      }
+      ctx.globalAlpha = 0.75; ctx.fill();
+    }
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawRainfall(t, k) {
+  while (rainDrops.length < 160) rainDrops.push({ x: Math.random() * W * 1.3, y: Math.random() * H, v: 10 + Math.random() * 8, l: 10 + Math.random() * 18 });
+  ctx.strokeStyle = t.p; ctx.lineWidth = 1.1; ctx.globalAlpha = 0.45; ctx.beginPath();
+  for (const d of rainDrops) {
+    d.x -= d.v * 0.25 * k; d.y += d.v * k;
+    if (d.y > H) { if (splashes.length < 60) splashes.push({ x: d.x, y: H - 2 - Math.random() * 30, life: 1 }); d.y = -20; d.x = Math.random() * W * 1.3; }
+    ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + d.l * 0.25, d.y - d.l);
+  }
+  ctx.stroke();
+  ctx.strokeStyle = t.a; ctx.lineWidth = 1;
+  splashes = splashes.filter(sp => {
+    ctx.globalAlpha = sp.life * 0.7; ctx.beginPath(); ctx.ellipse(sp.x, sp.y, (1 - sp.life) * 10 + 1, (1 - sp.life) * 3 + 0.5, 0, 0, Math.PI * 2); ctx.stroke();
+    sp.life -= 0.06 * k; return sp.life > 0;
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawPetals(t, k) {
+  while (petalList.length < 38) petalList.push({ x: Math.random() * W, y: Math.random() * H - H, r: 4 + Math.random() * 5, a: Math.random() * 6, sp: 0.6 + Math.random() * 0.8, sw: Math.random() * 6 });
+  for (const pt of petalList) {
+    pt.y += pt.sp * k; pt.x += Math.sin(clock * 1.5 + pt.sw) * 0.8 * k + 0.3 * k; pt.a += 0.03 * k;
+    if (pt.y > H + 10) { pt.y = -10; pt.x = Math.random() * W; }
+    ctx.save(); ctx.translate(pt.x, pt.y); ctx.rotate(pt.a); ctx.scale(1, Math.abs(Math.cos(pt.a * 1.3)) * 0.7 + 0.3);
+    ctx.fillStyle = pt.sw > 3 ? '#fbcfe8' : t.p; ctx.globalAlpha = 0.85;
+    ctx.beginPath(); ctx.moveTo(0, -pt.r); ctx.quadraticCurveTo(pt.r, 0, 0, pt.r); ctx.quadraticCurveTo(-pt.r, 0, 0, -pt.r); ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawCrystals(t, k) {
+  if (!crystalList || crystalList.w !== W) {
+    crystalList = { w: W, list: [] };
+    for (let i = 0; i < 16; i++) crystalList.list.push({ x: Math.random() * W, h: H * (0.06 + Math.random() * 0.16), w: 10 + Math.random() * 22, top: i % 3 === 0, lean: (Math.random() - 0.5) * 0.4, ph: Math.random() * 6 });
+  }
+  for (const c of crystalList.list) {
+    const y0 = c.top ? 0 : H, dir = c.top ? 1 : -1, tipX = c.x + c.lean * c.h, tipY = y0 + dir * c.h;
+    const glow = 0.45 + 0.4 * Math.sin(clock * 1.3 + c.ph);
+    const g = ctx.createLinearGradient(c.x, y0, tipX, tipY);
+    g.addColorStop(0, t.a + '20'); g.addColorStop(1, t.p + 'aa');
+    ctx.fillStyle = g; ctx.globalAlpha = 0.5 + glow * 0.5;
+    ctx.beginPath(); ctx.moveTo(c.x - c.w / 2, y0); ctx.lineTo(tipX, tipY); ctx.lineTo(c.x + c.w / 2, y0); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = t.p; ctx.lineWidth = 1.2; ctx.globalAlpha = 0.5 + glow * 0.5; ctx.stroke();
+    ctx.globalAlpha = glow * 0.6; ctx.beginPath(); ctx.moveTo(c.x, y0); ctx.lineTo(tipX, tipY); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawClouds(t, k) {
+  if (!blobSprites || blobSprites.theme !== themeKey()) blobSprites = { theme: themeKey(), list: [blobSprite(t.p), blobSprite(t.a)] };
+  while (cloudList.length < 9) cloudList.push({ x: Math.random() * W * 1.4 - W * 0.2, y: Math.random() * H, s: 120 + Math.random() * 200, v: 0.15 + Math.random() * 0.35, c: cloudList.length % 2 });
+  for (const c of cloudList) {
+    c.x += c.v * k; if (c.x - c.s > W) { c.x = -c.s; c.y = Math.random() * H; }
+    ctx.globalAlpha = 0.28;
+    for (let j = 0; j < 3; j++) ctx.drawImage(blobSprites.list[c.c], c.x - c.s / 2 + j * c.s * 0.3, c.y - c.s * 0.3 + Math.sin(j * 2) * c.s * 0.1, c.s, c.s * 0.6);
+  }
+  ctx.globalAlpha = 1;
 }
 
 // ===== 3D gyroscope =====
@@ -1616,8 +2055,8 @@ function updatePersona(dt, R) {
   if (st === 'thinking') { pers.tex = 0.6 * Math.cos(phase); pers.tey = -0.8; }
   pers.ex += (pers.tex - pers.ex) * 0.15 * k; pers.ey += (pers.tey - pers.ey) * 0.15 * k;
   pers.nextBlink -= 0.016 * k;
-  if (pers.nextBlink <= 0) { pers.blink = 1; pers.nextBlink = 2 + Math.random() * 4; }
-  pers.blink = Math.max(0, pers.blink - 0.12 * k);
+  if (pers.nextBlink <= 0) { const bk = eyeCfg().blink; pers.blink = bk === 'never' ? 0 : 1; pers.nextBlink = bk === 'never' ? 5 : (2 + Math.random() * 4) * (bk === 'rapid' ? 0.3 : bk === 'sleepy' ? 0.7 : 1); if (bk === 'rapid' && Math.random() < 0.4) pers.nextBlink = 0.18; }
+  pers.blink = Math.max(0, pers.blink - (eyeCfg().blink === 'sleepy' ? 0.04 : 0.12) * k);
   pers.blush = Math.max(0, pers.blush - 0.006 * k);
   pers.wink = Math.max(0, pers.wink - 0.016 * k);
   pers.stars = Math.max(0, pers.stars - 0.008 * k);
@@ -1788,9 +2227,25 @@ function personaWrap(cx, cy, fn) {
   ctx.restore();
 }
 
+const EYE_DEFAULTS = { size: 1, gap: 1, height: 1, glow: 1.6, tilt: 0, color: 'accent', custom: '#7dd3fc', pupil: 'auto', blink: 'normal', lashes: false, brows: false };
+function eyeCfg() { return Object.assign({}, EYE_DEFAULTS, cfg.eye || {}); }
+// Eye color choice -> a theme-like object used to tint the eyes
+function eyeTheme(t, E) {
+  const c = E.color === 'primary' ? t.p : E.color === 'white' ? '#e0f2fe' : E.color === 'custom' ? E.custom
+    : E.color === 'rainbow' ? hslHex(clock * 70, 95, 64) : E.color === 'fire' ? hslHex(20 + Math.sin(clock * 3) * 20, 100, 58)
+    : E.color === 'ice' ? '#bae6fd' : E.color === 'toxic' ? '#bef264' : t.a;
+  return { p: t.p, a: c };
+}
+function tiltPath(path, x, y, ang) {
+  if (!ang) return path;
+  const m = new DOMMatrix().translate(x, y).rotate(ang * 57.3).translate(-x, -y);
+  const out = new Path2D(); out.addPath(path, m); return out;
+}
+
 const EYE_STYLES = {
   capsule: 'Capsule', round: 'Round', anime: 'Anime', cat: 'Cat', ring: 'Halo ring', star: 'Star',
-  heart: 'Heart', diamond: 'Diamond', pixel: 'Pixel', hud: 'HUD lens', visor: 'Visor', cyclops: 'Cyclops'
+  heart: 'Heart', diamond: 'Diamond', pixel: 'Pixel', hud: 'HUD lens', visor: 'Visor', cyclops: 'Cyclops',
+  oval: 'Oval', drop: 'Teardrop', moon: 'Crescent', squircle: 'Squircle', triangle: 'Triangle'
 };
 
 // Outline of one open eye, centered at (x, y); open = 0..1 (blinking)
@@ -1822,11 +2277,23 @@ function eyePath(style, x, y, w, h, open) {
   else if (style === 'diamond') { p.moveTo(x, y - h * 0.6 * oh); p.lineTo(x + w * 0.9, y); p.lineTo(x, y + h * 0.6 * oh); p.lineTo(x - w * 0.9, y); p.closePath(); }
   else if (style === 'pixel') { const s2 = w * 1.6, eh = s2 * oh; p.rect(x - s2 / 2, y - eh / 2, s2, eh); }
   else if (style === 'visor') { const eh = h * 0.4 * oh; rr(x - w / 2, y - eh / 2, w, eh, eh / 2); }
+  else if (style === 'oval') p.ellipse(x, y, w * 1.15, h * 0.42 * oh, 0, 0, Math.PI * 2);
+  else if (style === 'drop') { const eh = h * 0.62 * oh; p.moveTo(x, y - eh); p.bezierCurveTo(x + w * 1.1, y - eh * 0.1, x + w * 0.9, y + eh * 0.9, x, y + eh * 0.85); p.bezierCurveTo(x - w * 0.9, y + eh * 0.9, x - w * 1.1, y - eh * 0.1, x, y - eh); p.closePath(); }
+  else if (style === 'moon') { const R2 = w * 1.05; p.arc(x, y, R2, Math.PI * 0.15, Math.PI * 1.85, false); p.arc(x + R2 * 0.55, y, R2 * 0.78 * Math.max(0.3, oh), Math.PI * 1.7, Math.PI * 0.3, true); p.closePath(); }
+  else if (style === 'squircle') { const s2 = w * 1.5, eh = s2 * oh; rr(x - s2 / 2, y - eh / 2, s2, eh, s2 * 0.32); }
+  else if (style === 'triangle') { const eh = h * 0.55 * oh; p.moveTo(x, y - eh); p.lineTo(x + w * 1.05, y + eh * 0.7); p.lineTo(x - w * 1.05, y + eh * 0.7); p.closePath(); }
   return p;
 }
 
 // Translucent glass eye with a strong neon glow
 function glassEye(t, path, x, y, w, glow, size) {
+  // wide additive bloom: the more glow, the brighter and bigger the halo
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.shadowColor = t.a; ctx.shadowBlur = 44 * size * glow;
+  ctx.fillStyle = t.a; ctx.globalAlpha = Math.min(0.55, 0.16 * glow);
+  ctx.fill(path);
+  ctx.restore();
   // faint shadow so the eye reads on the bright core
   ctx.lineWidth = 3; ctx.strokeStyle = '#060913'; ctx.globalAlpha = 0.28; ctx.shadowBlur = 0;
   ctx.stroke(path);
@@ -1861,13 +2328,15 @@ function glowStroke(t, draw, lw, glow, size) {
 
 function drawFace(t, cx, cy) {
   if (!persOn() || cfg.face === false) return;
+  const E = eyeCfg();
+  t = eyeTheme(t, E);
   const style = cfg.eyes || 'capsule';
   const r0 = (26 + Math.sin(phase * 3) * 5 + level * 14) * cfg.size;
-  const gap = r0 * 0.42, w = r0 * 0.23, h = r0 * 0.6;
+  const gap = r0 * 0.42 * E.gap, w = r0 * 0.23 * E.size, h = r0 * 0.6 * E.size * E.height;
   const ox = pers.ex * r0 * 0.28, oy = pers.ey * r0 * 0.22;
   const y = cy - r0 * 0.05 + oy;
   const m = pers.mood;
-  const glow = 0.8 + Math.sin(clock * 2.2) * 0.2;
+  const glow = (0.8 + Math.sin(clock * 2.2) * 0.2) * E.glow;
   const open = 1 - Math.sin(pers.blink * Math.PI);
   const lw = Math.max(2.2, w * 0.6);
   const sides = style === 'cyclops' ? [0] : [-1, 1];
@@ -1929,23 +2398,30 @@ function drawFace(t, cx, cy) {
       const sideBig = m === 'confused' ? (side < 0 ? 1.3 : 0.7) : 1;
       const narrow = m === 'determined' ? 0.6 : m === 'sad' ? 0.85 : 1;
       const ew = (style === 'cyclops' ? w * 1.9 : w) * big * sideBig, eh = (style === 'cyclops' ? h * 1.4 : h) * big * sideBig * narrow;
-      const path = eyePath(style === 'cyclops' ? 'round' : style2, ex, y + (m === 'sad' ? h * 0.08 : 0), ew, eh, open);
+      const path = tiltPath(eyePath(style === 'cyclops' ? 'round' : style2, ex, y + (m === 'sad' ? h * 0.08 : 0), ew, eh, open), ex, y, (side || 1) * E.tilt);
       glassEye(ec, path, ex, y, ew, glow, cfg.size);
       if (open < 0.35 || m === 'love' || m === 'starry') continue;
-      // inner details
-      const px = ex + pers.ex * ew * 0.35, py = y + pers.ey * ew * 0.3;
-      ctx.fillStyle = '#060913'; ctx.globalAlpha = 0.55;
-      if (style === 'cat') { ctx.beginPath(); ctx.ellipse(px, py, ew * 0.18, eh * 0.32 * open, 0, 0, Math.PI * 2); ctx.fill(); }
-      else if (m === 'shocked') { ctx.globalAlpha = 0.8; ctx.beginPath(); ctx.arc(px, py, ew * 0.14, 0, Math.PI * 2); ctx.fill(); }
-      else if (style2 === 'anime' || style2 === 'round' || style === 'cyclops') { ctx.beginPath(); ctx.arc(px, py, ew * (style2 === 'anime' ? 0.45 : 0.4), 0, Math.PI * 2); ctx.fill(); }
-      else if (style === 'ring') { ctx.globalAlpha = 0.8; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(px, py, ew * 0.38, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#060913'; ctx.globalAlpha = 0.4; ctx.beginPath(); ctx.arc(px, py, ew * 0.2, 0, Math.PI * 2); ctx.fill(); }
-      else if (style === 'hud') {
-        ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = 0.85; ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.arc(px, py, ew * 0.45, 0, Math.PI * 2);
-        ctx.moveTo(px - ew * 0.75, py); ctx.lineTo(px - ew * 0.2, py); ctx.moveTo(px + ew * 0.2, py); ctx.lineTo(px + ew * 0.75, py);
-        ctx.moveTo(px, py - ew * 0.75); ctx.lineTo(px, py - ew * 0.2); ctx.moveTo(px, py + ew * 0.2); ctx.lineTo(px, py + ew * 0.75);
-        ctx.stroke();
+      // inner details (or a custom pupil)
+      if (E.pupil !== 'auto') drawPupil(E.pupil, ex + pers.ex * ew * 0.35, y + pers.ey * ew * 0.3, ew, eh, open);
+      else {
+        const px = ex + pers.ex * ew * 0.35, py = y + pers.ey * ew * 0.3;
+        ctx.fillStyle = '#060913'; ctx.globalAlpha = 0.55;
+        if (style === 'cat') { ctx.beginPath(); ctx.ellipse(px, py, ew * 0.18, eh * 0.32 * open, 0, 0, Math.PI * 2); ctx.fill(); }
+        else if (m === 'shocked') { ctx.globalAlpha = 0.8; ctx.beginPath(); ctx.arc(px, py, ew * 0.14, 0, Math.PI * 2); ctx.fill(); }
+        else if (style2 === 'anime' || style2 === 'round' || style === 'cyclops') { ctx.beginPath(); ctx.arc(px, py, ew * (style2 === 'anime' ? 0.45 : 0.4), 0, Math.PI * 2); ctx.fill(); }
+        else if (style === 'ring') { ctx.globalAlpha = 0.8; ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(px, py, ew * 0.38, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#060913'; ctx.globalAlpha = 0.4; ctx.beginPath(); ctx.arc(px, py, ew * 0.2, 0, Math.PI * 2); ctx.fill(); }
+        else if (style === 'hud') {
+          ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = 0.85; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(px, py, ew * 0.45, 0, Math.PI * 2);
+          ctx.moveTo(px - ew * 0.75, py); ctx.lineTo(px - ew * 0.2, py); ctx.moveTo(px + ew * 0.2, py); ctx.lineTo(px + ew * 0.75, py);
+          ctx.moveTo(px, py - ew * 0.75); ctx.lineTo(px, py - ew * 0.2); ctx.moveTo(px, py + ew * 0.2); ctx.lineTo(px, py + ew * 0.75);
+          ctx.stroke();
+        }
       }
+      if (E.lashes) glowStroke(t, () => {
+        const sd = side || 1;
+        for (let q = 0; q < 3; q++) { const a = -Math.PI / 2 + sd * (0.35 + q * 0.32), x0 = ex + Math.cos(a) * ew * 0.95, y0 = y + Math.sin(a) * eh * 0.5; ctx.moveTo(x0, y0); ctx.lineTo(x0 + Math.cos(a) * ew * 0.5, y0 + Math.sin(a) * ew * 0.5); }
+      }, Math.max(1.4, lw * 0.4), glow, cfg.size);
       // glints
       ctx.fillStyle = '#ffffff'; ctx.globalAlpha = 0.95 * open;
       ctx.beginPath();
@@ -1967,8 +2443,29 @@ function drawFace(t, cx, cy) {
     }
     if (m === 'sad') drawTears(cx, y, gap, w, false);
     if (m === 'nervous') drawSweat(cx, cy, r0);
+  } else if (E.brows) {
+    for (const side of sides) {
+      const ex = cx + side * gap + ox, by = y - h * 0.8 - (m === 'surprised' || m === 'shocked' ? h * 0.2 : 0);
+      glowStroke(t, () => { ctx.moveTo(ex - w * 1.1, by + w * 0.2); ctx.quadraticCurveTo(ex, by - w * 0.5, ex + w * 1.1, by + w * 0.2); }, lw * 0.6, glow, cfg.size);
+    }
   }
   drawCheeks(t, cx, cy, r0, gap, y);
+}
+
+// Custom pupils
+function drawPupil(kind, x, y, ew, eh, open) {
+  if (kind === 'none' || open < 0.35) return;
+  ctx.fillStyle = '#060913'; ctx.strokeStyle = '#060913'; ctx.globalAlpha = 0.7; ctx.lineWidth = Math.max(1.5, ew * 0.18);
+  ctx.beginPath();
+  if (kind === 'dot') ctx.arc(x, y, ew * 0.3, 0, Math.PI * 2);
+  else if (kind === 'slit') ctx.ellipse(x, y, ew * 0.12, eh * 0.33 * open, 0, 0, Math.PI * 2);
+  else if (kind === 'ring') { ctx.arc(x, y, ew * 0.38, 0, Math.PI * 2); ctx.stroke(); ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x, y, ew * 0.14, 0, Math.PI * 2); }
+  else if (kind === 'star') { for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = (i % 2 ? 0.17 : 0.42) * ew; i ? ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r) : ctx.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } ctx.closePath(); }
+  else if (kind === 'heart') { const s2 = ew * 0.36; ctx.moveTo(x, y + s2 * 0.8); ctx.bezierCurveTo(x - s2 * 1.3, y, x - s2 * 0.6, y - s2, x, y - s2 * 0.35); ctx.bezierCurveTo(x + s2 * 0.6, y - s2, x + s2 * 1.3, y, x, y + s2 * 0.8); }
+  else if (kind === 'cross') { const s2 = ew * 0.38; ctx.moveTo(x - s2, y); ctx.lineTo(x + s2, y); ctx.moveTo(x, y - s2); ctx.lineTo(x, y + s2); ctx.stroke(); ctx.beginPath(); }
+  else if (kind === 'spiral') { for (let j = 0; j < 22; j++) { const a = j * 0.6 + clock * 4, r = j / 22 * ew * 0.45; j ? ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r) : ctx.moveTo(x, y); } ctx.stroke(); ctx.beginPath(); }
+  ctx.fill();
+  ctx.globalAlpha = 1;
 }
 
 // Glowing blue teardrops (one slow tear when sad, streams when crying)
@@ -2263,7 +2760,7 @@ function drawTouch(t, k) {
 }
 
 function drawCore(t, cx, cy) {
-  if (!coreSprite || spriteTheme !== cfg.theme) buildThemeCache();
+  if (!coreSprite || spriteTheme !== themeKey()) buildThemeCache();
   const r = (26 + Math.sin(phase * 3) * 5 + level * 14) * cfg.size * 2.4;
   // a structured core style dims the glow a little so its insides show
   ctx.globalAlpha = (cfg.coreStyle || 'nucleus') === 'glow' ? 1 : 0.62;
@@ -2328,7 +2825,7 @@ function blobSprite(color) {
 }
 
 function drawNebula(t, cx, cy, R) {
-  if (!blobSprites || blobSprites.theme !== cfg.theme) blobSprites = { theme: cfg.theme, list: [blobSprite(t.p), blobSprite(t.a)] };
+  if (!blobSprites || blobSprites.theme !== themeKey()) blobSprites = { theme: themeKey(), list: [blobSprite(t.p), blobSprite(t.a)] };
   ctx.globalAlpha = 0.32;
   for (const b of nebulaBlobs) {
     const a = b.a + phase * b.sp * 0.3;
@@ -2854,7 +3351,7 @@ function drawSpiro(t, cx, cy, R) {
 }
 
 function drawFireflies(t, k) {
-  if (!fireflySprite || fireflySprite.theme !== cfg.theme) fireflySprite = { theme: cfg.theme, list: [blobSprite(t.p), blobSprite(t.a)] };
+  if (!fireflySprite || fireflySprite.theme !== themeKey()) fireflySprite = { theme: themeKey(), list: [blobSprite(t.p), blobSprite(t.a)] };
   for (const f of fireflyList) {
     f.a += 0.02 * k;
     f.x += Math.cos(f.a * 1.3) * 0.6 * f.s * k; f.y += Math.sin(f.a) * 0.5 * f.s * k;
@@ -2914,8 +3411,8 @@ function makeDataSprite(color, r, n, font) {
 }
 
 function drawDataRing(t, cx, cy, R) {
-  if (!dataSprites || dataSprites.theme !== cfg.theme) {
-    dataSprites = { theme: cfg.theme, outer: makeDataSprite(t.p, 228, 72, 15), inner: makeDataSprite(t.a, 170, 48, 13) };
+  if (!dataSprites || dataSprites.theme !== themeKey()) {
+    dataSprites = { theme: themeKey(), outer: makeDataSprite(t.p, 228, 72, 15), inner: makeDataSprite(t.a, 170, 48, 13) };
   }
   const size = R * 2.55;
   [[dataSprites.outer, 0.12], [dataSprites.inner, -0.2]].forEach(([sp, dir], i) => gyro(30 + i, cx, cy, () => {
@@ -3132,7 +3629,7 @@ function drawVoicePrint(t) {
 }
 
 function drawSchematic(t, k) {
-  if (!gridSprite || gridSprite.theme !== cfg.theme || gridSprite.w !== W || gridSprite.h !== H) {
+  if (!gridSprite || gridSprite.theme !== themeKey() || gridSprite.w !== W || gridSprite.h !== H) {
     const c = document.createElement('canvas');
     c.width = W; c.height = H;
     const x = c.getContext('2d');
@@ -3145,7 +3642,7 @@ function drawSchematic(t, k) {
     for (let gx = 0; gx < W; gx += 120) { x.moveTo(gx + 0.5, 0); x.lineTo(gx + 0.5, H); }
     for (let gy = 0; gy < H; gy += 120) { x.moveTo(0, gy + 0.5); x.lineTo(W, gy + 0.5); }
     x.stroke();
-    gridSprite = { theme: cfg.theme, w: W, h: H, c: c };
+    gridSprite = { theme: themeKey(), w: W, h: H, c: c };
   }
   ctx.drawImage(gridSprite.c, 0, 0, W, H);
   const sx = (phase * 40) % W, sy = (phase * 27) % H;
@@ -3257,6 +3754,8 @@ function render(dt) {
   const L = cfg.layers;
   updatePersona(dt, R);
   const P = fn => personaWrap(cx, cy, fn);
+  if (L.clouds) drawClouds(t, k);
+  if (L.godrays) drawGodRays(t, k);
   if (L.aurora) drawAurora(t);
   if (L.nebula) drawNebula(t, cx, cy, R);
   if (L.galaxy) drawGalaxy(t, cx, cy, R);
@@ -3270,6 +3769,10 @@ function render(dt) {
   if (L.bubbles) drawBubbles(t, k);
   if (L.fireflies) drawFireflies(t, k);
   if (L.lasers) drawLasers(t);
+  if (L.skyline) drawSkyline(t, k);
+  if (L.crystals) drawCrystals(t, k);
+  if (L.petals) drawPetals(t, k);
+  if (L.rainfall) drawRainfall(t, k);
   if (L.schematic) drawSchematic(t, k);
   if (L.warp) drawWarp(t, k, cx, cy);
   drawParticles(t, k);
@@ -3286,6 +3789,11 @@ function render(dt) {
   if (L.dnaring) drawDnaRing(t, cx, cy, R);
   if (L.synapsering) drawSynapseRing(t, cx, cy, R);
   if (L.decayrings) drawDecayRings(t, cx, cy, R, k);
+  if (L.saturn) drawSaturn(t, cx, cy, R);
+  if (L.hexband) drawHexBand(t, cx, cy, R);
+  if (L.triring) drawTriRing(t, cx, cy, R);
+  if (L.beadring) drawBeadRing(t, cx, cy, R);
+  if (L.boltring) drawBoltRing(t, cx, cy, R);
   if (L.quarkrings) drawQuarkRings(t, cx, cy, R);
   if (L.rings) drawRings(t, cx, cy, R);
   if (L.sphere) drawSphere(t, cx, cy, R);
@@ -3398,6 +3906,7 @@ window.addEventListener('pointerup', () => {
 // ===== Clock =====
 function clockColor() { return cfg.clock.color === 'theme' ? th().p : cfg.clock.color; }
 
+let lastClockMin = -1;
 function tickClock() {
   const k = cfg.clock;
   $('clock').style.display = k.on ? '' : 'none';
@@ -3409,7 +3918,14 @@ function tickClock() {
   const pad = n => String(n).padStart(2, '0');
   let t = (k.h24 ? pad(h) : h) + ':' + pad(d.getMinutes());
   if (k.secs) t += ':' + pad(d.getSeconds());
-  $('clockTime').innerHTML = t + (ampm ? '<small>' + ampm + '</small>' : '');
+  // wave animation needs each character in its own span
+  const body = k.anim === 'wave' ? t.split('').map((ch, i) => '<span style="--i:' + i + '">' + ch + '</span>').join('') : t;
+  $('clockTime').innerHTML = body + (ampm ? '<small>' + ampm + '</small>' : '');
+  // tick flip: flip the digits whenever the minute changes
+  if (k.anim === 'flip' && lastClockMin !== d.getMinutes() && lastClockMin !== -1) {
+    $('clockTime').classList.remove('flip'); void $('clockTime').offsetWidth; $('clockTime').classList.add('flip');
+  }
+  lastClockMin = d.getMinutes();
   $('clockDate').style.display = k.date ? '' : 'none';
   if (k.date) $('clockDate').textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 }
@@ -3417,8 +3933,9 @@ function tickClock() {
 function styleClock() {
   const k = cfg.clock;
   const el = $('clock');
-  el.className = 'pos-' + k.pos + ' f-' + k.font + (k.glow ? ' glow' : '');
+  el.className = 'pos-' + k.pos + ' f-' + k.font + (k.glow ? ' glow' : '') + ' ca-' + (k.anim || 'none') + ' au-' + (k.aura || 'none');
   el.style.setProperty('--c', clockColor());
+  el.style.setProperty('--c2', th().a);
   el.style.setProperty('--cs', k.size);
   tickClock();
 }
@@ -3470,7 +3987,7 @@ function updateUI() {
   styleClock();
   styleCaption();
   $('scan').classList.toggle('on', !!cfg.layers.scan);
-  if (spriteTheme !== cfg.theme) buildThemeCache();
+  if (spriteTheme !== themeKey()) buildThemeCache();
   if (isWall) return;
 
   const act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
@@ -3487,6 +4004,11 @@ function updateUI() {
   act('[data-persona]', b => b.dataset.persona === (cfg.persona || 'quirky'));
   act('[data-face]', b => (b.dataset.face === '1') === (cfg.face !== false));
   act('[data-eyes]', b => b.dataset.eyes === (cfg.eyes || 'capsule'));
+  const EY = eyeCfg();
+  act('[data-eye-opt]', b => String(EY[b.dataset.eyeOpt]) === b.dataset.val);
+  act('[data-eye-tog]', b => !!EY[b.dataset.eyeTog]);
+  document.querySelectorAll('[data-eye-rng]').forEach(r => { r.value = EY[r.dataset.eyeRng]; r.nextElementSibling.textContent = (+EY[r.dataset.eyeRng]).toFixed(2).replace(/\.?0+$/, ''); });
+  if ($('eyeColor')) $('eyeColor').value = EY.custom;
   act('[data-core-style]', b => b.dataset.coreStyle === (cfg.coreStyle || 'nucleus'));
   act('[data-vt]', b => !!cfg.voice[b.dataset.vt]);
   [['Speed', 'speed', 'x'], ['Particles', 'particles', ''], ['Arcs', 'arcs', ''], ['Size', 'size', 'x']].forEach(([id, k, u]) => {
@@ -3540,11 +4062,13 @@ function makeBtn(parent, text, data, onclick) {
 }
 
 function buildUI() {
-  Object.keys(THEMES).forEach(k => {
+  Object.keys(THEMES).concat(Object.keys(DYNAMIC_THEMES)).forEach(k => {
     const d = document.createElement('div');
     d.className = 'swatch';
     d.dataset.theme = k;
-    d.style.background = 'linear-gradient(135deg,' + THEMES[k].p + ',' + THEMES[k].a + ')';
+    d.title = DYNAMIC_THEMES[k] ? DYNAMIC_THEMES[k].name + ' (animated)' : k;
+    d.style.background = DYNAMIC_THEMES[k] ? DYNAMIC_THEMES[k].css : 'linear-gradient(135deg,' + THEMES[k].p + ',' + THEMES[k].a + ')';
+    if (DYNAMIC_THEMES[k]) d.style.boxShadow = '0 0 10px rgba(255,255,255,0.35)';
     d.onclick = () => set('theme', k);
     $('swatches').appendChild(d);
   });
@@ -3570,6 +4094,12 @@ function buildUI() {
     if (k === 'love') pers.blush = 1; if (k === 'dizzy' || k === 'ko') pers.stars = 2; if (k === 'suspicious') pers.winkSide = 1;
   }));
   Object.keys(CORE_STYLES).forEach(k => makeBtn($('coreBtns'), CORE_STYLES[k], { coreStyle: k }, () => { set('coreStyle', k); pers.vz += 0.35; setMood('starry', 0.8); }));
+  const setEye = (k, v) => { cfg.eye = Object.assign({}, cfg.eye || {}, { [k]: v }); cfg.face = true; saveCfg(); updateUI(); };
+  document.querySelectorAll('[data-eye-rng]').forEach(r => r.oninput = () => setEye(r.dataset.eyeRng, parseFloat(r.value)));
+  document.querySelectorAll('[data-eye-opt]').forEach(b => b.onclick = () => { setEye(b.dataset.eyeOpt, b.dataset.val); if (b.dataset.eyeOpt !== 'blink') setMood('surprised', 0.5); });
+  document.querySelectorAll('[data-eye-tog]').forEach(b => b.onclick = () => setEye(b.dataset.eyeTog, !eyeCfg()[b.dataset.eyeTog]));
+  $('eyeColor').oninput = e => { setEye('custom', e.target.value); setEye('color', 'custom'); };
+  $('eyeReset').onclick = () => { cfg.eye = {}; saveCfg(); updateUI(); setMood('happy', 1); };
   Object.keys(EYE_STYLES).forEach(k => makeBtn($('eyeBtns'), EYE_STYLES[k], { eyes: k }, () => { set('face', true); set('eyes', k); setMood('surprised', 0.6); }));
   [['Speed', 'speed'], ['Particles', 'particles'], ['Arcs', 'arcs'], ['Size', 'size']].forEach(([id, k]) => {
     $('rng' + id).oninput = e => set(k, parseFloat(e.target.value));
