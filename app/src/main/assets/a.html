@@ -69,6 +69,14 @@ body{background:#060913;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFo
 .chips .sec-label{flex-basis:100%;}
 #sceneGroups .opt-btn{background:transparent;border-style:dashed;}
 #sceneGroups .opt-btn.act{border-style:solid;}
+.fav-save{display:flex;gap:8px;margin-bottom:10px;}
+.fav-save .inp{flex:1;padding:9px 12px;}
+.fav-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;}
+.fav-card{flex:none;width:86px;scroll-snap-align:start;position:relative;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:#060913;overflow:hidden;cursor:pointer;}
+.fav-card.act{border-color:var(--p);box-shadow:0 0 12px var(--p);}
+.fav-card img{display:block;width:86px;height:120px;object-fit:cover;}
+.fav-card span{display:block;font-size:10px;font-weight:700;color:#e2e8f0;padding:5px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fav-card b{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(6,9,19,0.8);color:#f87171;font-size:11px;display:flex;align-items:center;justify-content:center;}
 .mini-label{font-size:10px;font-weight:700;letter-spacing:1px;color:#64748b;margin:10px 0 6px;text-transform:uppercase;}
 .tabs{top:12px;}
 #drawerToggle{position:fixed;right:18px;top:84px;z-index:21;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(15,23,42,0.85);color:var(--p);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .3s;}
@@ -208,6 +216,15 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
 
   <!-- LOOK -->
   <div class="tab act" id="tab-look">
+    <details class="acc" id="favAcc">
+      <summary>★ Favorites <span class="sum" data-sum="favs"></span></summary>
+      <div class="fav-save">
+        <input class="inp" id="favName" placeholder="Name this look…" maxlength="24" autocomplete="off">
+        <button class="send-btn" id="favSaveBtn">★ SAVE</button>
+      </div>
+      <div class="fav-row" id="favList"></div>
+      <div class="note" id="favNote">Saves everything: scene, layers, theme, core, eyes, motion, effects, clock and captions. Tap a card to apply it.</div>
+    </details>
     <details class="acc" open>
       <summary>Scene <span class="sum" data-sum="scene"></span></summary>
       <div class="chips" id="sceneGroups"></div>
@@ -777,6 +794,7 @@ function loadCfg() {
   return c;
 }
 function saveCfg() {
+  if (typeof favDirty === 'function') favDirty();
   try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) {}
 }
 let cfg = loadCfg();
@@ -3962,6 +3980,79 @@ function set(k, v) {
   saveCfg(); updateUI();
 }
 
+// ===== Favorites: saved looks =====
+let favApplying = false;
+function favDirty() { /* cards only highlight the last applied/saved look */ }
+const FAV_KEY = 'novaApexFavs';
+const FAV_FIELDS = ['theme', 'scene', 'layers', 'coreStyle', 'eyes', 'eye', 'face', 'persona', 'camera', 'gyro', 'touch', 'snow',
+  'speed', 'size', 'particles', 'arcs', 'clock', 'caption'];
+function loadFavs() { try { const f = JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); return Array.isArray(f) ? f : []; } catch (e) { return []; } }
+function saveFavs(list) { try { localStorage.setItem(FAV_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+function favName(id) { const f = loadFavs().find(x => x.id === id); return f ? f.name : ''; }
+
+// small picture of the scene as it looks right now (taken from the visible preview area)
+function snapshot() {
+  try {
+    const sc = canvas.width / W, top = 0, hgt = Math.max(60, H - view.sheet);
+    const c = document.createElement('canvas'); c.width = 86; c.height = 120;
+    const x = c.getContext('2d');
+    x.fillStyle = '#060913'; x.fillRect(0, 0, 86, 120);
+    const g = x.createRadialGradient(43, 60, 0, 43, 60, 80); g.addColorStop(0, th().a + '44'); g.addColorStop(1, '#06091300');
+    x.fillStyle = g; x.fillRect(0, 0, 86, 120);
+    const srcW = W * sc, srcH = hgt * sc, aspect = 86 / 120;
+    let sw = srcW, sh = srcW / aspect; if (sh > srcH) { sh = srcH; sw = sh * aspect; }
+    x.drawImage(canvas, (srcW - sw) / 2, top + (srcH - sh) / 2, sw, sh, 0, 0, 86, 120);
+    return c.toDataURL('image/jpeg', 0.7);
+  } catch (e) { return ''; }
+}
+
+function saveFavorite(name) {
+  const list = loadFavs();
+  const look = {};
+  FAV_FIELDS.forEach(k => { if (cfg[k] !== undefined) look[k] = JSON.parse(JSON.stringify(cfg[k])); });
+  const fav = { id: 'f' + Date.now().toString(36), name: (name || '').trim() || 'Look ' + (list.length + 1), cfg: look, img: snapshot() };
+  list.unshift(fav);
+  if (!saveFavs(list.slice(0, 40))) { list.forEach(f => f.img = ''); saveFavs(list.slice(0, 40)); }   // out of space: keep looks, drop pictures
+  cfg.fav = fav.id; saveCfg();
+  return fav;
+}
+
+function applyFavorite(id) {
+  const fav = loadFavs().find(f => f.id === id);
+  if (!fav) return false;
+  Object.keys(fav.cfg).forEach(k => cfg[k] = JSON.parse(JSON.stringify(fav.cfg[k])));
+  cfg.clock = Object.assign({}, CLOCK_DEFAULTS, cfg.clock || {});
+  cfg.caption = Object.assign({}, CAPTION_DEFAULTS, cfg.caption || {});
+  cfg.layers = Object.assign({}, DEFAULTS.layers, cfg.layers || {});
+  cfg.fav = id;
+  buildParticles();
+  saveCfg(); updateUI();
+  if (!isWall && !isAgent && SCENES[cfg.scene]) showSceneGroup(SCENES[cfg.scene].group);
+  pers.vz += 0.3; setMood('starry', 0.9);
+  return fav;
+}
+
+function deleteFavorite(id) { saveFavs(loadFavs().filter(f => f.id !== id)); if (cfg.fav === id) { cfg.fav = ''; saveCfg(); } renderFavs(); renderCommands(); }
+
+function renderFavs() {
+  const box = $('favList');
+  if (!box) return;
+  const list = loadFavs();
+  box.innerHTML = '';
+  list.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'fav-card' + (cfg.fav === f.id ? ' act' : '');
+    card.innerHTML = (f.img ? '<img alt="">' : '<div style="height:120px;display:flex;align-items:center;justify-content:center;font-size:28px">★</div>') + '<span></span><b>✕</b>';
+    if (f.img) card.querySelector('img').src = f.img;
+    card.querySelector('span').textContent = f.name;
+    card.onclick = e => { if (e.target.tagName === 'B') return; applyFavorite(f.id); renderFavs(); };
+    card.querySelector('b').onclick = () => { if (confirm('Delete "' + f.name + '"?')) deleteFavorite(f.id); };
+    box.appendChild(card);
+  });
+  const sumEl = document.querySelector('[data-sum="favs"]');
+  if (sumEl) sumEl.textContent = list.length ? list.length + ' saved' : '';
+}
+
 function setScene(name) {
   cfg.scene = name;
   cfg.layers = Object.assign({}, SCENES[name].layers);
@@ -4093,6 +4184,15 @@ function buildUI() {
     set('face', true); setMood(k, 3);
     if (k === 'love') pers.blush = 1; if (k === 'dizzy' || k === 'ko') pers.stars = 2; if (k === 'suspicious') pers.winkSide = 1;
   }));
+  $('favSaveBtn').onclick = () => {
+    const f = saveFavorite($('favName').value);
+    $('favName').value = ''; $('favName').blur();
+    renderFavs(); renderCommands();
+    showCaption('', 'Saved "' + f.name + '" to favorites ★');
+    pers.vz += 0.3; setMood('happy', 1); emote('★');
+  };
+  $('favName').onkeydown = e => { if (e.key === 'Enter') $('favSaveBtn').click(); };
+  renderFavs();
   Object.keys(CORE_STYLES).forEach(k => makeBtn($('coreBtns'), CORE_STYLES[k], { coreStyle: k }, () => { set('coreStyle', k); pers.vz += 0.35; setMood('starry', 0.8); }));
   const setEye = (k, v) => { cfg.eye = Object.assign({}, cfg.eye || {}, { [k]: v }); cfg.face = true; saveCfg(); updateUI(); };
   document.querySelectorAll('[data-eye-rng]').forEach(r => r.oninput = () => setEye(r.dataset.eyeRng, parseFloat(r.value)));
@@ -4244,7 +4344,9 @@ const ACTIONS = {
   snowOff:     { label: 'Snow off' },
   ask:         { label: 'Ask AI a set question', arg: 'text' },
   speak:       { label: 'Say something', arg: 'text' },
-  apply:       { label: 'Set as wallpaper' }
+  apply:       { label: 'Set as wallpaper' },
+  fav:         { label: 'Apply favorite', arg: () => loadFavs().map(f => f.id) },
+  nextFav:     { label: 'Next favorite' }
 };
 
 // Runs an action; returns a short spoken confirmation ('' when the action answers by itself)
@@ -4271,6 +4373,14 @@ function runAction(a, v, quiet) {
     case 'toggleClock': setClock('on', !cfg.clock.on); msg = 'Clock ' + (cfg.clock.on ? 'on.' : 'off.'); break;
     case 'ask': askAI(v || 'Hello'); return '';
     case 'speak': msg = v; break;
+    case 'fav': { const f = applyFavorite(v); msg = f ? f.name + ' engaged.' : 'I couldn\'t find that favorite.'; if (f && !isWall && !isAgent) renderFavs(); break; }
+    case 'nextFav': {
+      const list = loadFavs();
+      if (!list.length) { msg = 'No favorites saved yet.'; break; }
+      const i = list.findIndex(f => f.id === cfg.fav), f = applyFavorite(list[(i + 1) % list.length].id);
+      if (!isWall && !isAgent) renderFavs();
+      msg = f.name + '.'; break;
+    }
     case 'apply':
       saveCfg();
       if (hasNative('applyWallpaper')) { Android.applyWallpaper(); msg = 'Opening wallpaper settings.'; }
@@ -4315,7 +4425,8 @@ function renderCommands() {
     const arg = ACTIONS[c.a] && ACTIONS[c.a].arg;
     if (typeof arg === 'function') {
       const s = document.createElement('select'); s.className = 'inp';
-      arg().forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = (SCENES[k] && SCENES[k].label) || k; s.appendChild(o); });
+      arg().forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = (SCENES[k] && SCENES[k].label) || (c.a === 'fav' ? favName(k) : '') || k; s.appendChild(o); });
+      if (!arg().length) { const o = document.createElement('option'); o.textContent = 'Save a favorite first'; s.appendChild(o); }
       s.value = c.v || arg()[0];
       s.onchange = () => { c.v = s.value; saveCfg(); };
       r2.appendChild(s);
