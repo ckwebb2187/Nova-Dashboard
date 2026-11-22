@@ -266,6 +266,172 @@ body.unlocking #unlockFx{animation:gSweep 1.1s cubic-bezier(.2,.8,.2,1);}
 @keyframes gSweep{0%{opacity:1;background-position:0 100%;}100%{opacity:0;background-position:0 0;}}
 @media (prefers-reduced-motion:reduce){body.unlocking *{animation:none !important;}#bgCanvas{transition:none;}}
 @media (prefers-reduced-motion:reduce){.dcard,.dspark path,.dbar i{animation:none!important;stroke-dashoffset:0;opacity:1;width:var(--w);}}
+/* ===== Living dashboard: look and motion from Colin's Dashboard web page ===== */
+#dash{--ldk:1;}
+.ldc{isolation:isolate;}
+body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ldterm{font:500 12px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#91a99a;}
+.ldterm .pr{color:var(--p);}
+.ldterm .ty{display:inline-block;vertical-align:bottom;overflow:hidden;white-space:nowrap;width:0;color:#e3efe7;animation:ldType calc(1.4s * var(--ldk)) steps(var(--n)) .35s forwards;}
+.ldterm .car{display:inline-block;width:7px;height:13px;background:var(--p);vertical-align:-2px;margin-left:2px;box-shadow:0 0 8px var(--p);animation:ldBlink 1s steps(1) infinite;}
+.ldterm .out{display:block;opacity:0;color:#e3efe7;animation:ldShow .5s calc(1.9s * var(--ldk)) forwards;}
+.ldterm .out b{color:var(--p);}
+.ldsky{min-height:118px;}
+.ldsky .skyfx{position:absolute;inset:0;z-index:-1;background:var(--sky);background-size:220% 220%;opacity:.85;animation:ldSkyflow calc(18s * var(--ldk)) ease-in-out infinite alternate;}
+.ldsky[data-sky=night]{--sky:linear-gradient(135deg,#050b1f,#1e1b4b 45%,#0a3d2c);}
+.ldsky[data-sky=dawn]{--sky:linear-gradient(135deg,#7c2d12,#db2777 40%,#312e81);}
+.ldsky[data-sky=day]{--sky:linear-gradient(135deg,#0369a1,#0d9488 45%,#15803d);}
+.ldsky[data-sky=dusk]{--sky:linear-gradient(135deg,#b45309,#be123c 45%,#4c1d95);}
+.ldorb{position:absolute;border-radius:50%;filter:blur(22px);z-index:-1;opacity:.55;}
+.ldorb.o1{width:110px;height:110px;left:-20px;top:-30px;background:var(--p);animation:ldOrbA calc(11s * var(--ldk)) ease-in-out infinite alternate;}
+.ldorb.o2{width:90px;height:90px;right:-10px;bottom:-30px;background:var(--da,#2dd4bf);animation:ldOrbB calc(14s * var(--ldk)) ease-in-out infinite alternate;}
+.ldorb.o3{width:70px;height:70px;left:45%;top:20%;background:#f2b84b;opacity:.3;animation:ldOrbC calc(9s * var(--ldk)) ease-in-out infinite alternate;}
+.ldstars{position:absolute;inset:0;z-index:-1;display:none;}
+.ldsky[data-sky=night] .ldstars,.ldsky[data-sky=dawn] .ldstars{display:block;}
+.ldstars b{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:ldTwinkle calc(2.6s * var(--ldk)) ease-in-out infinite;}
+.ldtime{display:flex;align-items:baseline;font:800 44px/1 "Sora",-apple-system,sans-serif;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;text-shadow:0 2px 18px rgba(0,0,0,.35);margin-top:2px;}
+.ldtime .colon{animation:ldColon 1s steps(1,end) infinite;}
+.ldtime .ss{font-size:18px;opacity:.65;margin-left:8px;font-weight:700;display:inline-block;}
+.ldtime .ss.tick{animation:ldTick .45s cubic-bezier(.2,.8,.2,1);}
+.ldtime .ap{font-size:14px;font-weight:600;opacity:.7;margin-left:5px;}
+.ldtime .hm{display:inline-flex;}
+.ldtime.flip .hm{animation:ldFlip .6s cubic-bezier(.2,.8,.2,1);}
+.lddate{font-size:12px;color:rgba(227,239,231,.8);margin-top:4px;}
+.lddt{position:relative;height:4px;border-radius:4px;background:rgba(255,255,255,.18);margin-top:12px;}
+.lddt i{position:absolute;top:50%;left:var(--x);width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fbbf24;box-shadow:0 0 10px 2px #fbbf24aa;animation:ldSun calc(3s * var(--ldk)) ease-in-out infinite;}
+.lddt.moon i{background:#e2e8f0;box-shadow:0 0 10px 2px #e2e8f088;}
+.ldst{height:3px;border-radius:3px;background:rgba(255,255,255,.12);margin-top:8px;overflow:hidden;}
+.ldst i{display:block;height:100%;width:var(--w,0%);background:var(--p);box-shadow:0 0 8px var(--p);border-radius:3px;transition:width .9s linear;}
+.ldst.low i{background:#fbbf24;box-shadow:0 0 8px #fbbf24;}
+.ldwx{display:flex;align-items:center;gap:12px;--wx-cloud:#e2e8f0;--wx-edge:#94a3b8;}
+.ldwx .wxbg{position:absolute;inset:0;z-index:-1;opacity:.55;background:var(--wxg);background-size:200% 200%;animation:ldSkyflow calc(14s * var(--ldk)) ease-in-out infinite alternate;}
+.ldwx[data-k=sun],.ldwx[data-k=partsun]{--wxg:linear-gradient(120deg,#b45309,#0d9488 55%,#15803d);}
+.ldwx[data-k=moon],.ldwx[data-k=partmoon]{--wxg:linear-gradient(120deg,#1e1b4b,#0f3d2e);}
+.ldwx[data-k=cloud],.ldwx[data-k=fog]{--wxg:linear-gradient(120deg,#334155,#0f3d2e);}
+.ldwx[data-k=rain]{--wxg:linear-gradient(120deg,#1e3a8a,#0f3d2e);}
+.ldwx[data-k=storm]{--wxg:linear-gradient(120deg,#312e81,#111827);}
+.ldwx[data-k=snow]{--wxg:linear-gradient(120deg,#64748b,#1e3a8a);}
+.ldwx[data-k=storm] .wxbg{animation:ldSkyflow calc(14s * var(--ldk)) ease-in-out infinite alternate,ldFlash calc(6s * var(--ldk)) infinite;}
+.ldfx{position:absolute;inset:0;z-index:-1;overflow:hidden;}
+.ldfx b{position:absolute;top:-14px;}
+.ldwx[data-k=rain] .ldfx b,.ldwx[data-k=storm] .ldfx b{width:1.5px;height:12px;background:#93c5fd;opacity:.7;animation:ldRain calc(.9s * var(--ldk)) linear infinite;}
+.ldwx[data-k=snow] .ldfx b{width:5px;height:5px;border-radius:50%;background:#e0f2fe;animation:ldSnow calc(3.4s * var(--ldk)) linear infinite;}
+.ldwx[data-k=sun] .ldfx b,.ldwx[data-k=partsun] .ldfx b,.ldwx[data-k=moon] .ldfx b,.ldwx[data-k=partmoon] .ldfx b{top:auto;width:4px;height:4px;border-radius:50%;background:#fde68a;animation:ldMote calc(3s * var(--ldk)) ease-in-out infinite;}
+.ldwx[data-k=cloud] .ldfx,.ldwx[data-k=fog] .ldfx{display:none;}
+.wxsvg{width:64px;height:64px;flex:none;overflow:visible;}
+.wx-sun{animation:ldSpin calc(18s * var(--ldk)) linear infinite;}
+.wx-moon{animation:ldGlow calc(4s * var(--ldk)) ease-in-out infinite;}
+.wx-stars circle{fill:#fff;animation:ldTwinkle calc(2.6s * var(--ldk)) ease-in-out infinite;}
+.wx-drift{animation:ldDrift calc(4s * var(--ldk)) ease-in-out infinite alternate;}
+.wx-drop{animation:ldDrop calc(1.1s * var(--ldk)) linear infinite;}
+.wx-flake{animation:ldFlake calc(2.4s * var(--ldk)) linear infinite;}
+.wx-bolt{animation:ldBolt calc(3s * var(--ldk)) infinite;}
+.wx-fog line{stroke:#cbd5e1;stroke-width:3;stroke-linecap:round;animation:ldFog calc(3s * var(--ldk)) ease-in-out infinite alternate;}
+.ldwx .t{font:800 34px/1 "Sora",-apple-system,sans-serif;font-variant-numeric:tabular-nums;text-shadow:0 0 14px color-mix(in srgb,var(--p) 50%,transparent);}
+.ldwx .ph{font-size:12px;color:rgba(227,239,231,.85);margin-top:3px;}
+.ldwx .mt{font:500 10px "JetBrains Mono",monospace;color:rgba(227,239,231,.6);margin-top:3px;}
+.ldbig{font:800 30px/1 "Sora",-apple-system,sans-serif;font-variant-numeric:tabular-nums;}
+.ldbig small{font-size:13px;font-weight:600;opacity:.6;margin-left:4px;}
+.ldbar{position:relative;height:9px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:8px;}
+.ldbar.sm{height:6px;margin-top:0;}
+.ldbar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:9px;overflow:hidden;background:linear-gradient(90deg,var(--da,#2dd4bf),var(--p));box-shadow:0 0 12px -2px var(--p);animation:dGrow calc(1.2s * var(--ldk)) .3s cubic-bezier(.2,.8,.2,1) forwards;}
+.ldbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:ldSheen calc(2.6s * var(--ldk)) 1.4s ease-in-out infinite;}
+.ldnext{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:rgba(227,239,231,.8);}
+.ldnext em{font-style:normal;font:600 9px "JetBrains Mono",monospace;letter-spacing:1px;text-transform:uppercase;color:#06140c;background:var(--p);padding:3px 7px;border-radius:99px;animation:ldPulse calc(2.2s * var(--ldk)) infinite;}
+.ldrow{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:0;border-bottom:1px dashed rgba(255,255,255,.08);color:#e3efe7;font:500 13px/1.3 "IBM Plex Sans",-apple-system,sans-serif;padding:6px 4px;border-radius:8px;}
+.ldrow:last-child{border-bottom:0;}
+.ldrow .bx{width:16px;height:16px;border-radius:5px;border:2px solid rgba(227,239,231,.3);flex:none;display:grid;place-content:center;font-size:10px;font-weight:800;color:#06140c;transition:background .25s,border-color .25s;}
+.ldrow.on{color:rgba(227,239,231,.5);text-decoration:line-through;}
+.ldrow.on .bx{background:var(--p);border-color:var(--p);}
+.ldrow.on .bx::after{content:"✓";}
+.ldrow.lock{opacity:.45;}
+.ldrow.lock .bx::after{content:"🔒";font-size:8px;}
+.ldrow.just{animation:ldRowFlash .9s ease-out;}
+.ldrow.just .bx{animation:ldBox .45s cubic-bezier(.2,.8,.2,1),ldRing .8s ease-out;}
+.ldstages{display:flex;gap:6px;margin:6px 0 8px;}
+.ldstages span{flex:1;font:600 10px "JetBrains Mono",monospace;padding:5px 4px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);text-align:center;color:rgba(227,239,231,.7);}
+.ldstages .done{background:color-mix(in srgb,var(--p) 22%,transparent);border-color:color-mix(in srgb,var(--p) 50%,transparent);color:var(--p);}
+.ldstages .cur{border-color:var(--p);color:#e3efe7;animation:ldPulse calc(2.2s * var(--ldk)) infinite;}
+.ldstages .lock{opacity:.5;}
+.ldarea{display:grid;grid-template-columns:64px 1fr 34px;align-items:center;gap:8px;font-size:12px;margin:6px 0;}
+.ldarea b{text-align:right;font:600 11px "JetBrains Mono",monospace;color:var(--p);}
+.ldpins{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.ldpin{display:grid;justify-items:center;gap:4px;padding:8px 2px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e3efe7;font:600 10px/1.2 "IBM Plex Sans",sans-serif;text-align:center;animation:ldBob calc(3.2s * var(--ldk)) ease-in-out infinite;animation-delay:calc(var(--j,0) * -.45s);}
+.ldpin b{font-size:20px;line-height:1;}
+.ldvin{display:flex;align-items:center;gap:14px;}
+.ldvin .disc{position:relative;width:64px;height:64px;border-radius:50%;flex:none;background:repeating-radial-gradient(circle,#0b0b0b 0 2px,#1c1c1c 2px 3px);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 8px 24px -8px #000,0 0 24px -6px var(--p);animation:ldSpin calc(3.2s * var(--ldk)) linear infinite;}
+.ldvin .disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(transparent 0 20%,rgba(255,255,255,.18) 25%,transparent 30% 70%,rgba(255,255,255,.12) 75%,transparent 80%);}
+.ldvin .disc::after{content:"";position:absolute;inset:21px;border-radius:50%;background:radial-gradient(circle,#06140c 0 3px,var(--p) 3.5px);}
+.ldvin .mt{flex:1;min-width:0;}
+.ldmarq{overflow:hidden;white-space:nowrap;font:500 11px "JetBrains Mono",monospace;color:rgba(227,239,231,.7);margin-top:4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);}
+.ldmarq span{display:inline-block;padding-left:100%;animation:ldMarq calc(12s * var(--ldk)) linear infinite;}
+.ldeq{display:flex;gap:3px;align-items:flex-end;height:22px;margin-top:6px;}
+.ldeq i{width:4px;height:40%;border-radius:2px;background:var(--p);box-shadow:0 0 6px var(--p);animation:ldEq calc(.9s * var(--ldk)) ease-in-out infinite alternate;}
+.ldcap{display:flex;align-items:center;gap:12px;}
+.ldcap .cw{position:relative;width:52px;height:52px;flex:none;display:grid;place-content:center;}
+.ldcap .cap{font-size:30px;display:inline-block;animation:ldCapBob calc(2.8s * var(--ldk)) ease-in-out infinite;}
+.ldcap .ring{position:absolute;inset:4px;border-radius:50%;border:2px solid var(--p);animation:ldCapRing calc(2.4s * var(--ldk)) ease-out infinite;}
+.ldcap .orb{position:absolute;inset:0;animation:ldSpin calc(4s * var(--ldk)) linear infinite;}
+.ldcap .orb::after{content:"";position:absolute;top:0;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#f2b84b;box-shadow:0 0 8px #f2b84b;}
+.ldcap .tas{position:absolute;right:9px;top:16px;width:2px;height:15px;background:#f2b84b;border-radius:2px;transform-origin:top;animation:ldTassel calc(1.8s * var(--ldk)) ease-in-out infinite;}
+#ldToast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:60;transform:translate(-50%,-20px) scale(.96);opacity:0;pointer-events:none;padding:10px 16px;border-radius:99px;background:rgba(17,31,24,.9);border:1px solid color-mix(in srgb,var(--p) 55%,transparent);color:#e3efe7;font:700 13px "Sora",-apple-system,sans-serif;box-shadow:0 10px 30px -10px var(--p);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:opacity .35s,transform .45s cubic-bezier(.2,.8,.2,1);white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;}
+#ldToast.show{opacity:1;transform:translate(-50%,0) scale(1);}
+.ldspk{position:fixed;z-index:61;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;pointer-events:none;background:var(--c);box-shadow:0 0 8px var(--c);animation:ldSpk .85s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes ldSpk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0;}}
+@keyframes ldType{to{width:calc(var(--n) * 1ch);}}
+@keyframes ldBlink{50%{opacity:0;}}
+@keyframes ldShow{to{opacity:1;}}
+@keyframes ldSkyflow{to{background-position:100% 100%;}}
+@keyframes ldOrbA{to{transform:translate(60px,40px) scale(1.2);}}
+@keyframes ldOrbB{to{transform:translate(-70px,-30px) scale(.85);}}
+@keyframes ldOrbC{to{transform:translate(-50px,30px) scale(1.3);}}
+@keyframes ldTwinkle{50%{opacity:.15;}}
+@keyframes ldColon{50%{opacity:.2;}}
+@keyframes ldTick{0%{transform:translateY(-35%);opacity:0;}100%{transform:none;opacity:.65;}}
+@keyframes ldFlip{0%{transform:rotateX(90deg);opacity:0;}100%{transform:none;opacity:1;}}
+@keyframes ldSun{50%{box-shadow:0 0 20px 4px #fbbf24;}}
+@keyframes ldFlash{0%,100%{filter:none;}3%,6%{filter:brightness(1.9);}4.5%{filter:none;}}
+@keyframes ldRain{to{transform:translateY(160px) translateX(-14px);}}
+@keyframes ldSnow{0%{transform:translate(0,0);}50%{transform:translate(8px,70px);}100%{transform:translate(-4px,150px);}}
+@keyframes ldMote{0%,100%{transform:translateY(0);opacity:.2;}50%{transform:translateY(-12px);opacity:1;}}
+@keyframes ldSpin{to{transform:rotate(360deg);}}
+@keyframes ldGlow{50%{filter:drop-shadow(0 0 8px #fde68a);}}
+@keyframes ldDrift{to{transform:translateX(6px);}}
+@keyframes ldDrop{0%{transform:translateY(-6px);opacity:0;}20%{opacity:1;}100%{transform:translateY(14px);opacity:0;}}
+@keyframes ldFlake{0%{transform:translateY(-6px);opacity:0;}20%{opacity:1;}100%{transform:translateY(16px);opacity:0;}}
+@keyframes ldBolt{0%,100%{opacity:0;}5%,9%{opacity:1;}7%{opacity:.2;}}
+@keyframes ldFog{to{transform:translateX(8px);opacity:.35;}}
+@keyframes ldSheen{to{transform:translateX(100%);}}
+@keyframes ldPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--p) 60%,transparent);}100%{box-shadow:0 0 0 8px transparent;}}
+@keyframes ldRowFlash{0%{background:color-mix(in srgb,var(--p) 26%,transparent);}100%{background:transparent;}}
+@keyframes ldBox{40%{transform:scale(.7);}100%{transform:scale(1);}}
+@keyframes ldRing{0%{box-shadow:0 0 0 0 var(--p);}100%{box-shadow:0 0 0 12px transparent;}}
+@keyframes ldBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+@keyframes ldMarq{to{transform:translateX(-100%);}}
+@keyframes ldEq{0%{height:15%;}35%{height:95%;}70%{height:40%;}100%{height:70%;}}
+@keyframes ldCapBob{0%,100%{transform:translateY(1px) rotate(-4deg);}50%{transform:translateY(-3px) rotate(4deg);}}
+@keyframes ldTassel{0%,100%{transform:rotate(-14deg);}50%{transform:rotate(14deg);}}
+@keyframes ldCapRing{0%{transform:scale(1);opacity:.7;}100%{transform:scale(1.6);opacity:0;}}
+@keyframes ldGrowFrom{from{width:var(--w0);}to{width:var(--w);}}
+/* re-draws after a tick in the app: no fly-in, bars slide from where they were */
+#dash.still .dcard{animation:none;}
+#dash.still .dbar i{animation:none;width:var(--w);}
+#dash.still .ldbar i{width:var(--w);animation:ldGrowFrom .7s cubic-bezier(.2,.8,.2,1);}
+#dash.still .dspark path.l{animation:none;stroke-dashoffset:0;}
+#dash.still .dspark path.a{animation:none;opacity:.14;}
+#dash.still .ldterm .ty{animation:none;width:auto;}
+#dash.still .ldterm .out{animation:none;opacity:1;}
+/* Motion: Calm drops the particles and slows the loops (speed is set in --ldk), Off stops everything */
+#dash.m-calm .ldfx,#dash.m-calm .ldstars{display:none!important;}
+#dash.m-off,#dash.m-off *{animation:none!important;transition:none!important;}
+#dash.m-off .dspark path.l{stroke-dashoffset:0;}
+#dash.m-off .dspark path.a{opacity:.14;}
+#dash.m-off .dbar i,#dash.m-off .ldbar i{width:var(--w);}
+#dash.m-off .ldterm .ty{width:auto;}
+#dash.m-off .ldterm .out{opacity:1;}
+#dash.m-off .ldfx{display:none;}
+/* stop every loop while the wallpaper isn't on screen */
+#dash.ldp,#dash.ldp *{animation-play-state:paused!important;}
 </style>
 </head>
 <body>
@@ -666,6 +832,43 @@ body.unlocking #unlockFx{animation:gSweep 1.1s cubic-bezier(.2,.8,.2,1);}
       <button class="opt-btn" data-dash-card="oil">WRX oil change</button>
       <button class="opt-btn" data-dash-card="goal">Goal / note</button>
     </div>
+    <div class="sec-label">Living dashboard</div>
+    <div class="note">The look and motion from your web dashboard: a living sky clock, weather, goals, the WRX build and more. Pick a layout, then switch single cards on or off below.</div>
+    <div class="grid-3">
+      <button class="opt-btn" data-ld-preset="living">Living</button>
+      <button class="opt-btn" data-ld-preset="classic">Classic</button>
+      <button class="opt-btn" data-ld-preset="all">Everything</button>
+    </div>
+    <div class="grid-2">
+      <button class="opt-btn" data-dash-card="prompt">Typing prompt</button>
+      <button class="opt-btn" data-dash-card="sky">Living sky clock</button>
+      <button class="opt-btn" data-dash-card="wx">Weather</button>
+      <button class="opt-btn" data-dash-card="goals">Goals bar</button>
+      <button class="opt-btn" data-dash-card="wrx">WRX build &amp; fixes</button>
+      <button class="opt-btn" data-dash-card="areas">Progress by area</button>
+      <button class="opt-btn" data-dash-card="watch">Crypto watch list</button>
+      <button class="opt-btn" data-dash-card="pc">Gaming PC setup</button>
+      <button class="opt-btn" data-dash-card="yt">YouTube pipeline</button>
+      <button class="opt-btn" data-dash-card="vinyl">Obsidian Dominion vinyl</button>
+      <button class="opt-btn" data-dash-card="pins">Pinned links</button>
+      <button class="opt-btn" data-dash-card="cap">Syllabus cap</button>
+    </div>
+    <div class="sec-label">Motion</div>
+    <div class="grid-3">
+      <button class="opt-btn" data-ld-motion="full">Full</button>
+      <button class="opt-btn" data-ld-motion="calm">Calm</button>
+      <button class="opt-btn" data-ld-motion="off">Off</button>
+    </div>
+    <div class="slider-row"><span>Speed</span><input type="range" id="rngLdSpeed" min="0.5" max="2" step="0.1"><b id="valLdSpeed"></b></div>
+    <div class="note">Full runs every animation. Calm slows the loops and drops the rain, snow and sparkles. Off holds the cards still.</div>
+    <div class="sec-label">Weather city</div>
+    <input class="inp" id="ldWxCity" placeholder="New Orleans" autocomplete="off">
+    <div class="note" id="ldWxNote">Live weather from Open-Meteo, refreshed every 20 minutes. Type a city and press Enter to change it.</div>
+    <div class="sec-label">Pinned links</div>
+    <div class="grid-2" id="ldPinGrid"></div>
+    <div class="sec-label">Goals &amp; checklists</div>
+    <div class="note">Tick things off here, or tap them on the cards in the app. On the wallpaper the cards are look-only, so swiping your home screen never ticks something by accident. It celebrates your latest win when you get back.</div>
+    <div class="dash-list" id="ldChecks"></div>
     <div class="sec-label">Glass look</div>
     <div class="slider-row"><span>See-through</span><input type="range" id="rngDashOp" min="0.1" max="0.9" step="0.05"><b id="valDashOp"></b></div>
     <div class="slider-row"><span>Blur</span><input type="range" id="rngDashBlur" min="0" max="30" step="1"><b id="valDashBlur"></b></div>
@@ -5104,8 +5307,9 @@ window.onUpdate = function (type, text) {
 // Mirrors the Command Center web app's Home tab. Kept in its own storage key so
 // favorites and looks don't carry your list and miles around.
 const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx2';
-const DASH_DEFAULTS = { on: false, pos: 'mid', dense: false, gclock: true, lockAnim: true, lockCards: false, lockClock: false, lockDim: 0.3, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
-  cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1 } };
+const LD_LIVING = { prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 };
+const DASH_DEFAULTS = { motion: 'full', speed: 1, wxCity: 'New Orleans', wxLat: 29.955, wxLon: -90.075, pins: ['a-homebase', 'a-fbo', 'a-career', 'a-tune'], checks: { 'g-tune': 1, 'g-cmc1': 1 }, win: null, ldv: 0, on: false, pos: 'mid', dense: false, gclock: true, lockAnim: true, lockCards: false, lockClock: false, lockDim: 0.3, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
+  cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1, prompt: 1, sky: 1, wx: 1, goals: 1, wrx: 1, areas: 0, watch: 0, pc: 0, yt: 0, pins: 0, vinyl: 1, cap: 0 } };
 const COIN_IDS = { xrp: 'ripple', hbar: 'hedera-hashgraph', btc: 'bitcoin', eth: 'ethereum', sol: 'solana', doge: 'dogecoin', ada: 'cardano', xlm: 'stellar', link: 'chainlink', ltc: 'litecoin', dot: 'polkadot', avax: 'avalanche-2', shib: 'shiba-inu', bnb: 'binancecoin', sui: 'sui' };
 const CC_URL = 'https://claude.ai/artifact/8P38KRZjgFbQUCc8vNc6ND';
 const DASH_APPS = ['🌌', '🫧', '🧭', '📺', '🏎️', '🐾'];
@@ -5114,6 +5318,11 @@ function loadDash() {
   d.cards = Object.assign({}, DASH_DEFAULTS.cards, d.cards || {});
   d.oil = Object.assign({}, DASH_DEFAULTS.oil, d.oil || {});
   if (!Array.isArray(d.todos)) d.todos = [];
+  d.checks = Object.assign({}, d.checks || {});
+  d.pins = Array.isArray(d.pins) ? d.pins.slice() : DASH_DEFAULTS.pins.slice();
+  if (['full', 'calm', 'off'].indexOf(d.motion) < 0) d.motion = 'full';
+  // first run of this version: switch to the living layout once (Classic in DASH brings the old one back)
+  if (!d.ldv) { Object.assign(d.cards, LD_LIVING); d.ldv = 1; }
   return d;
 }
 let dash = loadDash();
@@ -5130,10 +5339,10 @@ function dashSpark(arr) {
   return '<svg class="dspark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><path class="a" d="' + d + ' L' + w + ' ' + h + ' L0 ' + h + ' Z"/><path class="l" pathLength="1" vector-effect="non-scaling-stroke" d="' + d + '"/></svg>';
 }
 // numbers count up from zero each time the cards appear, like the web app
-function dashCount(el) {
+function dashCount(el, instant) {
   const to = parseFloat(el.dataset.n), dec = +el.dataset.dec || 0, pre = el.dataset.pre || '', suf = el.dataset.suf || '';
   const f = v => pre + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
-  if (!isFinite(to) || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = f(to || 0); return; }
+  if (instant || !isFinite(to) || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = f(to || 0); return; }
   const t0 = performance.now();
   (function step(t) { const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 3); el.textContent = f(to * e); if (k < 1) requestAnimationFrame(step); })(t0);
 }
@@ -5170,13 +5379,16 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setT
 
 function renderDash() {
   const el = $('dash'); if (!el) return;
-  el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos + (dash.dense ? ' dense' : '');
+  el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos + (dash.dense ? ' dense' : '') + ' m-' + dash.motion + (ldStill ? ' still' : '') + (paused ? ' ldp' : '');
+  el.style.setProperty('--ldk', ldMotionK());
   el.style.setProperty('--dop', dash.op); el.style.setProperty('--dblur', dash.blur + 'px'); el.style.setProperty('--drad', dash.rad + 'px');
   el.style.setProperty('--da', th().a);
   if (!dash.on) { el.innerHTML = ''; layoutDash(); return; }
   const C = dash.cards, px = readJson(DASH_PX_KEY).data || {}, out = [];
+  if (C.prompt) ldCardsTop(out, { prompt: 1 });
   if (C.greet) out.push('<div class="dcard solid"><div class="dhead"><span class="dlbl">Colin\'s world</span><div class="davs">' + DASH_APPS.map(e => '<span>' + e + '</span>').join('') + '</div></div>' +
     '<div class="dgreet">' + dashGreet() + ', Colin. Everything\'s <em>better</em> in one place.</div><div class="dsub">Your apps, the WRX build, crypto and the channel, all at a glance.</div></div>');
+  ldCardsTop(out, Object.assign({}, C, { prompt: 0 }));
   const n = new Date();
   if (C.clock) out.push('<div class="dcard ' + (C.week ? 'half' : '') + '"><div class="dhead"><span class="dlbl">New Orleans</span></div><div class="dclock" id="dashClock">' + dashClockHTML() + '</div><div class="dsub" style="margin-top:6px">' + n.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) + '</div></div>');
   if (C.week) {
@@ -5200,6 +5412,7 @@ function renderDash() {
     out.push('<div class="dcard"><div class="dhead"><span class="dh3">Today\'s focus</span><span class="dlbl">' + d + '/' + dash.todos.length + ' done</span></div><div class="dtodo">' +
       dash.todos.slice(0, 5).map(x => '<div class="' + (x.d ? 'done' : '') + '"><i></i>' + dashEsc(x.t) + '</div>').join('') + '</div></div>');
   }
+  ldCardsBottom(out, C);
   const o = dash.oil, now = +o.now, last = +o.last, every = +o.every || 5000, showOil = C.oil && now && last, showGoal = C.goal && dash.goal;
   if (showOil) {
     const left = every - (now - last), pct = Math.max(0, Math.min(100, (now - last) / every * 100));
@@ -5208,9 +5421,281 @@ function renderDash() {
   if (showGoal) out.push('<div class="dcard ' + (showOil ? 'half' : '') + '"><span class="dlbl">Goal</span><div class="dh3" style="margin-top:6px;line-height:1.3">' + dashEsc(dash.goal) + '</div></div>');
   el.innerHTML = out.join('');
   el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
-  el.querySelectorAll('[data-n]').forEach(dashCount);
+  el.querySelectorAll('[data-n]').forEach(x => dashCount(x, ldStill || dash.motion === 'off'));
   layoutDash();
 }
+// ===== Living dashboard: the look and motion of Colin's Dashboard web page =====
+// Every card here has its own switch in DASH. Nothing here touches audio, the mic or alarms.
+const LD_ART = 'https://claude.ai/artifact/', LD_WX_KEY = 'novaDashWx';
+const LD_GROUPS = [
+  { id: 'fix', name: 'WRX fix list', area: 'Garage', items: [['g-fan', 'Diagnose cooling fan / radiator fan'], ['g-cmc2', 'Replace clutch master cylinder (again)'], ['g-res', 'Sort out shared brake/clutch reservoir level'], ['g-vib', 'Track down 6th-gear steering wheel vibration']] },
+  { id: 'build1', name: 'Stage 1 base', short: 'Stage 1', area: 'Garage', items: [['g-tune', 'MAPerformance Stage 1 tune'], ['g-cmc1', 'Clutch master cylinder swap (first time)'], ['g-aa', 'Android Auto with OEM-style head unit']] },
+  { id: 'build2', name: 'E85 flex fuel', short: 'E85', area: 'Garage', lock: 'build1', items: [['g-flex', 'Flex fuel sensor kit'], ['g-pump', 'Fuel pump upgrade'], ['g-inj', 'Injectors sized for E85'], ['g-flextune', 'Flex fuel retune + datalogs']] },
+  { id: 'build3', name: 'FBO & built motor', short: 'FBO', area: 'Garage', lock: 'build2', items: [['g-fbo', 'Full bolt-ons (intake, J-pipe, FMIC)'], ['g-built', 'Built FA20 short block'], ['g-turbo', 'Turbo upgrade'], ['g-final', 'Final tune on the build']] },
+  { id: 'cwatch', name: "Things I'm watching", area: 'Crypto', items: [['c-etf', 'XRP ETF inflows'], ['c-clarity', 'CLARITY Act progress'], ['c-ipo', 'Ripple IPO news'], ['c-season', 'XRP seasonality / Q4 history']] },
+  { id: 'pc', name: 'Gaming PC setup', area: 'Gaming', items: [['p-os', 'Install Windows + updates'], ['p-drv', 'GPU drivers'], ['p-steam', 'Steam + game library'], ['p-obs', 'OBS for streaming'], ['p-link', 'Steam Link / Air Link to Quest'], ['p-deck', 'Remote Play to Steam Deck']] },
+  { id: 'yt', name: 'Obsidian Dominion pipeline', area: 'YouTube', items: [['y-suno', 'Generate tracks in Suno'], ['y-vis', 'Visuals in Kling / Runway'], ['y-thumb', 'Thumbnail image prompt'], ['y-desc', 'Description + hashtag set'], ['y-up', 'Upload + schedule'], ['y-short', 'Cut a Short teaser']] }
+];
+const LD_PINS = [['a-homebase', '🏠', 'Home Base', 'KbGyM5nYNdaZMzVqiWCrAb'], ['a-coding', '💻', 'Coding', 'KRjmz2rHrALpGnC87Mzt1H'], ['a-jarvis', '🤖', 'Jarvis picks', '5RQwneuEV5zC6bDj1iMVD9'], ['a-morphe', '🧭', 'Morphe', 'YWDjX8h3Nkj7DXnA3HHXKd'],
+  ['a-kaido', '🗺️', 'Kaido', 'ESJNG3z8sY7x9dQqWnc8hj'], ['a-hbread', '📺', 'HB read-me', 'B6V14NBBndRRLencEX6mwX'], ['a-fbo', '🏁', 'FBO plan', 'MWp5ainpbsAT8FF8GjVpve'], ['a-fbosheet', '📊', 'FBO sheet', 'Xq3BB7LoWjiudc6oNhEs4n'],
+  ['a-tune', '🔧', 'Tuning', 'TnqN6cCdveXFaAgjvsJBoP'], ['a-career', '🚀', 'Career', 'BG8atNYaNc5sLPdqYqvNpJ'], ['a-todo', '✅', 'Daily todo', 'BsJzMk3RCPhgLMyfmiuvfj'], ['a-email', '📬', 'Email triage', '1x7y4GJeVFjhLykUHsVcQy'],
+  ['a-tasks', '🗂️', 'Tasks', 'S987Ky37y366xL8QZDc4jF'], ['a-offgrid', '🌾', 'Off-grid', 'X4ukcvaBwPfB383AMzq7Hy'], ['a-blackout', '🔦', 'Blackout kit', '8x7zhTpt8FaFxmc9wfZfoo'], ['a-greymane', '🐺', 'Greymane', 'N12e5AAsF6YKfda3FCK6zw']];
+const LD_SYLLABUS = LD_ART + 'BG8atNYaNc5sLPdqYqvNpJ';
+const LD_PRESETS = {
+  living: { prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 },
+  classic: { prompt: 0, greet: 1, sky: 0, clock: 0, week: 1, wx: 0, goals: 0, wrx: 0, prices: 1, todo: 1, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 0, cap: 0, oil: 1, goal: 1 },
+  all: { prompt: 1, greet: 1, sky: 1, clock: 0, week: 1, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 1, watch: 1, pc: 1, yt: 1, areas: 1, pins: 1, vinyl: 1, cap: 1, oil: 1, goal: 1 }
+};
+let ldStill = false, ldJust = '', ldPrevW = {}, ldSeenWin = (dash.win && dash.win.t) || 0, ldLastMin = -1;
+function ldOpen(u) { if (hasNative('openUrl')) Android.openUrl(u); else window.open(u, '_blank'); }
+function ldGroup(id) { return LD_GROUPS.find(g => g.id === id); }
+function ldDone(g) { return g.items.filter(x => dash.checks[x[0]]).length; }
+function ldLocked(g) { if (!g.lock) return false; const p = ldGroup(g.lock); return ldDone(p) < p.items.length; }
+function ldTotals(list) { let d = 0, n = 0; (list || LD_GROUPS).forEach(g => { d += ldDone(g); n += g.items.length; }); return { d, n, pct: n ? Math.round(d / n * 100) : 0 }; }
+function ldBar(key, pct, cls) {
+  const w0 = ldPrevW[key] != null ? ldPrevW[key] : 0; ldPrevW[key] = pct;
+  return '<div class="ldbar ' + (cls || '') + '"><i style="--w:' + pct + '%;--w0:' + w0 + '%"></i></div>';
+}
+function ldRow(id, text, lock) {
+  const on = !!dash.checks[id];
+  return '<button class="ldrow ldtap' + (on ? ' on' : '') + (lock ? ' lock' : '') + (ldJust === id ? ' just' : '') + '" data-ldc="' + id + '"><span class="bx"></span><span>' + dashEsc(text) + '</span></button>';
+}
+function ldSkyPhase(h) { return h < 5 || h >= 21 ? 'night' : h < 7 ? 'dawn' : h < 17 ? 'day' : 'dusk'; }
+function ldTimeParts() {
+  const n = new Date(), h24 = cfg.clock && cfg.clock.h24, h = n.getHours();
+  const hh = h24 ? String(h).padStart(2, '0') : String(h % 12 || 12);
+  return { n, hh, mm: String(n.getMinutes()).padStart(2, '0'), ss: String(n.getSeconds()).padStart(2, '0'), ap: h24 ? '' : (h < 12 ? 'AM' : 'PM') };
+}
+function ldWxKind(c, day) {
+  c = +c;
+  if (c >= 95) return 'storm';
+  if ((c >= 71 && c <= 77) || c === 85 || c === 86) return 'snow';
+  if (c >= 51) return 'rain';
+  if (c === 45 || c === 48) return 'fog';
+  if (c === 3) return 'cloud';
+  if (c === 1 || c === 2) return day ? 'partsun' : 'partmoon';
+  return day ? 'sun' : 'moon';
+}
+function ldWxText(c) { return c === 0 ? 'Clear' : c === 1 ? 'Mostly clear' : c === 2 ? 'Partly cloudy' : c === 3 ? 'Cloudy' : c === 45 || c === 48 ? 'Fog' : c >= 95 ? 'Thunderstorms' : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'Snow' : c >= 80 ? 'Showers' : c >= 61 ? 'Rain' : c >= 51 ? 'Drizzle' : 'Fair'; }
+function ldWxIcon(k) {
+  const cloud = (x, y, s, cls) => '<g class="' + cls + '" transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><path d="M14 34h34a12 12 0 0 0 0-24 16 16 0 0 0-30-2A12 12 0 0 0 14 34z" fill="var(--wx-cloud)" stroke="var(--wx-edge)" stroke-width="2"/></g>';
+  const sun = (x, y, r) => '<g class="wx-sun" style="transform-origin:' + x + 'px ' + y + 'px"><circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#fbbf24"/>' + Array.from({ length: 8 }, (_, i) => { const a = i * Math.PI / 4; return '<line x1="' + (x + Math.cos(a) * (r + 4)).toFixed(1) + '" y1="' + (y + Math.sin(a) * (r + 4)).toFixed(1) + '" x2="' + (x + Math.cos(a) * (r + 10)).toFixed(1) + '" y2="' + (y + Math.sin(a) * (r + 10)).toFixed(1) + '" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>'; }).join('') + '</g>';
+  const moon = (x, y, r) => '<g class="wx-moon"><path d="M' + (x + r * .35) + ' ' + (y - r) + 'A' + r + ' ' + r + ' 0 1 0 ' + (x + r) + ' ' + (y + r * .35) + 'A' + (r * .85) + ' ' + (r * .85) + ' 0 0 1 ' + (x + r * .35) + ' ' + (y - r) + 'z" fill="#f5edc8"/></g><g class="wx-stars"><circle cx="12" cy="12" r="1.6"/><circle cx="62" cy="8" r="1.3" style="animation-delay:-1s"/><circle cx="70" cy="30" r="1.1" style="animation-delay:-1.8s"/></g>';
+  const drops = n => Array.from({ length: n }, (_, i) => '<line class="wx-drop" style="animation-delay:' + (i * .27).toFixed(2) + 's" x1="' + (22 + i * 10) + '" y1="52" x2="' + (19 + i * 10) + '" y2="60" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>').join('');
+  const flakes = n => Array.from({ length: n }, (_, i) => '<text class="wx-flake" style="animation-delay:' + (i * .5).toFixed(1) + 's" x="' + (20 + i * 11) + '" y="56" font-size="10" fill="#e0f2fe">❄</text>').join('');
+  const B = {
+    sun: sun(40, 38, 13), moon: moon(38, 38, 15),
+    partsun: sun(44, 26, 11) + cloud(4, 30, .85, 'wx-drift'), partmoon: moon(44, 26, 14) + cloud(4, 30, .85, 'wx-drift'),
+    cloud: cloud(2, 14, .8, 'wx-drift') + cloud(12, 22, .95, 'wx-drift'),
+    fog: cloud(8, 8, .85, 'wx-drift') + '<g class="wx-fog"><line x1="8" y1="52" x2="60" y2="52"/><line x1="16" y1="60" x2="70" y2="60"/><line x1="6" y1="68" x2="50" y2="68"/></g>',
+    rain: cloud(8, 8, .95, 'wx-drift') + drops(4),
+    storm: cloud(8, 6, .95, 'wx-drift') + '<path class="wx-bolt" d="M40 46l-8 14h7l-4 12 12-16h-7l5-10z" fill="#fde047"/>' + drops(2),
+    snow: cloud(8, 8, .95, 'wx-drift') + flakes(4)
+  };
+  return '<svg class="wxsvg" viewBox="0 0 80 80" aria-hidden="true">' + (B[k] || B.sun) + '</svg>';
+}
+function ldFx(n) { return '<div class="ldfx">' + Array.from({ length: n }, (_, i) => '<b style="left:' + ((i * 29 + 7) % 100) + '%;' + (i % 2 ? 'bottom:' + ((i * 17) % 60 + 10) + '%;' : '') + 'animation-delay:' + (-i * .43).toFixed(2) + 's"></b>').join('') + '</div>'; }
+
+// Cards that go before the classic ones
+function ldCardsTop(out, C) {
+  const T = ldTotals();
+  if (C.prompt) {
+    const cmd = 'dashboard --glass --motion ' + dash.motion;
+    out.push('<div class="dcard ldc"><div class="ldterm"><span class="pr">~/colin $</span> <span class="ty" style="--n:' + cmd.length + '">' + cmd + '</span><span class="car"></span>' +
+      '<span class="out">✓ <b>' + T.d + '</b> of ' + T.n + ' goals done · ' + dashEsc(dashGreet().toLowerCase()) + '</span></div></div>');
+  }
+  if (C.sky) {
+    const p = ldTimeParts(), h = p.n.getHours(), mins = h * 60 + p.n.getMinutes(), day = h >= 6 && h < 19;
+    const sunX = day ? (mins - 360) / 780 * 100 : ((mins + 300) % 1440) / 660 * 100;
+    out.push('<div class="dcard ldc ldsky" id="ldSky" data-sky="' + ldSkyPhase(h) + '"><span class="skyfx"></span><span class="ldorb o1"></span><span class="ldorb o2"></span><span class="ldorb o3"></span>' +
+      '<span class="ldstars">' + Array.from({ length: 14 }, (_, i) => '<b style="left:' + ((i * 37 + 11) % 100) + '%;top:' + ((i * 53 + 7) % 90) + '%;animation-delay:' + (-i * .37).toFixed(2) + 's"></b>').join('') + '</span>' +
+      '<div class="dhead"><span class="dlbl">' + dashEsc(dash.wxCity || 'New Orleans') + ' · ' + ldSkyPhase(h) + '</span><span class="dchip">● live</span></div>' +
+      '<div class="ldtime" id="ldTime"><span class="hm"><span id="ldHH">' + p.hh + '</span><span class="colon">:</span><span id="ldMM">' + p.mm + '</span></span><span class="ss" id="ldSS">' + p.ss + '</span>' + (p.ap ? '<span class="ap">' + p.ap + '</span>' : '') + '</div>' +
+      '<div class="lddate">' + p.n.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) + '</div>' +
+      '<div class="lddt' + (day ? '' : ' moon') + '"><i style="--x:' + Math.max(0, Math.min(100, sunX)).toFixed(1) + '%"></i></div>' +
+      '<div class="ldst' + (+p.ss >= 50 ? ' low' : '') + '" id="ldSecT"><i style="--w:' + (+p.ss / 59 * 100).toFixed(1) + '%"></i></div></div>');
+  }
+  if (C.wx) {
+    const w = readJson(LD_WX_KEY), c = w.data;
+    const k = c ? ldWxKind(c.code, c.day) : 'partsun';
+    out.push('<div class="dcard ldc ldwx" data-k="' + k + '"><span class="wxbg"></span>' + ldFx(10) + ldWxIcon(k) +
+      '<div><div class="t">' + (c ? '<span data-n="' + Math.round(c.temp) + '">0</span>°' : '--°') + '</div>' +
+      '<div class="ph">' + (c ? ldWxText(c.code) + ' · feels ' + Math.round(c.feel) + '°' : 'Loading weather…') + '</div>' +
+      '<div class="mt">' + (c ? '💧 ' + Math.round(c.hum) + '% · 🌬 ' + Math.round(c.wind) + ' mph · H ' + Math.round(c.hi) + '° L ' + Math.round(c.lo) + '°' : dashEsc(dash.wxCity || '')) + '</div></div></div>');
+  }
+  if (C.goals) {
+    const nx = LD_GROUPS.filter(g => !ldLocked(g)).map(g => g.items.find(x => !dash.checks[x[0]])).find(Boolean);
+    out.push('<div class="dcard ldc"><div class="dhead"><span class="dlbl">Goals</span><span class="dchip">' + T.d + '/' + T.n + '</span></div>' +
+      '<div class="ldbig"><span data-n="' + T.pct + '" data-suf="%">0%</span><small>of everything</small></div>' + ldBar('all', T.pct) +
+      (nx ? '<div class="ldnext"><em>Next up</em><span>' + dashEsc(nx[1]) + '</span></div>' : '<div class="ldnext"><em>Done</em><span>Every goal checked off. Legend.</span></div>') + '</div>');
+  }
+  if (C.wrx) {
+    const fix = ldGroup('fix'), stages = ['build1', 'build2', 'build3'].map(ldGroup), cur = stages.find(g => ldDone(g) < g.items.length);
+    const fixLeft = fix.items.filter(x => !dash.checks[x[0]] || x[0] === ldJust);
+    out.push('<div class="dcard ldc"><div class="dhead"><span class="dh3">🏎️ WRX build</span><span class="dlbl">' + ldDone(fix) + '/' + fix.items.length + ' fixes</span></div>' +
+      '<div class="ldstages">' + stages.map(g => '<span class="' + (ldDone(g) === g.items.length ? 'done' : g === cur ? 'cur' : 'lock') + '">' + (ldDone(g) === g.items.length ? '✓ ' : g === cur ? '' : '🔒 ') + g.short + '</span>').join('') + '</div>' +
+      (cur ? ldBar('st-' + cur.id, Math.round(ldDone(cur) / cur.items.length * 100), 'sm') + cur.items.slice(0, 4).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="dsub">All three stages done. Go drive it.</div>') +
+      (fixLeft.length ? '<div class="ldnext"><em>Fix next</em><span>' + dashEsc(fixLeft[0][1]) + '</span></div>' + fixLeft.slice(0, 2).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="ldnext"><em>Fixed</em><span>Fix list is clear.</span></div>') + '</div>');
+  }
+}
+// Cards that go after the classic lists
+function ldCardsBottom(out, C) {
+  [['watch', 'cwatch', '📈'], ['pc', 'pc', '🖥️'], ['yt', 'yt', '🎵']].forEach(([k, gid, e]) => {
+    if (!C[k]) return;
+    const g = ldGroup(gid), d = ldDone(g);
+    out.push('<div class="dcard ldc"><div class="dhead"><span class="dh3">' + e + ' ' + dashEsc(g.name) + '</span><span class="dlbl">' + d + '/' + g.items.length + '</span></div>' +
+      ldBar('g-' + gid, Math.round(d / g.items.length * 100), 'sm') + '<div style="margin-top:6px">' + g.items.map(x => ldRow(x[0], x[1], false)).join('') + '</div></div>');
+  });
+  const half = C.areas && C.cap;
+  if (C.areas) {
+    const areas = ['Garage', 'Crypto', 'Gaming', 'YouTube'];
+    out.push('<div class="dcard ldc' + (half ? ' half' : '') + '"><span class="dlbl">Progress by area</span>' + areas.map(a => {
+      const t = ldTotals(LD_GROUPS.filter(g => g.area === a));
+      return half ? '<div style="margin-top:7px;font-size:11px">' + a + ' <b style="float:right;color:var(--p)">' + t.pct + '%</b>' + ldBar('a-' + a, t.pct, 'sm') + '</div>'
+        : '<div class="ldarea"><span>' + a + '</span>' + ldBar('a-' + a, t.pct, 'sm') + '<b>' + t.pct + '%</b></div>';
+    }).join('') + '</div>');
+  }
+  if (C.cap) out.push('<div class="dcard ldc ldtap' + (half ? ' half' : '') + '" data-ldurl="' + LD_SYLLABUS + '"><div class="ldcap"><span class="cw"><span class="ring"></span><span class="orb"></span><span class="cap">🎓</span><span class="tas"></span></span>' +
+    '<div><div class="dh3">Syllabus</div><div class="dsub">Career roadmap' + (isWall ? '' : ' · tap to open') + '</div></div></div></div>');
+  if (C.pins) {
+    const pins = LD_PINS.filter(p => dash.pins.indexOf(p[0]) >= 0);
+    if (pins.length) out.push('<div class="dcard ldc"><div class="dhead"><span class="dlbl">Pinned</span>' + (isWall ? '' : '<span class="dlbl">tap to open</span>') + '</div><div class="ldpins">' +
+      pins.map((p, j) => '<div class="ldpin ldtap" style="--j:' + j + '" data-ldurl="' + LD_ART + p[3] + '"><b>' + p[1] + '</b>' + dashEsc(p[2]) + '</div>').join('') + '</div></div>');
+  }
+  if (C.vinyl) {
+    const y = ldGroup('yt');
+    out.push('<div class="dcard ldc ldvin"><span class="disc"></span><div class="mt"><span class="dlbl">Now spinning</span><div class="dh3">Obsidian Dominion</div>' +
+      '<div class="ldmarq"><span>Next drop: ' + dashEsc((y.items.find(x => !dash.checks[x[0]]) || ['', 'pipeline clear, ship it'])[1]) + ' · ' + ldDone(y) + '/' + y.items.length + ' steps done · keep the channel moving ·</span></div>' +
+      '<div class="ldeq">' + Array.from({ length: 12 }, (_, i) => '<i style="animation-delay:' + (-i * .17).toFixed(2) + 's"></i>').join('') + '</div></div></div>');
+  }
+}
+function ldMotionK() { return ((dash.motion === 'calm' ? 2.4 : 1) / (dash.speed || 1)).toFixed(2); }
+
+// One tick per second for the living clock: only text and two bars change, nothing re-renders
+function ldTickSky() {
+  if (paused || !$('ldTime')) return;
+  const p = ldTimeParts(), m = p.n.getHours() * 60 + p.n.getMinutes();
+  const ss = $('ldSS'); ss.textContent = p.ss; ss.classList.remove('tick'); void ss.offsetWidth; ss.classList.add('tick');
+  const st = $('ldSecT'), i = st.firstChild, s = +p.ss;
+  st.classList.toggle('low', s >= 50);
+  if (s === 0) { i.style.transition = 'none'; i.style.setProperty('--w', '0%'); void i.offsetWidth; i.style.transition = ''; }
+  else i.style.setProperty('--w', (s / 59 * 100).toFixed(1) + '%');
+  if (m !== ldLastMin) {
+    const first = ldLastMin < 0; ldLastMin = m;
+    $('ldHH').textContent = p.hh; $('ldMM').textContent = p.mm;
+    if (!first) { const t = $('ldTime'); t.classList.remove('flip'); void t.offsetWidth; t.classList.add('flip'); }
+    const sky = $('ldSky'), ph = ldSkyPhase(p.n.getHours()); if (sky && sky.dataset.sky !== ph) renderDash();
+  }
+}
+setInterval(ldTickSky, 1000);
+
+// Weather from Open-Meteo, cached so the wallpaper and the app share one fetch
+let ldWxBusy = false;
+function refreshWx(force) {
+  if (!dash.on || !dash.cards.wx || ldWxBusy || isAgent) return;
+  const c = readJson(LD_WX_KEY), key = dash.wxLat + ',' + dash.wxLon;
+  if (!force && c.t && Date.now() - c.t < 20 * 60 * 1000 && c.key === key) return;
+  ldWxBusy = true;
+  httpGet('https://api.open-meteo.com/v1/forecast?latitude=' + dash.wxLat + '&longitude=' + dash.wxLon + '&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&forecast_days=1&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto', { 'Accept': 'application/json' }).then(r => {
+    ldWxBusy = false;
+    try {
+      const j = JSON.parse(r.body), cur = j.current;
+      if (r.status === 200 && cur) {
+        localStorage.setItem(LD_WX_KEY, JSON.stringify({ t: Date.now(), key: key, data: { temp: cur.temperature_2m, feel: cur.apparent_temperature, hum: cur.relative_humidity_2m, wind: cur.wind_speed_10m, code: cur.weather_code, day: !!cur.is_day, hi: j.daily.temperature_2m_max[0], lo: j.daily.temperature_2m_min[0] } }));
+        renderDash(); renderDashUI();
+      }
+    } catch (e) {}
+  }).catch(() => { ldWxBusy = false; });
+}
+setInterval(() => { if (!paused) refreshWx(false); }, 60 * 1000);
+function ldFindCity(name) {
+  name = (name || '').trim(); if (!name) return;
+  const note = $('ldWxNote'); if (note) note.textContent = 'Looking up ' + name + '…';
+  httpGet('https://geocoding-api.open-meteo.com/v1/search?count=1&name=' + encodeURIComponent(name), { 'Accept': 'application/json' }).then(r => {
+    try {
+      const g = (JSON.parse(r.body).results || [])[0];
+      if (!g) { if (note) note.textContent = "Couldn't find " + name + '. Try a bigger nearby city.'; return; }
+      dash.wxCity = g.name; dash.wxLat = +g.latitude.toFixed(3); dash.wxLon = +g.longitude.toFixed(3);
+      saveDash(); refreshWx(true);
+      if (note) note.textContent = 'Weather for ' + g.name + (g.admin1 ? ', ' + g.admin1 : '') + '.';
+    } catch (e) { if (note) note.textContent = "Couldn't reach the weather service."; }
+  });
+}
+
+// Checking things off: a pop, sparks, a toast, and the wallpaper celebrates too next time you see it
+function ldToast(msg) {
+  let t = $('ldToast'); if (!t) { t = document.createElement('div'); t.id = 'ldToast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+  clearTimeout(ldToast.tm); ldToast.tm = setTimeout(() => t.classList.remove('show'), 2400);
+}
+function ldSparks(x, y, n) {
+  if (dash.motion === 'off') return;
+  const cols = ['var(--p)', '#2dd4bf', '#f2b84b', '#e3efe7'];
+  for (let i = 0; i < (n || 16); i++) {
+    const s = document.createElement('i'), a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 70;
+    s.className = 'ldspk'; s.style.left = x + 'px'; s.style.top = y + 'px';
+    s.style.setProperty('--c', cols[i % 4]); s.style.setProperty('--dx', (Math.cos(a) * d).toFixed(0) + 'px'); s.style.setProperty('--dy', (Math.sin(a) * d).toFixed(0) + 'px');
+    document.body.appendChild(s); setTimeout(() => s.remove(), 900);
+  }
+}
+function ldToggle(id, x, y) {
+  const g = LD_GROUPS.find(gr => gr.items.some(it => it[0] === id)); if (!g) return;
+  if (ldLocked(g)) { ldToast('🔒 Finish ' + ldGroup(g.lock).name + ' first'); return; }
+  const was = !!dash.checks[id], unlockedBefore = LD_GROUPS.filter(gr => !ldLocked(gr)).length;
+  if (was) delete dash.checks[id]; else dash.checks[id] = 1;
+  let msg = '';
+  if (!was) {
+    const item = g.items.find(it => it[0] === id)[1];
+    const next = LD_GROUPS.find(gr => gr.lock === g.id);
+    if (ldDone(g) === g.items.length) msg = next && LD_GROUPS.filter(gr => !ldLocked(gr)).length > unlockedBefore ? '🔓 Unlocked: ' + next.name : '🏁 ' + g.name + ' complete!';
+    else msg = '✓ ' + item + ' · Nice work, Colin.';
+    dash.win = { t: Date.now(), msg: msg };
+    ldSeenWin = dash.win.t;
+  }
+  ldJust = was ? '' : id; ldStill = true;
+  saveDash();
+  ldStill = false;
+  setTimeout(() => { ldJust = ''; }, 1000);
+  if (msg) { ldToast(msg); if (x != null) ldSparks(x, y, /complete|Unlocked/.test(msg) ? 30 : 16); }
+}
+// The wallpaper catches up on wins you logged in the app
+function ldCatchUp() {
+  const w = dash.win; if (!w || !w.t || w.t <= ldSeenWin) return;
+  ldSeenWin = w.t;
+  if (!isWall || Date.now() - w.t > 6 * 3600 * 1000) return;
+  setTimeout(() => { ldToast(w.msg); ldSparks(innerWidth / 2, innerHeight * 0.32, 26); }, 700);
+}
+// Taps on cards only work in the app, so swiping your home screen never ticks something by accident
+document.addEventListener('click', e => {
+  if (isWall || isAgent) return;
+  const el = e.target.closest && e.target.closest('#dash [data-ldc], #dash [data-ldurl], #ldChecks [data-ldc]'); if (!el) return;
+  if (el.dataset.ldurl) { ldOpen(el.dataset.ldurl); return; }
+  const r = el.getBoundingClientRect(); ldToggle(el.dataset.ldc, r.left + 20, r.top + r.height / 2);
+});
+(function () { const sp = window.setPaused; window.setPaused = function (b) { sp(b); const d = $('dash'); if (d) d.classList.toggle('ldp', !!b); }; })();
+
+function ldRenderUI() {
+  const act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
+  act('[data-ld-motion]', b => b.dataset.ldMotion === dash.motion);
+  act('[data-ld-pin]', b => dash.pins.indexOf(b.dataset.ldPin) >= 0);
+  $('rngLdSpeed').value = dash.speed; $('valLdSpeed').textContent = (+dash.speed).toFixed(1) + '×';
+  if (document.activeElement !== $('ldWxCity')) $('ldWxCity').value = dash.wxCity || '';
+  const T = ldTotals();
+  $('ldChecks').innerHTML = '<div class="note">' + T.d + ' of ' + T.n + ' done (' + T.pct + '%).</div>' + LD_GROUPS.map(g => {
+    const lk = ldLocked(g);
+    return '<div class="sec-label" style="margin-top:10px">' + dashEsc(g.name) + ' · ' + ldDone(g) + '/' + g.items.length + (lk ? ' · 🔒 finish ' + dashEsc(ldGroup(g.lock).name) + ' first' : '') + '</div>' +
+      g.items.map(x => ldRow(x[0], x[1], lk)).join('');
+  }).join('');
+}
+function ldBuildUI() {
+  document.querySelectorAll('[data-ld-motion]').forEach(b => b.onclick = () => { dash.motion = b.dataset.ldMotion; saveDash(); });
+  document.querySelectorAll('[data-ld-preset]').forEach(b => b.onclick = () => { Object.assign(dash.cards, LD_PRESETS[b.dataset.ldPreset]); dash.on = true; saveDash(); refreshPrices(true); refreshWx(false); ldToast('Layout: ' + b.textContent.trim()); });
+  $('rngLdSpeed').oninput = e => { dash.speed = parseFloat(e.target.value); saveDash(); };
+  $('ldWxCity').onchange = e => ldFindCity(e.target.value);
+  $('ldPinGrid').innerHTML = LD_PINS.map(p => '<button class="opt-btn" data-ld-pin="' + p[0] + '">' + p[1] + ' ' + dashEsc(p[2]) + '</button>').join('');
+  document.querySelectorAll('[data-ld-pin]').forEach(b => b.onclick = () => { const k = b.dataset.ldPin, i = dash.pins.indexOf(k); if (i >= 0) dash.pins.splice(i, 1); else dash.pins.push(k); saveDash(); });
+}
+
 setInterval(() => { const c = $('dashClock'); if (c && !paused) c.innerHTML = dashClockHTML(); }, 15000);
 // Live prices with a 7-day chart, cached so the wallpaper and the app share one fetch
 let dashFetching = false;
@@ -5246,6 +5731,7 @@ function renderDashUI() {
   $('rngDashRad').value = dash.rad; $('valDashRad').textContent = dash.rad + 'px';
   $('rngLockDim').value = dash.lockDim; $('valLockDim').textContent = Math.round(dash.lockDim * 100) + '%';
   [['dashCoins', dash.coins], ['dashGoal', dash.goal], ['dashOilNow', dash.oil.now], ['dashOilLast', dash.oil.last], ['dashOilEvery', dash.oil.every]].forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v; });
+  ldRenderUI();
   $('dashTodoList').innerHTML = dash.todos.length ? dash.todos.map((x, i) => '<div class="row ' + (x.d ? 'done' : '') + '"><button class="dash-mini" data-dtodo="' + i + '">' + (x.d ? '✓' : '○') + '</button><span>' + dashEsc(x.t) + '</span><button class="dash-mini" data-ddel="' + i + '">✕</button></div>').join('') : '<div class="note">Nothing on the list yet.</div>';
   const c = readJson(DASH_PX_KEY);
   if (c.t) $('dashPxNote').textContent = 'Tickers separated by commas (xrp, hbar, btc, eth, sol…). Prices and 7-day charts from CoinGecko, last updated ' + new Date(c.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
@@ -5253,7 +5739,7 @@ function renderDashUI() {
 function buildDashUI() {
   document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); styleClock(); refreshPrices(true); });
   document.querySelectorAll('[data-dash-pos]').forEach(b => b.onclick = () => { dash.pos = b.dataset.dashPos; saveDash(); });
-  document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); });
+  document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); });
   document.querySelectorAll('[data-sprite]').forEach(b => b.onclick = () => { cfg.sprite = b.dataset.sprite === '1'; saveCfg(); updateUI(); renderDashUI(); });
   $('rngDashOp').oninput = e => { dash.op = parseFloat(e.target.value); saveDash(); };
   $('rngDashBlur').oninput = e => { dash.blur = parseInt(e.target.value, 10); saveDash(); };
@@ -5272,6 +5758,7 @@ function buildDashUI() {
     if (t) { const x = dash.todos[+t.dataset.dtodo]; x.d = !x.d; saveDash(); }
     if (d) { dash.todos.splice(+d.dataset.ddel, 1); saveDash(); }
   };
+  ldBuildUI();
   $('dashOpenCC').onclick = () => { if (hasNative('openUrl')) Android.openUrl(CC_URL); else window.open(CC_URL, '_blank'); };
   renderDashUI();
 }
@@ -5304,7 +5791,7 @@ window.setLock = function (locked, animate, preview) {
 };
 
 window.syncConfig = function () {
-  dash = loadDash(); renderDash(); applyLockClasses(); setTimeout(layoutDash, 60);
+  dash = loadDash(); renderDash(); applyLockClasses(); setTimeout(layoutDash, 60); ldCatchUp(); refreshWx(false);
   const old = cfg;
   cfg = loadCfg();
   if (cfg.particles !== old.particles) buildParticles();
@@ -5328,6 +5815,7 @@ updateUI();
 renderDash();
 applyLockClasses();
 setTimeout(() => refreshPrices(false), 1500);
+setTimeout(() => refreshWx(false), 1800);
 if (!isAgent) {
   setInterval(tickClock, 1000);
   startLoop();
