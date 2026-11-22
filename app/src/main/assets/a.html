@@ -432,6 +432,38 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
 #dash.m-off .ldfx{display:none;}
 /* stop every loop while the wallpaper isn't on screen */
 #dash.ldp,#dash.ldp *{animation-play-state:paused!important;}
+/* Phone fit: hidden cards, and tighter sizes on narrow screens like the Galaxy S24+ (412 wide) */
+#dash .ldhide{display:none!important;}
+.ldmore{grid-column:span 2;justify-self:center;font:500 10px "JetBrains Mono",monospace;color:rgba(227,239,231,.75);background:rgba(17,31,24,.7);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:5px 12px;text-align:center;}
+#dash{width:auto;box-sizing:border-box;}
+.dcard{min-width:0;box-sizing:border-box;overflow-wrap:anywhere;}
+.ldrow span:last-child{min-width:0;}
+.ldterm{white-space:normal;}
+@media (max-width:460px){
+  #dash{left:12px;right:12px;gap:8px;}
+  #dash.pos-top{top:120px;}
+  #dash.pos-bottom{bottom:120px;}
+  #dash.pos-full{top:56px;}
+  body.wallpaper #dash.pos-full{top:52px;}
+  .dcard{padding:12px 14px;}
+  .ldsky{min-height:104px;}
+  .ldtime{font-size:40px;}
+  .ldtime .ss{font-size:16px;}
+  .ldwx{gap:10px;}
+  .wxsvg{width:54px;height:54px;}
+  .ldwx .t{font-size:30px;}
+  .ldbig{font-size:26px;}
+  .ldrow{font-size:12.5px;padding:5px 2px;}
+  .ldvin .disc{width:54px;height:54px;}
+  .ldvin .disc::after{inset:18px;}
+  .ldpins{gap:6px;}
+  .ldpin{font-size:9.5px;}
+  .ldterm{font-size:11px;}
+  .dgreet{font-size:18px;}
+  .dclock{font-size:34px;}
+  .dbig{font-size:22px;}
+}
+@media (max-width:360px){ .ldpins{grid-template-columns:repeat(3,1fr);} .ldtime{font-size:34px;} .dcard.half{grid-column:span 2;} }
 </style>
 </head>
 <body>
@@ -5352,27 +5384,52 @@ function dashClockHTML() {
 }
 function dashGlassClock() { try { return !!(dash && dash.on && dash.gclock && !isAgent); } catch (e) { return false; } }
 // Keep the cards clear of Nova's clock: move them below (or above) it, and shrink them to fit if needed
+// Cards hidden first when the screen can't fit them all (last in the list goes first)
+const LD_HIDE_ORDER = ['sky', 'wx', 'goals', 'wrx', 'prices', 'prompt', 'vinyl', 'greet', 'clock', 'week', 'todo', 'oil', 'goal', 'yt', 'pc', 'watch', 'areas', 'cap', 'pins'];
+const LD_MIN_SCALE = 0.9;
+function ldCardKey(h) {
+  const M = [['class="ldterm"', 'prompt'], ['class="dgreet"', 'greet'], ['ldsky', 'sky'], ['ldwx', 'wx'], ['>Goals</span>', 'goals'], ['WRX build', 'wrx'], ['id="dashClock"', 'clock'],
+    ['class="dweek"', 'week'], [' price</span>', 'prices'], ['class="dtodo"', 'todo'], ['📈', 'watch'], ['🖥️', 'pc'], ['🎵', 'yt'], ['Progress by area', 'areas'], ['ldcap', 'cap'],
+    ['ldpins', 'pins'], ['ldvin', 'vinyl'], ['WRX oil change', 'oil'], ['>Goal</span>', 'goal']];
+  const m = M.find(x => h.indexOf(x[0]) >= 0); return m ? m[1] : '';
+}
+// Shrink a little if that's enough, otherwise hide the lowest-priority cards until the rest fit at a readable size
+function ldFit(el, avail) {
+  el.style.transform = 'none';
+  let h = el.getBoundingClientRect().height, hidden = 0;
+  if (h > avail && avail > 120) {
+    const cards = [...el.querySelectorAll('.dcard')].sort((a, b) => LD_HIDE_ORDER.indexOf(b.dataset.c || '') - LD_HIDE_ORDER.indexOf(a.dataset.c || ''));
+    while (h * LD_MIN_SCALE > avail && hidden < cards.length - 1) { cards[hidden].classList.add('ldhide'); hidden++; h = el.getBoundingClientRect().height; }
+    if (hidden && !isWall) {
+      const m = document.createElement('div'); m.id = 'ldMore'; m.className = 'ldmore';
+      m.textContent = '+' + hidden + (hidden === 1 ? ' card' : ' cards') + " didn't fit. " + (cfg.clock && cfg.clock.on && dash.cards.sky ? "Turn off Nova's clock in TEXT (the sky card has the time) or switch cards off in DASH." : 'Switch some off in DASH or use Compact cards.');
+      el.appendChild(m); h = el.getBoundingClientRect().height;
+    }
+    if (h > avail) el.style.transform = 'scale(' + Math.max(0.5, avail / h).toFixed(3) + ')';
+  }
+}
+// Keep the cards clear of Nova's clock, the status bar and camera, and the dock and gesture bar
 function layoutDash() {
   const el = $('dash'); if (!el) return;
   try { if (!dash) return; } catch (e) { return; }
   el.style.top = el.style.bottom = el.style.transform = el.style.transformOrigin = '';
-  if (!el.classList.contains('on') || !el.children.length) return;
-  const ck = $('clock'), vh = window.innerHeight, pad = 16, botSafe = isWall ? Math.round(vh * 0.11) : 120;
+  el.querySelectorAll('.ldhide').forEach(c => c.classList.remove('ldhide'));
+  const more = $('ldMore'); if (more) more.remove();
+  if (!el.classList.contains('on') || !el.querySelector('.dcard')) return;
+  const ck = $('clock'), vh = window.innerHeight, pad = 14, topSafe = isWall ? 52 : 56, botSafe = isWall ? Math.round(vh * 0.11) : 110;
   const clockOn = cfg.clock && cfg.clock.on && ck && ck.style.display !== 'none' && !document.body.classList.contains('drawer-open');
+  const toTop = y => { el.style.top = Math.round(y) + 'px'; el.style.bottom = 'auto'; el.style.transformOrigin = 'top center'; };
   let r = el.getBoundingClientRect();
   if (!clockOn) {
-    if (r.height > vh - 40 - botSafe) { el.style.top = '40px'; el.style.bottom = 'auto'; el.style.transform = 'scale(' + ((vh - 40 - botSafe) / r.height).toFixed(3) + ')'; el.style.transformOrigin = 'top center'; }
+    if (r.top < topSafe || r.bottom > vh - botSafe) { toTop(topSafe); ldFit(el, vh - topSafe - botSafe); }
     return;
   }
   const c = ck.getBoundingClientRect();
-  if (r.top >= c.bottom + pad || r.bottom <= c.top - pad) return;
+  if (r.top >= Math.max(c.bottom + pad, topSafe) && r.bottom <= vh - botSafe) return;
+  if (r.bottom <= c.top - pad && r.top >= topSafe) return;
   const clockUp = (c.top + c.bottom) / 2 < vh / 2;
-  let avail;
-  if (clockUp) { el.style.top = Math.round(c.bottom + pad) + 'px'; el.style.bottom = 'auto'; avail = vh - (c.bottom + pad) - botSafe; el.style.transformOrigin = 'top center'; }
-  else { el.style.bottom = Math.round(vh - c.top + pad) + 'px'; el.style.top = 'auto'; avail = c.top - pad - 40; el.style.transformOrigin = 'bottom center'; }
-  el.style.transform = 'none';
-  r = el.getBoundingClientRect();
-  if (r.height > avail && avail > 120) el.style.transform = 'scale(' + (avail / r.height).toFixed(3) + ')';
+  if (clockUp) { toTop(Math.max(c.bottom + pad, topSafe)); ldFit(el, vh - Math.max(c.bottom + pad, topSafe) - botSafe); }
+  else { el.style.bottom = Math.round(vh - c.top + pad) + 'px'; el.style.top = 'auto'; el.style.transformOrigin = 'bottom center'; ldFit(el, c.top - pad - topSafe); }
 }
 addEventListener('resize', () => setTimeout(layoutDash, 80));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setTimeout(layoutDash, 50));
@@ -5419,7 +5476,7 @@ function renderDash() {
     out.push('<div class="dcard ' + (showGoal ? 'half' : '') + '"><span class="dlbl">WRX oil change</span><div class="dbig" style="color:' + (left < 0 ? '#f87171' : left < 500 ? '#facc15' : '#e3efe7') + '"><span data-n="' + Math.abs(left) + '">0</span><span style="font-size:13px;opacity:.6;font-weight:600"> mi ' + (left < 0 ? 'overdue' : 'left') + '</span></div><div class="dbar"><i style="--w:' + pct + '%"></i></div></div>');
   }
   if (showGoal) out.push('<div class="dcard ' + (showOil ? 'half' : '') + '"><span class="dlbl">Goal</span><div class="dh3" style="margin-top:6px;line-height:1.3">' + dashEsc(dash.goal) + '</div></div>');
-  el.innerHTML = out.join('');
+  el.innerHTML = out.map(h => h.replace('<div class="dcard', '<div data-c="' + ldCardKey(h) + '" class="dcard')).join('');
   el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
   el.querySelectorAll('[data-n]').forEach(x => dashCount(x, ldStill || dash.motion === 'off'));
   layoutDash();
@@ -5534,8 +5591,8 @@ function ldCardsTop(out, C) {
     const fixLeft = fix.items.filter(x => !dash.checks[x[0]] || x[0] === ldJust);
     out.push('<div class="dcard ldc"><div class="dhead"><span class="dh3">🏎️ WRX build</span><span class="dlbl">' + ldDone(fix) + '/' + fix.items.length + ' fixes</span></div>' +
       '<div class="ldstages">' + stages.map(g => '<span class="' + (ldDone(g) === g.items.length ? 'done' : g === cur ? 'cur' : 'lock') + '">' + (ldDone(g) === g.items.length ? '✓ ' : g === cur ? '' : '🔒 ') + g.short + '</span>').join('') + '</div>' +
-      (cur ? ldBar('st-' + cur.id, Math.round(ldDone(cur) / cur.items.length * 100), 'sm') + cur.items.slice(0, 4).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="dsub">All three stages done. Go drive it.</div>') +
-      (fixLeft.length ? '<div class="ldnext"><em>Fix next</em><span>' + dashEsc(fixLeft[0][1]) + '</span></div>' + fixLeft.slice(0, 2).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="ldnext"><em>Fixed</em><span>Fix list is clear.</span></div>') + '</div>');
+      (cur ? ldBar('st-' + cur.id, Math.round(ldDone(cur) / cur.items.length * 100), 'sm') + cur.items.filter(x => !dash.checks[x[0]] || x[0] === ldJust).slice(0, 3).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="dsub">All three stages done. Go drive it.</div>') +
+      (fixLeft.length ? '<div class="ldnext"><em>Fix list</em><span>' + fixLeft.filter(x => !dash.checks[x[0]]).length + ' left</span></div>' + fixLeft.slice(0, 2).map(x => ldRow(x[0], x[1], false)).join('') : '<div class="ldnext"><em>Fixed</em><span>Fix list is clear.</span></div>') + '</div>');
   }
 }
 // Cards that go after the classic lists
