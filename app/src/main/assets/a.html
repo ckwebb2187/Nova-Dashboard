@@ -479,6 +479,89 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
   .dbig{font-size:22px;}
 }
 @media (max-width:360px){ .ldpins{grid-template-columns:repeat(3,1fr);} .ldtime{font-size:34px;} .dcard.half{grid-column:span 2;} }
+/* ===== Weekly build Nov 22: shift strip, auto shift theme, OpenJarvis pulse ===== */
+/* Shift strip: the next 7 days as glowing pills, with a live countdown to the next day off */
+.ldshift .pills{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px;}
+.ldshift .pl{position:relative;display:grid;justify-items:center;gap:1px;padding:6px 0 5px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);font:600 9px "JetBrains Mono",monospace;color:rgba(227,239,231,.7);animation:shPop calc(.55s * var(--ldk)) cubic-bezier(.2,.9,.25,1.3) both;animation-delay:calc(var(--j,0) * 60ms + .25s);}
+.ldshift .pl b{font:800 15px/1.1 "Sora",-apple-system,sans-serif;color:#e3efe7;}
+.ldshift .pl em{font-style:normal;font-size:8px;letter-spacing:.5px;padding:1px 4px;border-radius:6px;margin-top:2px;}
+.ldshift .pl.work{border-color:rgba(94,234,212,.45);background:linear-gradient(180deg,rgba(20,184,166,.22),rgba(20,184,166,.05));}
+.ldshift .pl.work em{background:#2dd4bf;color:#042f2e;}
+.ldshift .pl.off{border-color:rgba(74,222,128,.55);background:linear-gradient(180deg,rgba(34,197,94,.28),rgba(34,197,94,.06));box-shadow:0 0 14px -4px #4ade80;animation:shPop calc(.55s * var(--ldk)) cubic-bezier(.2,.9,.25,1.3) both,shGlow calc(2.8s * var(--ldk)) ease-in-out infinite alternate;animation-delay:calc(var(--j,0) * 60ms + .25s),calc(var(--j,0) * -0.4s);}
+.ldshift .pl.off em{background:#4ade80;color:#052e16;}
+.ldshift .pl.wknd{border-color:rgba(251,191,36,.6);background:linear-gradient(180deg,rgba(251,191,36,.25),rgba(34,197,94,.08));box-shadow:0 0 14px -4px #fbbf24;animation:shPop calc(.55s * var(--ldk)) cubic-bezier(.2,.9,.25,1.3) both,shGold calc(2.4s * var(--ldk)) ease-in-out infinite alternate;animation-delay:calc(var(--j,0) * 60ms + .25s),calc(var(--j,0) * -0.3s);}
+.ldshift .pl.wknd em{background:#fbbf24;color:#422006;}
+.ldshift .pl.none em{background:rgba(255,255,255,.1);color:rgba(227,239,231,.6);}
+.ldshift .pl.today{outline:2px solid var(--p);outline-offset:1px;}
+.ldshift .pl.today::after{content:"";position:absolute;inset:-5px;border-radius:15px;border:2px solid var(--p);opacity:0;animation:shRing calc(2.2s * var(--ldk)) ease-out infinite;}
+.ldshift .cd{display:flex;align-items:baseline;gap:6px;margin-top:9px;font-size:12px;color:rgba(227,239,231,.8);}
+.ldshift .cd b{font:800 20px/1 "Sora",-apple-system,sans-serif;color:#e3efe7;font-variant-numeric:tabular-nums;letter-spacing:-.5px;text-shadow:0 0 14px color-mix(in srgb,var(--p) 45%,transparent);}
+.ldshift .cd b.tick{animation:ldTick .45s cubic-bezier(.2,.8,.2,1);}
+.ldshift .conn{display:block;width:100%;margin-top:8px;padding:9px;border-radius:12px;border:1px solid var(--p);background:color-mix(in srgb,var(--p) 18%,transparent);color:#e3efe7;font:700 12px "Sora",-apple-system,sans-serif;animation:ldPulse calc(2.2s * var(--ldk)) infinite;}
+.ldshift .mode{font:600 9px "JetBrains Mono",monospace;letter-spacing:1px;text-transform:uppercase;padding:3px 7px;border-radius:99px;}
+.ldshift .mode.off{background:#4ade80;color:#052e16;}
+.ldshift .mode.work{background:#2dd4bf;color:#042f2e;}
+@keyframes shPop{0%{transform:translateY(10px) scale(.6);opacity:0;}100%{transform:none;opacity:1;}}
+@keyframes shGlow{to{box-shadow:0 0 22px -2px #4ade80;}}
+@keyframes shGold{to{box-shadow:0 0 22px -2px #fbbf24;}}
+@keyframes shRing{0%{transform:scale(.92);opacity:.8;}100%{transform:scale(1.12);opacity:0;}}
+/* OpenJarvis pulse card */
+.ldjv .jvtop{display:flex;align-items:center;gap:6px;margin-top:6px;font:600 10px "JetBrains Mono",monospace;color:rgba(227,239,231,.65);}
+.ldjv .jvk{padding:2px 7px;border-radius:99px;color:#06140c;background:var(--p);}
+.ldjv .jvk.is{background:#a78bfa;color:#1e1b4b;}
+.ldjv .jvst{padding:2px 6px;border-radius:99px;border:1px solid rgba(255,255,255,.15);}
+.ldjv .jvst.open{color:#4ade80;border-color:rgba(74,222,128,.5);}
+.ldjv .jvst.merged{color:#c4b5fd;border-color:rgba(196,181,253,.5);}
+.ldjv .jvst.closed{color:#f87171;border-color:rgba(248,113,113,.4);}
+.ldjv .jvt{margin-top:5px;font:600 13px/1.3 "IBM Plex Sans",-apple-system,sans-serif;color:#e3efe7;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ldjv .jvm{margin-top:4px;font:500 10px "JetBrains Mono",monospace;color:rgba(227,239,231,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ldjv .ekg{display:block;width:100%;height:22px;margin-top:6px;overflow:visible;}
+.ldjv .ekg path{fill:none;stroke:var(--p);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px var(--p));stroke-dasharray:.22 1;animation:ldJvBeat calc(2.4s * var(--ldk)) linear infinite;}
+.ldjv .ekg path.bg{stroke:rgba(255,255,255,.08);filter:none;stroke-dasharray:none;animation:none;}
+.ldjv .ring{position:absolute;right:16px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--p);box-shadow:0 0 8px var(--p);}
+.ldjv .ring::before,.ldjv .ring::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--p);animation:ldJvRing calc(2s * var(--ldk)) ease-out infinite;}
+.ldjv .ring::after{animation-delay:calc(1s * var(--ldk));}
+.ldjv.fresh{border-color:color-mix(in srgb,var(--p) 70%,transparent);animation:dIn .7s cubic-bezier(.2,.8,.2,1) both,ldJvGlow calc(1.6s * var(--ldk)) ease-in-out infinite alternate;}
+.ldjv.fresh .ekg path{animation-duration:calc(1.1s * var(--ldk));}
+.ldjv.fresh .ring::before,.ldjv.fresh .ring::after{animation-duration:calc(1.1s * var(--ldk));}
+.ldjv .new{font:800 9px "JetBrains Mono",monospace;letter-spacing:1px;padding:3px 7px;border-radius:99px;background:#fbbf24;color:#422006;animation:ldPulse calc(1.4s * var(--ldk)) infinite;margin-right:18px;}
+@keyframes ldJvBeat{from{stroke-dashoffset:1.22;}to{stroke-dashoffset:0;}}
+@keyframes ldJvRing{0%{transform:scale(1);opacity:.9;}100%{transform:scale(3.2);opacity:0;}}
+@keyframes ldJvGlow{from{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 0 0 transparent;}to{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 26px -6px var(--p);}}
+/* Auto shift theme: a calm green aurora on OFF days, a sharper focused look on Work days.
+   It only adds a layer and restyles the cards, so turning it off puts everything back. */
+#shiftFx{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity 1.2s ease;--ldk:1;overflow:hidden;}
+body.sh-off #shiftFx,body.sh-work #shiftFx{opacity:1;}
+#shiftFx .au{position:absolute;left:-30%;right:-30%;height:42%;border-radius:50%;filter:blur(38px);mix-blend-mode:screen;opacity:0;}
+body.sh-off #shiftFx .au{opacity:.5;}
+#shiftFx .au.a1{top:-12%;background:linear-gradient(90deg,transparent,#22c55e 30%,#2dd4bf 55%,#86efac 75%,transparent);animation:shAurA calc(16s * var(--ldk)) ease-in-out infinite alternate;}
+#shiftFx .au.a2{top:6%;background:linear-gradient(90deg,transparent,#10b981 25%,#a3e635 50%,#34d399 80%,transparent);opacity:0;animation:shAurB calc(21s * var(--ldk)) ease-in-out infinite alternate;}
+body.sh-off #shiftFx .au.a2{opacity:.35;}
+#shiftFx .au.a3{top:58%;height:50%;background:radial-gradient(ellipse at center,#14532d,transparent 70%);animation:shAurC calc(25s * var(--ldk)) ease-in-out infinite alternate;}
+body.sh-off #shiftFx .au.a3{opacity:.45;}
+#shiftFx .ff{position:absolute;width:4px;height:4px;border-radius:50%;background:#bbf7d0;box-shadow:0 0 8px 2px #4ade80;opacity:0;}
+body.sh-off #shiftFx .ff{animation:shFly calc(7s * var(--ldk)) ease-in-out infinite;}
+#shiftFx .grid,#shiftFx .sweep,#shiftFx .vig{position:absolute;inset:0;opacity:0;transition:opacity 1s;}
+#shiftFx .grid{background-image:linear-gradient(rgba(94,234,212,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(94,234,212,.07) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%);}
+#shiftFx .sweep{background:linear-gradient(180deg,transparent 45%,rgba(45,212,191,.16) 50%,transparent 55%);background-size:100% 240%;}
+#shiftFx .vig{background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(2,6,23,.55) 100%);}
+body.sh-work #shiftFx .grid,body.sh-work #shiftFx .vig{opacity:1;}
+body.sh-work #shiftFx .sweep{opacity:1;animation:shSweep calc(7s * var(--ldk)) linear infinite;}
+body.sh-off #dash .dcard{border-color:rgba(134,239,172,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 30px -16px #4ade80;}
+body.sh-work #dash .dcard{border-color:rgba(94,234,212,.42);-webkit-backdrop-filter:blur(calc(var(--dblur,14px) * .6)) saturate(1.7) contrast(1.05);backdrop-filter:blur(calc(var(--dblur,14px) * .6)) saturate(1.7) contrast(1.05);}
+body.sh-work #dash .dcard::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#2dd4bf,transparent);background-size:50% 100%;background-repeat:no-repeat;animation:shEdge calc(3.2s * var(--ldk)) linear infinite;opacity:.85;}
+#shiftFx.m-calm .ff,#shiftFx.m-calm .au.a2{display:none;}
+#shiftFx.m-off,#shiftFx.m-off *{animation:none!important;}
+#shiftFx.ldp,#shiftFx.ldp *{animation-play-state:paused!important;}
+#dash.m-off .dcard::before{animation:none!important;}
+#dash.ldp .dcard::before{animation-play-state:paused!important;}
+@media (prefers-reduced-motion:reduce){#shiftFx *{animation:none!important;}}
+@keyframes shAurA{0%{transform:translateX(-12%) rotate(-6deg) scaleY(.8);}100%{transform:translateX(12%) rotate(5deg) scaleY(1.25);}}
+@keyframes shAurB{0%{transform:translateX(14%) rotate(8deg);}100%{transform:translateX(-14%) rotate(-4deg) scaleY(1.4);}}
+@keyframes shAurC{0%{transform:translateY(0) scale(1);}100%{transform:translateY(-8%) scale(1.15);}}
+@keyframes shFly{0%{transform:translate(0,0);opacity:0;}20%{opacity:.9;}50%{transform:translate(var(--fx),var(--fy));opacity:.4;}80%{opacity:.9;}100%{transform:translate(calc(var(--fx) * -.5),calc(var(--fy) * 1.6));opacity:0;}}
+@keyframes shSweep{from{background-position:0 100%;}to{background-position:0 -140%;}}
+@keyframes shEdge{from{background-position:-100% 0;}to{background-position:200% 0;}}
 </style>
 </head>
 <body>
@@ -486,6 +569,7 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
 <canvas id="bgCanvas"></canvas>
 <div id="scan"></div>
 
+<div id="shiftFx"></div>
 <div id="clock"><div id="clockAura"></div><div id="clockTime"></div><div id="clockDate"></div></div>
 <div id="dash"></div>
 <div id="unlockFx"></div>
@@ -899,6 +983,8 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
       <button class="opt-btn" data-dash-card="vinyl">Obsidian Dominion vinyl</button>
       <button class="opt-btn" data-dash-card="pins">Pinned links</button>
       <button class="opt-btn" data-dash-card="cap">Syllabus cap</button>
+      <button class="opt-btn" data-dash-card="shift">📅 Shift strip</button>
+      <button class="opt-btn" data-dash-card="jarvis">🤖 OpenJarvis pulse</button>
     </div>
     <div class="sec-label">Card order</div>
     <div class="note">Drag a card by its handle, or use the arrows. The switch turns a card on or off. Your order shows on the wallpaper and in the app, and if the screen can't fit everything, cards at the bottom of your list are left out first.</div>
@@ -915,6 +1001,31 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
     <div class="sec-label">Weather city</div>
     <input class="inp" id="ldWxCity" placeholder="New Orleans" autocomplete="off">
     <div class="note" id="ldWxNote">Live weather from Open-Meteo, refreshed every 20 minutes. Type a city and press Enter to change it.</div>
+    <div class="sec-label">Shift strip &amp; shift theme</div>
+    <div class="note" id="ldCalNote">The shift strip reads your calendar's all-day Work, OFF and weekend days. Nova only asks for calendar access when you tap Connect, and it only reads; it never adds or changes events.</div>
+    <div class="grid-2">
+      <button class="opt-btn" id="ldCalBtn">📅 Connect calendar</button>
+      <button class="opt-btn" id="ldShiftTheme">Auto shift theme</button>
+    </div>
+    <div class="grid-3" style="margin-top:8px">
+      <input class="inp" id="ldWordWork" placeholder="Work" maxlength="24" autocomplete="off" aria-label="Word for work days">
+      <input class="inp" id="ldWordOff" placeholder="OFF" maxlength="24" autocomplete="off" aria-label="Word for days off">
+      <input class="inp" id="ldWordWknd" placeholder="Weekend" maxlength="24" autocomplete="off" aria-label="Word for weekend days">
+    </div>
+    <div class="note">The words Nova looks for in event titles: work days, days off, and special weekends (gold pills). Only events with these words are read.</div>
+    <div class="grid-2">
+      <button class="opt-btn" data-ld-prev="off">🌿 Preview OFF look</button>
+      <button class="opt-btn" data-ld-prev="work">⚡ Preview Work look</button>
+    </div>
+    <div class="note">Auto shift theme: a calm green aurora with fireflies on OFF days, a sharper focus grid with a scan sweep on Work days. It follows the Motion setting above and leaves your Nova theme alone.</div>
+    <div class="sec-label">OpenJarvis pulse</div>
+    <input class="inp" id="ldJvRepo" placeholder="open-jarvis/OpenJarvis" autocomplete="off" autocapitalize="off">
+    <div class="grid-3" style="margin-top:8px">
+      <button class="opt-btn" data-ld-jvk="all">PRs + issues</button>
+      <button class="opt-btn" data-ld-jvk="pr">PRs only</button>
+      <button class="opt-btn" data-ld-jvk="issue">Issues only</button>
+    </div>
+    <div class="note" id="ldJvNote">The newest PR or issue from the repo on GitHub, checked every 15 minutes. When something new lands, the card pulses until you tap it in the app.</div>
     <div class="sec-label">Pinned links</div>
     <div class="grid-2" id="ldPinGrid"></div>
     <div class="sec-label">Goals &amp; checklists</div>
@@ -5359,8 +5470,8 @@ window.onUpdate = function (type, text) {
 // favorites and looks don't carry your list and miles around.
 const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx2';
 // Card order: the default is the order the cards were built in; dash.order holds Colin's own order from DASH
-const LD_ORDER_DEFAULT = ['prompt', 'greet', 'sky', 'wx', 'goals', 'wrx', 'clock', 'week', 'prices', 'todo', 'watch', 'pc', 'yt', 'areas', 'cap', 'pins', 'vinyl', 'oil', 'goal'];
-const LD_CARD_NAMES = { prompt: 'Typing prompt', greet: 'Welcome card', sky: 'Living sky clock', wx: 'Weather', goals: 'Goals bar', wrx: 'WRX build & fixes', clock: 'Clock card', week: 'Week calendar', prices: 'Crypto prices', todo: "Today's list", watch: 'Crypto watch list', pc: 'Gaming PC setup', yt: 'YouTube pipeline', areas: 'Progress by area', cap: 'Syllabus cap', pins: 'Pinned links', vinyl: 'Obsidian Dominion vinyl', oil: 'WRX oil change', goal: 'Goal / note' };
+const LD_ORDER_DEFAULT = ['prompt', 'greet', 'sky', 'shift', 'wx', 'goals', 'jarvis', 'wrx', 'clock', 'week', 'prices', 'todo', 'watch', 'pc', 'yt', 'areas', 'cap', 'pins', 'vinyl', 'oil', 'goal'];
+const LD_CARD_NAMES = { prompt: 'Typing prompt', greet: 'Welcome card', sky: 'Living sky clock', wx: 'Weather', goals: 'Goals bar', wrx: 'WRX build & fixes', clock: 'Clock card', week: 'Week calendar', prices: 'Crypto prices', todo: "Today's list", watch: 'Crypto watch list', pc: 'Gaming PC setup', yt: 'YouTube pipeline', areas: 'Progress by area', cap: 'Syllabus cap', pins: 'Pinned links', vinyl: 'Obsidian Dominion vinyl', oil: 'WRX oil change', goal: 'Goal / note', shift: 'Shift strip', jarvis: 'OpenJarvis pulse' };
 function ldOrderList() { const o = (dash.order || []).filter(k => LD_ORDER_DEFAULT.indexOf(k) >= 0); return o.concat(LD_ORDER_DEFAULT.filter(k => o.indexOf(k) < 0)); }
 // Put the built cards in Colin's order; half-width cards that lose their partner go full width
 function ldSortCards(cards) {
@@ -5374,9 +5485,10 @@ function ldSortCards(cards) {
   close();
   return cards;
 }
-const LD_LIVING = { prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 };
+const LD_LIVING = { shift: 1, jarvis: 1, prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 };
 const DASH_DEFAULTS = { motion: 'full', speed: 1, wxCity: 'New Orleans', wxLat: 29.955, wxLon: -90.075, pins: ['a-homebase', 'a-fbo', 'a-career', 'a-tune'], checks: { 'g-tune': 1, 'g-cmc1': 1 }, win: null, ldv: 0, on: false, pos: 'mid', dense: false, gclock: true, lockAnim: true, lockCards: false, lockClock: false, lockDim: 0.3, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
-  cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1, prompt: 1, sky: 1, wx: 1, goals: 1, wrx: 1, areas: 0, watch: 0, pc: 0, yt: 0, pins: 0, vinyl: 1, cap: 0 } };
+  shiftTheme: true, words: { work: 'Work', off: 'OFF', wknd: 'Weekend' }, jvRepo: 'open-jarvis/OpenJarvis', jvKind: 'all',
+  cards: { shift: 1, jarvis: 1, greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1, prompt: 1, sky: 1, wx: 1, goals: 1, wrx: 1, areas: 0, watch: 0, pc: 0, yt: 0, pins: 0, vinyl: 1, cap: 0 } };
 const COIN_IDS = { xrp: 'ripple', hbar: 'hedera-hashgraph', btc: 'bitcoin', eth: 'ethereum', sol: 'solana', doge: 'dogecoin', ada: 'cardano', xlm: 'stellar', link: 'chainlink', ltc: 'litecoin', dot: 'polkadot', avax: 'avalanche-2', shib: 'shiba-inu', bnb: 'binancecoin', sui: 'sui' };
 const CC_URL = 'https://claude.ai/artifact/8P38KRZjgFbQUCc8vNc6ND';
 const DASH_APPS = ['🌌', '🫧', '🧭', '📺', '🏎️', '🐾'];
@@ -5391,6 +5503,17 @@ function loadDash() {
   if (['full', 'calm', 'off'].indexOf(d.motion) < 0) d.motion = 'full';
   // first run of this version: switch to the living layout once (Classic in DASH brings the old one back)
   if (!d.ldv) { Object.assign(d.cards, LD_LIVING); d.ldv = 1; }
+  d.words = Object.assign({}, DASH_DEFAULTS.words, d.words || {});
+  Object.keys(DASH_DEFAULTS.words).forEach(k => { if (!String(d.words[k] || '').trim()) d.words[k] = DASH_DEFAULTS.words[k]; });
+  if (['all', 'pr', 'issue'].indexOf(d.jvKind) < 0) d.jvKind = 'all';
+  // Weekly build Nov 22: with his own card order, put the two new cards near the top once so they don't start out hidden
+  if ((d.ldv || 0) < 2) {
+    if (d.order.length) {
+      const ins = (k, after, at) => { if (d.order.indexOf(k) >= 0) return; const i = d.order.indexOf(after); d.order.splice(i >= 0 ? i + 1 : Math.min(at, d.order.length), 0, k); };
+      ins('shift', 'sky', 1); ins('jarvis', 'goals', 3);
+    }
+    d.ldv = 2;
+  }
   return d;
 }
 let dash = loadDash();
@@ -5421,10 +5544,10 @@ function dashClockHTML() {
 function dashGlassClock() { try { return !!(dash && dash.on && dash.gclock && !isAgent); } catch (e) { return false; } }
 // Keep the cards clear of Nova's clock: move them below (or above) it, and shrink them to fit if needed
 // Cards hidden first when the screen can't fit them all (last in the list goes first)
-const LD_HIDE_ORDER = ['sky', 'wx', 'goals', 'wrx', 'prices', 'prompt', 'vinyl', 'greet', 'clock', 'week', 'todo', 'oil', 'goal', 'yt', 'pc', 'watch', 'areas', 'cap', 'pins'];
+const LD_HIDE_ORDER = ['sky', 'shift', 'wx', 'goals', 'jarvis', 'wrx', 'prices', 'prompt', 'vinyl', 'greet', 'clock', 'week', 'todo', 'oil', 'goal', 'yt', 'pc', 'watch', 'areas', 'cap', 'pins'];
 const LD_MIN_SCALE = 0.9;
 function ldCardKey(h) {
-  const M = [['class="ldterm"', 'prompt'], ['class="dgreet"', 'greet'], ['ldsky', 'sky'], ['ldwx', 'wx'], ['>Goals</span>', 'goals'], ['WRX build', 'wrx'], ['id="dashClock"', 'clock'],
+  const M = [['class="dcard ldc ldshift', 'shift'], ['class="dcard ldc ldjv', 'jarvis'], ['class="ldterm"', 'prompt'], ['class="dgreet"', 'greet'], ['ldsky', 'sky'], ['ldwx', 'wx'], ['>Goals</span>', 'goals'], ['WRX build', 'wrx'], ['id="dashClock"', 'clock'],
     ['class="dweek"', 'week'], [' price</span>', 'prices'], ['class="dtodo"', 'todo'], ['📈', 'watch'], ['🖥️', 'pc'], ['🎵', 'yt'], ['Progress by area', 'areas'], ['ldcap', 'cap'],
     ['ldpins', 'pins'], ['ldvin', 'vinyl'], ['WRX oil change', 'oil'], ['>Goal</span>', 'goal']];
   const m = M.find(x => h.indexOf(x[0]) >= 0); return m ? m[1] : '';
@@ -5533,6 +5656,7 @@ function renderDash() {
   el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
   el.querySelectorAll('[data-n]').forEach(x => dashCount(x, ldStill || dash.motion === 'off'));
   layoutDash();
+  applyShiftTheme();
 }
 // ===== Living dashboard: the look and motion of Colin's Dashboard web page =====
 // Every card here has its own switch in DASH. Nothing here touches audio, the mic or alarms.
@@ -5552,9 +5676,9 @@ const LD_PINS = [['a-homebase', '🏠', 'Home Base', 'KbGyM5nYNdaZMzVqiWCrAb'], 
   ['a-tasks', '🗂️', 'Tasks', 'S987Ky37y366xL8QZDc4jF'], ['a-offgrid', '🌾', 'Off-grid', 'X4ukcvaBwPfB383AMzq7Hy'], ['a-blackout', '🔦', 'Blackout kit', '8x7zhTpt8FaFxmc9wfZfoo'], ['a-greymane', '🐺', 'Greymane', 'N12e5AAsF6YKfda3FCK6zw']];
 const LD_SYLLABUS = LD_ART + 'BG8atNYaNc5sLPdqYqvNpJ';
 const LD_PRESETS = {
-  living: { prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 },
-  classic: { prompt: 0, greet: 1, sky: 0, clock: 0, week: 1, wx: 0, goals: 0, wrx: 0, prices: 1, todo: 1, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 0, cap: 0, oil: 1, goal: 1 },
-  all: { prompt: 1, greet: 1, sky: 1, clock: 0, week: 1, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 1, watch: 1, pc: 1, yt: 1, areas: 1, pins: 1, vinyl: 1, cap: 1, oil: 1, goal: 1 }
+  living: { shift: 1, jarvis: 1, prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 },
+  classic: { shift: 1, jarvis: 0, prompt: 0, greet: 1, sky: 0, clock: 0, week: 1, wx: 0, goals: 0, wrx: 0, prices: 1, todo: 1, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 0, cap: 0, oil: 1, goal: 1 },
+  all: { shift: 1, jarvis: 1, prompt: 1, greet: 1, sky: 1, clock: 0, week: 1, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 1, watch: 1, pc: 1, yt: 1, areas: 1, pins: 1, vinyl: 1, cap: 1, oil: 1, goal: 1 }
 };
 let ldStill = false, ldJust = '', ldPrevW = {}, ldSeenWin = (dash.win && dash.win.t) || 0, ldLastMin = -1;
 function ldOpen(u) { if (hasNative('openUrl')) Android.openUrl(u); else window.open(u, '_blank'); }
@@ -5625,6 +5749,7 @@ function ldCardsTop(out, C) {
       '<div class="lddt' + (day ? '' : ' moon') + '"><i style="--x:' + Math.max(0, Math.min(100, sunX)).toFixed(1) + '%"></i></div>' +
       '<div class="ldst' + (+p.ss >= 50 ? ' low' : '') + '" id="ldSecT"><i style="--w:' + (+p.ss / 59 * 100).toFixed(1) + '%"></i></div></div>');
   }
+  if (C.shift) ldShiftCard(out);
   if (C.wx) {
     const w = readJson(LD_WX_KEY), c = w.data;
     const k = c ? ldWxKind(c.code, c.day) : 'partsun';
@@ -5639,6 +5764,7 @@ function ldCardsTop(out, C) {
       '<div class="ldbig"><span data-n="' + T.pct + '" data-suf="%">0%</span><small>of everything</small></div>' + ldBar('all', T.pct) +
       (nx ? '<div class="ldnext"><em>Next up</em><span>' + dashEsc(nx[1]) + '</span></div>' : '<div class="ldnext"><em>Done</em><span>Every goal checked off. Legend.</span></div>') + '</div>');
   }
+  if (C.jarvis) ldJarvisCard(out);
   if (C.wrx) {
     const fix = ldGroup('fix'), stages = ['build1', 'build2', 'build3'].map(ldGroup), cur = stages.find(g => ldDone(g) < g.items.length);
     const fixLeft = fix.items.filter(x => !dash.checks[x[0]] || x[0] === ldJust);
@@ -5678,6 +5804,215 @@ function ldCardsBottom(out, C) {
       '<div class="ldmarq"><span>Next drop: ' + dashEsc((y.items.find(x => !dash.checks[x[0]]) || ['', 'pipeline clear, ship it'])[1]) + ' · ' + ldDone(y) + '/' + y.items.length + ' steps done · keep the channel moving ·</span></div>' +
       '<div class="ldeq">' + Array.from({ length: 12 }, (_, i) => '<i style="animation-delay:' + (-i * .17).toFixed(2) + 's"></i>').join('') + '</div></div></div>');
   }
+}
+// ===== Weekly build Nov 22: shift strip, auto shift theme, OpenJarvis pulse =====
+// Shift days come from the phone's calendar (read-only, only after Colin taps Connect), cached so
+// the wallpaper and the app share one read. Nothing here touches audio, the mic or alarms.
+var LD_SHIFT_KEY = 'novaShift', LD_JV_KEY = 'novaJarvis', LD_JV_SEEN = 'novaJarvisSeen';
+var ldCalDenied = false, ldShiftDay = '', ldShPrev = '', ldShPrevTm = 0, ldJvBusy = false;
+function ldYmd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function ldDayAt(base, i) { const d = new Date(base.getFullYear(), base.getMonth(), base.getDate()); d.setDate(d.getDate() + i); return d; }
+// Bits from the calendar: 1 Work, 2 OFF, 4 weekend
+function ldShiftOf(days, d) {
+  const b = days && days[ldYmd(d)];
+  if (b == null) return '';
+  if ((b & 1) && !(b & 2)) return 'work';
+  if (b & 4) return 'wknd';
+  if (b & 2) return 'off';
+  return 'work';
+}
+function ldFree(s) { return s === 'off' || s === 'wknd'; }
+function ldShiftCache() { const c = readJson(LD_SHIFT_KEY); c.days = c.days || {}; return c; }
+function ldShiftToday() { const c = ldShiftCache(); return c.perm ? ldShiftOf(c.days, new Date()) : ''; }
+function ldShiftWanted() { return (dash.on && dash.cards.shift) || dash.shiftTheme; }
+function refreshShifts(force) {
+  if (isAgent || !ldShiftWanted() || !hasNative('getShifts')) return;
+  const w = dash.words, key = [w.work, w.off, w.wknd].join('|') + '@' + ldYmd(new Date()), c = readJson(LD_SHIFT_KEY);
+  if (!force && c.t && c.key === key && Date.now() - c.t < (c.perm ? 10 * 60 * 1000 : 60 * 1000)) return;
+  let j;
+  try { j = JSON.parse(Android.getShifts(16, w.work || '', w.off || '', w.wknd || '')); } catch (e) { return; }
+  const nv = { t: Date.now(), key: key, perm: !!j.perm, days: j.days || {} };
+  const changed = JSON.stringify([!!c.perm, c.days || {}]) !== JSON.stringify([nv.perm, nv.days]);
+  try { localStorage.setItem(LD_SHIFT_KEY, JSON.stringify(nv)); } catch (e) {}
+  if (changed) { renderDash(); renderDashUI(); } else applyShiftTheme();
+}
+function ldCalStatus() { try { return hasNative('calendarStatus') ? Android.calendarStatus() : 'none'; } catch (e) { return 'none'; } }
+function ldCalConnect() {
+  if (!hasNative('requestCalendar')) { ldToast(isWall ? 'Open Nova Apex Studio to connect your calendar' : 'Calendar works inside the Nova app'); return; }
+  if (ldCalStatus() === 'granted') { refreshShifts(true); ldToast('📅 Calendar connected'); return; }
+  if (ldCalDenied && hasNative('openAppSettings')) { Android.openAppSettings(); ldToast('Tap Permissions, then allow Calendar'); return; }
+  Android.requestCalendar();
+}
+window.onCalPerm = function (ok) {
+  ldCalDenied = !ok;
+  if (ok) { ldToast('📅 Calendar connected'); ldSparks(innerWidth / 2, innerHeight * 0.35, 22); }
+  else ldToast('No calendar access yet. Tap Connect again to open Settings.');
+  refreshShifts(true); renderDash(); renderDashUI();
+};
+function ldDur(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000)), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  const p = n => String(n).padStart(2, '0');
+  return (d ? d + 'd ' : '') + p(h) + ':' + p(m) + ':' + p(x);
+}
+// Where today sits: is he off, when the stretch started, and when it flips
+function ldShiftCalc(days) {
+  const n = new Date(), today = ldShiftOf(days, n), free = ldFree(today);
+  let target = null, start = ldDayAt(n, 0);
+  for (let i = 1; i < 15; i++) { const d = ldDayAt(n, i), s = ldShiftOf(days, d); if (free ? s === 'work' : ldFree(s)) { target = d; break; } }
+  for (let i = 1; i < 8; i++) { const d = ldDayAt(n, -i), s = ldShiftOf(days, d); if (!s || ldFree(s) !== free) break; start = d; }
+  return { today, free, target, start };
+}
+function ldShiftCard(out) {
+  const c = ldShiftCache(), n = new Date(), perm = !!c.perm, mode = perm && dash.shiftTheme ? ldShiftToday() : '';
+  const lbl = { work: 'WORK', off: 'OFF', wknd: 'WKND' };
+  const pills = Array.from({ length: 7 }, (_, i) => {
+    const d = ldDayAt(n, i), s = perm ? ldShiftOf(c.days, d) : '';
+    return '<div class="pl ' + (s || 'none') + (i ? '' : ' today') + '" style="--j:' + i + '">' + d.toLocaleDateString('en-US', { weekday: 'short' }) + '<b>' + d.getDate() + '</b><em>' + (lbl[s] || '·') + '</em></div>';
+  }).join('');
+  let h = '<div class="dcard ldc ldshift"><div class="dhead"><span class="dlbl">📅 Shifts · next 7 days</span>' +
+    (mode ? '<span class="mode ' + (mode === 'work' ? 'work">⚡ Focus mode' : 'off">🌿 OFF mode') + '</span>' : '') + '</div><div class="pills">' + pills + '</div>';
+  if (!perm) {
+    h += isWall || !hasNative('requestCalendar') ? '<div class="dsub" style="margin-top:8px">Open Nova Apex Studio and tap Connect calendar on this card.</div>'
+      : '<button class="conn ldtap" data-ldact="cal">' + (ldCalDenied ? '⚙️ Allow Calendar in Settings' : '📅 Connect calendar') + '</button>';
+  } else if (!Object.keys(c.days).length) {
+    h += '<div class="dsub" style="margin-top:8px">No ' + dashEsc(dash.words.work) + ' or ' + dashEsc(dash.words.off) + ' days found in the next 2 weeks. Check the shift words in DASH.</div>';
+  } else {
+    const k = ldShiftCalc(c.days);
+    const label = k.free ? (k.today === 'wknd' ? 'Weekend mode · back to work in' : 'Day off · back to work in') : 'Next day off in';
+    if (k.target) {
+      const pct = Math.max(2, Math.min(100, (n - k.start) / (k.target - k.start) * 100));
+      h += '<div class="cd"><span>' + label + '</span><b id="ldShiftCd" data-t="' + k.target.getTime() + '">' + ldDur(k.target - n) + '</b></div>' + ldBar('shift', Math.round(k.free ? 100 - pct : pct), 'sm');
+    } else h += '<div class="cd"><span>' + (k.free ? 'Off as far as your calendar shows 🌿' : 'No day off in the next 2 weeks') + '</span></div>';
+  }
+  out.push(h + '</div>');
+}
+// Live countdown, and a fresh look at midnight
+function ldTickShift() {
+  if (paused || isAgent) return;
+  const ymd = ldYmd(new Date());
+  if (ymd !== ldShiftDay) { const first = !ldShiftDay; ldShiftDay = ymd; if (!first) { refreshShifts(true); renderDash(); } }
+  const el = $('ldShiftCd'); if (!el) return;
+  const ms = +el.dataset.t - Date.now();
+  if (ms <= 0) { renderDash(); return; }
+  el.textContent = ldDur(ms);
+}
+setInterval(ldTickShift, 1000);
+setInterval(() => { if (!paused) refreshShifts(false); }, 60 * 1000);
+
+// Auto shift theme: one extra layer under the clock and cards, plus a card restyle. Nova's own theme stays as it is.
+function ldBuildShiftFx(fx) {
+  let h = '<div class="au a1"></div><div class="au a2"></div><div class="au a3"></div><div class="grid"></div><div class="sweep"></div><div class="vig"></div>';
+  for (let i = 0; i < 14; i++) h += '<i class="ff" style="left:' + ((i * 37 + 9) % 96) + '%;top:' + ((i * 53 + 17) % 88) + '%;--fx:' + (((i * 29) % 70) - 35) + 'px;--fy:' + (-20 - (i * 13) % 50) + 'px;animation-delay:' + (-i * 0.53).toFixed(2) + 's"></i>';
+  fx.innerHTML = h;
+}
+function applyShiftTheme() {
+  const fx = $('shiftFx'); if (!fx) return;
+  const st = isAgent ? '' : (ldShPrev || (dash.shiftTheme ? ldShiftToday() : ''));
+  const free = ldFree(st), work = st === 'work';
+  if ((free || work) && !fx.firstChild) ldBuildShiftFx(fx);
+  document.body.classList.toggle('sh-off', free);
+  document.body.classList.toggle('sh-work', work);
+  fx.className = 'm-' + dash.motion + (paused ? ' ldp' : '');
+  fx.style.setProperty('--ldk', ldMotionK());
+}
+function ldShiftPreview(k) {
+  ldShPrev = k; applyShiftTheme();
+  ldToast(k === 'work' ? '⚡ Work look for 8 seconds' : '🌿 OFF look for 8 seconds');
+  clearTimeout(ldShPrevTm); ldShPrevTm = setTimeout(() => { ldShPrev = ''; applyShiftTheme(); }, 8000);
+}
+
+// OpenJarvis pulse: the newest PR or issue from the public repo, shared cache, checked every 15 minutes
+function ldJvRepo() { const r = String(dash.jvRepo || '').trim().replace(/^https?:\/\/github\.com\//i, '').replace(/\/+$/, ''); return /^[\w.-]+\/[\w.-]+$/.test(r) ? r : ''; }
+function ldJvItems(c) { return (c.items || []).filter(x => dash.jvKind === 'pr' ? x.pr : dash.jvKind === 'issue' ? !x.pr : true); }
+function ldJvTop() { const c = readJson(LD_JV_KEY); return c.repo === ldJvRepo() ? ldJvItems(c)[0] || null : null; }
+function ldJvFresh(top) { const s = readJson(LD_JV_SEEN); return !!top && s.repo === ldJvRepo() && top.n > (s.n || 0) && Date.now() - Date.parse(top.at) < 48 * 3600 * 1000; }
+function ldAgo(iso) {
+  const m = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60000));
+  return m < 1 ? 'just now' : m < 60 ? m + 'm ago' : m < 1440 ? Math.round(m / 60) + 'h ago' : Math.round(m / 1440) + 'd ago';
+}
+function ldJvSaveSeen(s) { try { localStorage.setItem(LD_JV_SEEN, JSON.stringify(s)); } catch (e) {} }
+// First look at a repo just remembers what's there; after that, anything newer pulses and gets one toast
+function ldJvCheckNew() {
+  const top = ldJvTop(), repo = ldJvRepo(); if (!top) return;
+  const s = readJson(LD_JV_SEEN);
+  if (s.repo !== repo) { ldJvSaveSeen({ repo: repo, n: top.n, toast: top.n }); return; }
+  if (top.n > (s.toast || 0) && top.n > (s.n || 0)) {
+    s.toast = top.n; ldJvSaveSeen(s);
+    if (dash.on && dash.cards.jarvis) { ldToast('🤖 New in ' + repo.split('/')[1] + ': ' + (top.pr ? 'PR' : 'issue') + ' #' + top.n); ldSparks(innerWidth / 2, innerHeight * 0.4, 20); }
+  }
+}
+function ldJvMarkSeen() { const top = ldJvTop(); if (!top) return; const s = readJson(LD_JV_SEEN); ldJvSaveSeen({ repo: ldJvRepo(), n: Math.max(top.n, s.repo === ldJvRepo() ? s.n || 0 : 0), toast: Math.max(top.n, s.toast || 0) }); setTimeout(renderDash, 400); }
+function refreshJarvis(force) {
+  if (!dash.on || !dash.cards.jarvis || ldJvBusy || isAgent) return;
+  const repo = ldJvRepo(); if (!repo) return;
+  const c = readJson(LD_JV_KEY);
+  if (!force && c.t && c.repo === repo && Date.now() - c.t < 15 * 60 * 1000) return;
+  ldJvBusy = true;
+  httpGet('https://api.github.com/repos/' + repo + '/issues?state=all&sort=created&direction=desc&per_page=15', { 'Accept': 'application/vnd.github+json' }).then(r => {
+    ldJvBusy = false;
+    let list = null; try { list = JSON.parse(r.body); } catch (e) {}
+    if (r.status === 200 && Array.isArray(list)) {
+      const items = list.map(x => ({ n: x.number, pr: !!x.pull_request, t: String(x.title || ''), at: x.created_at, url: String(x.html_url || ''),
+        st: x.pull_request && x.pull_request.merged_at ? 'merged' : x.state === 'closed' ? 'closed' : 'open' }));
+      try { localStorage.setItem(LD_JV_KEY, JSON.stringify({ t: Date.now(), repo: repo, items: items })); } catch (e) {}
+      ldJvCheckNew();
+    } else {
+      const o = c.repo === repo ? c : { items: [] };
+      o.t = Date.now(); o.repo = repo;
+      o.err = r.status === 403 || r.status === 429 ? 'GitHub asked Nova to slow down' : r.status === 404 ? "Couldn't find that repo" : "Couldn't reach GitHub";
+      try { localStorage.setItem(LD_JV_KEY, JSON.stringify(o)); } catch (e) {}
+    }
+    renderDash(); renderDashUI();
+  }).catch(() => { ldJvBusy = false; });
+}
+setInterval(() => { if (!paused) refreshJarvis(false); }, 60 * 1000);
+var LD_EKG = 'M0 12 H58 L64 12 L68 4 L73 20 L77 8 L80 12 H128 L132 12 L135 7 L139 16 L142 12 H200';
+function ldJarvisCard(out) {
+  const c = readJson(LD_JV_KEY), repo = ldJvRepo(), items = c.repo === repo ? ldJvItems(c) : [], top = items[0], fresh = ldJvFresh(top);
+  const url = top && /^https:\/\/github\.com\//.test(top.url) ? top.url : '';
+  let h = '<div class="dcard ldc ldjv' + (fresh ? ' fresh' : '') + (url ? ' ldtap" data-ldjv="1" data-ldurl="' + dashEsc(url) + '"' : '"') + '><span class="ring"></span>' +
+    '<div class="dhead"><span class="dlbl">🤖 ' + dashEsc(repo ? repo.split('/')[1] : 'OpenJarvis') + ' pulse</span>' + (fresh ? '<span class="new">NEW</span>' : '') + '</div>';
+  if (top) {
+    h += '<div class="jvtop"><span class="jvk ' + (top.pr ? 'pr' : 'is') + '">' + (top.pr ? 'PR' : 'Issue') + '</span><b>#' + top.n + '</b><span class="jvst ' + top.st + '">' + top.st + '</span><span>' + ldAgo(top.at) + '</span></div>' +
+      '<div class="jvt">' + dashEsc(top.t) + '</div>' + (items[1] ? '<div class="jvm">before that #' + items[1].n + ' ' + dashEsc(items[1].t) + '</div>' : '');
+  } else h += '<div class="dsub" style="margin-top:6px">' + (!repo ? 'Set a GitHub repo in DASH.' : c.err && c.repo === repo ? dashEsc(c.err) + '. Trying again soon.' : 'Listening for the newest PR or issue…') + '</div>';
+  out.push(h + '<svg class="ekg" viewBox="0 0 200 22" preserveAspectRatio="none"><path class="bg" vector-effect="non-scaling-stroke" d="' + LD_EKG + '"/><path pathLength="1" vector-effect="non-scaling-stroke" d="' + LD_EKG + '"/></svg></div>');
+}
+// Turning a card on: ask for the calendar only now, and fetch right away
+function ldCardSwitched(k) {
+  if (!dash.cards[k]) return;
+  if (k === 'shift') { if (hasNative('calendarStatus') && ldCalStatus() !== 'granted') ldCalConnect(); else refreshShifts(true); }
+  if (k === 'jarvis') refreshJarvis(true);
+}
+(function () { const r = window.onAppResume; window.onAppResume = function () { if (r) r(); refreshShifts(true); refreshJarvis(false); }; })();
+function ldBuildShiftUI() {
+  $('ldCalBtn').onclick = ldCalConnect;
+  $('ldShiftTheme').onclick = () => {
+    dash.shiftTheme = !dash.shiftTheme; saveDash();
+    if (dash.shiftTheme) { if (hasNative('calendarStatus') && ldCalStatus() !== 'granted') ldCalConnect(); else refreshShifts(true); }
+    ldToast(dash.shiftTheme ? '🌗 Auto shift theme on' : 'Auto shift theme off');
+  };
+  [['ldWordWork', 'work'], ['ldWordOff', 'off'], ['ldWordWknd', 'wknd']].forEach(([id, k]) => $(id).onchange = e => { dash.words[k] = e.target.value.trim() || DASH_DEFAULTS.words[k]; saveDash(); refreshShifts(true); });
+  document.querySelectorAll('[data-ld-prev]').forEach(b => b.onclick = () => ldShiftPreview(b.dataset.ldPrev));
+  $('ldJvRepo').onchange = e => { dash.jvRepo = e.target.value.trim() || DASH_DEFAULTS.jvRepo; saveDash(); refreshJarvis(true); };
+  document.querySelectorAll('[data-ld-jvk]').forEach(b => b.onclick = () => { dash.jvKind = b.dataset.ldJvk; saveDash(); ldJvCheckNew(); });
+}
+function ldRenderShiftUI() {
+  const cs = ldCalStatus(), c = ldShiftCache(), act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
+  const btn = $('ldCalBtn'); if (!btn) return;
+  btn.textContent = cs === 'granted' ? '📅 Calendar connected ✓' : ldCalDenied ? '⚙️ Allow in Settings' : '📅 Connect calendar';
+  btn.classList.toggle('act', cs === 'granted');
+  $('ldShiftTheme').textContent = 'Auto shift theme: ' + (dash.shiftTheme ? 'on' : 'off');
+  $('ldShiftTheme').classList.toggle('act', !!dash.shiftTheme);
+  [['ldWordWork', 'work'], ['ldWordOff', 'off'], ['ldWordWknd', 'wknd']].forEach(([id, k]) => { if (document.activeElement !== $(id)) $(id).value = dash.words[k]; });
+  if (cs === 'granted' && c.perm) {
+    const n = Object.keys(c.days).length, t = ldShiftToday();
+    $('ldCalNote').textContent = 'Connected. ' + n + ' shift day' + (n === 1 ? '' : 's') + ' found in the next 2 weeks' + (t ? '; today reads as ' + ({ work: 'Work', off: 'OFF', wknd: 'a weekend day' })[t] : '') + '. Read-only: Nova never adds or changes events.';
+  }
+  if (document.activeElement !== $('ldJvRepo')) $('ldJvRepo').value = dash.jvRepo || '';
+  act('[data-ld-jvk]', b => b.dataset.ldJvk === dash.jvKind);
+  const j = readJson(LD_JV_KEY);
+  if (j.t && j.repo === ldJvRepo()) $('ldJvNote').textContent = (j.err ? j.err + '. ' : '') + 'Last checked ' + new Date(j.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ', every 15 minutes. When something new lands, the card pulses until you tap it in the app (which opens it on GitHub).';
 }
 function ldMotionK() { return ((dash.motion === 'calm' ? 2.4 : 1) / (dash.speed || 1)).toFixed(2); }
 
@@ -5778,11 +6113,13 @@ function ldCatchUp() {
 // Taps on cards only work in the app, so swiping your home screen never ticks something by accident
 document.addEventListener('click', e => {
   if (isWall || isAgent) return;
-  const el = e.target.closest && e.target.closest('#dash [data-ldc], #dash [data-ldurl], #ldChecks [data-ldc]'); if (!el) return;
+  const el = e.target.closest && e.target.closest('#dash [data-ldact], #dash [data-ldc], #dash [data-ldurl], #ldChecks [data-ldc]'); if (!el) return;
+  if (el.dataset.ldact === 'cal') { ldCalConnect(); return; }
+  if (el.dataset.ldjv) ldJvMarkSeen();
   if (el.dataset.ldurl) { ldOpen(el.dataset.ldurl); return; }
   const r = el.getBoundingClientRect(); ldToggle(el.dataset.ldc, r.left + 20, r.top + r.height / 2);
 });
-(function () { const sp = window.setPaused; window.setPaused = function (b) { sp(b); const d = $('dash'); if (d) d.classList.toggle('ldp', !!b); }; })();
+(function () { const sp = window.setPaused; window.setPaused = function (b) { sp(b); const d = $('dash'); if (d) d.classList.toggle('ldp', !!b); const f = $('shiftFx'); if (f) f.classList.toggle('ldp', !!b); }; })();
 
 function ldRenderOrder() {
   const box = $('ldOrder'); if (!box || box.dataset.dragging) return;
@@ -5803,7 +6140,7 @@ function ldBuildOrderUI() {
   const box = $('ldOrder'); if (!box) return;
   box.onclick = e => {
     const b = e.target.closest('button'); if (!b) return;
-    if (b.dataset.osw) { const k = b.dataset.osw; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); }
+    if (b.dataset.osw) { const k = b.dataset.osw; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); ldCardSwitched(k); }
     else if (b.dataset.oup) ldMoveCard(b.dataset.oup, -1);
     else if (b.dataset.odn) ldMoveCard(b.dataset.odn, 1);
   };
@@ -5834,6 +6171,7 @@ function ldBuildOrderUI() {
 }
 function ldRenderUI() {
   ldRenderOrder();
+  ldRenderShiftUI();
   const act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
   act('[data-ld-motion]', b => b.dataset.ldMotion === dash.motion);
   act('[data-ld-pin]', b => dash.pins.indexOf(b.dataset.ldPin) >= 0);
@@ -5848,10 +6186,11 @@ function ldRenderUI() {
 }
 function ldBuildUI() {
   document.querySelectorAll('[data-ld-motion]').forEach(b => b.onclick = () => { dash.motion = b.dataset.ldMotion; saveDash(); });
-  document.querySelectorAll('[data-ld-preset]').forEach(b => b.onclick = () => { Object.assign(dash.cards, LD_PRESETS[b.dataset.ldPreset]); dash.on = true; saveDash(); refreshPrices(true); refreshWx(false); ldToast('Layout: ' + b.textContent.trim()); });
+  document.querySelectorAll('[data-ld-preset]').forEach(b => b.onclick = () => { Object.assign(dash.cards, LD_PRESETS[b.dataset.ldPreset]); dash.on = true; saveDash(); refreshPrices(true); refreshWx(false); refreshShifts(true); refreshJarvis(false); ldToast('Layout: ' + b.textContent.trim()); });
   $('rngLdSpeed').oninput = e => { dash.speed = parseFloat(e.target.value); saveDash(); };
   $('ldWxCity').onchange = e => ldFindCity(e.target.value);
   ldBuildOrderUI();
+  ldBuildShiftUI();
   $('ldPinGrid').innerHTML = LD_PINS.map(p => '<button class="opt-btn" data-ld-pin="' + p[0] + '">' + p[1] + ' ' + dashEsc(p[2]) + '</button>').join('');
   document.querySelectorAll('[data-ld-pin]').forEach(b => b.onclick = () => { const k = b.dataset.ldPin, i = dash.pins.indexOf(k); if (i >= 0) dash.pins.splice(i, 1); else dash.pins.push(k); saveDash(); });
 }
@@ -5899,7 +6238,7 @@ function renderDashUI() {
 function buildDashUI() {
   document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); styleClock(); refreshPrices(true); });
   document.querySelectorAll('[data-dash-pos]').forEach(b => b.onclick = () => { dash.pos = b.dataset.dashPos; saveDash(); });
-  document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); });
+  document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); ldCardSwitched(k); });
   document.querySelectorAll('[data-sprite]').forEach(b => b.onclick = () => { cfg.sprite = b.dataset.sprite === '1'; saveCfg(); updateUI(); renderDashUI(); });
   $('rngDashOp').oninput = e => { dash.op = parseFloat(e.target.value); saveDash(); };
   $('rngDashBlur').oninput = e => { dash.blur = parseInt(e.target.value, 10); saveDash(); };
@@ -5951,7 +6290,7 @@ window.setLock = function (locked, animate, preview) {
 };
 
 window.syncConfig = function () {
-  dash = loadDash(); renderDash(); applyLockClasses(); setTimeout(layoutDash, 60); ldCatchUp(); refreshWx(false);
+  dash = loadDash(); renderDash(); applyLockClasses(); setTimeout(layoutDash, 60); ldCatchUp(); refreshWx(false); refreshShifts(false); refreshJarvis(false);
   const old = cfg;
   cfg = loadCfg();
   if (cfg.particles !== old.particles) buildParticles();
@@ -5976,6 +6315,8 @@ renderDash();
 applyLockClasses();
 setTimeout(() => refreshPrices(false), 1500);
 setTimeout(() => refreshWx(false), 1800);
+setTimeout(() => refreshShifts(false), 1200);
+setTimeout(() => refreshJarvis(false), 2200);
 if (!isAgent) {
   setInterval(tickClock, 1000);
   startLoop();

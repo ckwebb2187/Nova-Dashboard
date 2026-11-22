@@ -48,6 +48,7 @@ public class M extends Activity {
     static final String ACTION_RESUME_LISTEN = "com.nova.apex.wallpaper.RESUME_LISTEN";
     private static final String ACTION_INSTALLED = "com.nova.apex.wallpaper.INSTALL_RESULT";
     private static final int REQ_MIC = 7;
+    private static final int REQ_CAL = 9;
 
     private WebView v;
     private SpeechRecognizer rec;
@@ -177,6 +178,11 @@ public class M extends Activity {
     @Override
     public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
         super.onRequestPermissionsResult(code, perms, res);
+        if (code == REQ_CAL) {
+            boolean ok = res.length > 0 && res[0] == PackageManager.PERMISSION_GRANTED;
+            js("window.onCalPerm&&onCalPerm(" + ok + ")");
+            return;
+        }
         if (code != REQ_MIC) return;
         boolean ok = res.length > 0 && res[0] == PackageManager.PERMISSION_GRANTED;
         if (ok && pendingListen) startRec();
@@ -525,6 +531,37 @@ public class M extends Activity {
             } catch (Exception e) {
                 return "{\"code\":0,\"name\":\"?\"}";
             }
+        }
+
+        // ---- Shift strip: read-only calendar access, asked for only when Colin taps Connect ----
+        @JavascriptInterface
+        public String calendarStatus() {
+            if (Cal.allowed(M.this)) return "granted";
+            return shouldShowRequestPermissionRationale(Manifest.permission.READ_CALENDAR) ? "denied" : "ask";
+        }
+
+        @JavascriptInterface
+        public void requestCalendar() {
+            runOnUiThread(() -> {
+                if (Cal.allowed(M.this)) { js("window.onCalPerm&&onCalPerm(true)"); return; }
+                requestPermissions(new String[]{Manifest.permission.READ_CALENDAR}, REQ_CAL);
+            });
+        }
+
+        @JavascriptInterface
+        public void openAppSettings() {
+            runOnUiThread(() -> {
+                try {
+                    startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())));
+                } catch (Exception e) {
+                    Toast.makeText(M.this, "Allow Calendar for Nova Apex in Settings > Apps", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public String getShifts(int days, String work, String off, String wknd) {
+            return Cal.shifts(M.this, days, work, off, wknd);
         }
 
         @JavascriptInterface

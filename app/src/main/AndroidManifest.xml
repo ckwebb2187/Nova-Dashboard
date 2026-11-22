@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Shift strip card: reads Work / OFF days from the calendar, only after you turn it on and allow it -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
 
     <!-- Lets the app find the phone's speech recognizer and text-to-speech engine -->
     <queries>
