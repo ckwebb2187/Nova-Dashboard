@@ -230,6 +230,25 @@ body.wallpaper #dash.pos-full{top:40px;}
 .dash-list .row span{flex:1;}
 .dash-list .row.done span{text-decoration:line-through;opacity:.5;}
 .dash-mini{padding:6px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.12);background:rgba(30,41,59,0.6);color:#cbd5e1;font-size:12px;font-weight:700;}
+/* Glass clock: matches the dashboard cards (on when DASH cards + Glass clock are on) */
+#clock.gclock{font-family:"Sora",-apple-system,sans-serif;}
+#clock.gclock #clockTime{font-weight:800;letter-spacing:-0.045em;line-height:.95;text-shadow:none;filter:drop-shadow(0 0 22px color-mix(in srgb,var(--c) 45%,transparent));}
+#clock.gclock #clockTime .gd{display:inline-block;background:linear-gradient(100deg,#ffffff 0%,#ffffff 30%,var(--c) 48%,#ffffff 66%,color-mix(in srgb,var(--c) 70%,#fff) 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:gShine 7s ease-in-out infinite;}
+#clock.gclock #clockTime .gc{display:inline-block;color:var(--c);-webkit-text-fill-color:var(--c);margin:0 0.05em;animation:gBlink 2s ease-in-out infinite;transform:translateY(-0.06em);}
+#clock.gclock #clockTime .gd.in{animation:gIn .7s cubic-bezier(.2,.9,.25,1.25) both,gShine 7s ease-in-out infinite;}
+#clock.gclock #clockTime small{display:inline-block;vertical-align:.95em;margin-left:.3em;font:500 calc(13px * var(--cs))/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:2px;padding:5px 9px;border-radius:99px;color:var(--c);-webkit-text-fill-color:var(--c);background:rgba(17,31,24,0.5);border:1px solid color-mix(in srgb,var(--c) 40%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:1;}
+#clock.gclock #clockDate{display:inline-flex !important;align-items:center;gap:9px;margin-top:14px;font:500 calc(12px * var(--cs))/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:3px;padding:8px 15px;border-radius:99px;color:#e3efe7;background:rgba(17,31,24,0.45);border:1px solid rgba(255,255,255,0.12);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14),0 14px 30px -18px rgba(0,0,0,.6);-webkit-backdrop-filter:blur(12px) saturate(1.4);backdrop-filter:blur(12px) saturate(1.4);opacity:1;animation:gRise .8s .15s cubic-bezier(.2,.8,.2,1) both;}
+#clock.gclock #clockDate::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 0 var(--c);animation:gPing 2.4s ease-out infinite;}
+#clock.gclock #clockDate.off{display:none !important;}
+#clock.gclock #clockAura{display:block;width:calc(320px * var(--cs));height:calc(170px * var(--cs));border-radius:50%;background:radial-gradient(ellipse at 35% 50%,var(--c) 0%,transparent 60%),radial-gradient(ellipse at 70% 55%,var(--c2) 0%,transparent 60%);filter:blur(28px);opacity:.28;animation:gBreathe 6s ease-in-out infinite;border:0;box-shadow:none;}
+#clock.gclock #clockAura::before,#clock.gclock #clockAura::after{display:none;}
+@keyframes gShine{0%,100%{background-position:100% 0;}50%{background-position:0% 0;}}
+@keyframes gBlink{0%,100%{opacity:1;}50%{opacity:.35;}}
+@keyframes gIn{0%{opacity:0;transform:translateY(-55%) scale(.9);filter:blur(8px);}100%{opacity:1;transform:none;filter:none;}}
+@keyframes gRise{from{opacity:0;transform:translateY(10px);}}
+@keyframes gPing{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 70%,transparent);}80%,100%{box-shadow:0 0 0 9px transparent;}}
+@keyframes gBreathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.22;}50%{transform:translate(-50%,-50%) scale(1.12);opacity:.36;}}
+@media (prefers-reduced-motion:reduce){#clock.gclock *{animation:none !important;}}
 @media (prefers-reduced-motion:reduce){.dcard,.dspark path,.dbar i{animation:none!important;stroke-dashoffset:0;opacity:1;width:var(--w);}}
 </style>
 </head>
@@ -607,6 +626,10 @@ body.wallpaper #dash.pos-full{top:40px;}
       <button class="opt-btn" data-dash-pos="full">Full screen</button>
       <button class="opt-btn" data-dash-t="dense">Compact cards</button>
     </div>
+    <div class="grid-2">
+      <button class="opt-btn" data-dash-t="gclock">Glass clock</button>
+    </div>
+    <div class="note">Cards always make room for Nova's clock, so they never cover it. Glass clock restyles the clock to match the cards, with a shimmer, digits that drop in when they change, and a frosted date pill.</div>
     <div class="sec-label">Cards</div>
     <div class="grid-2">
       <button class="opt-btn" data-dash-card="greet">Welcome card</button>
@@ -4089,7 +4112,7 @@ window.addEventListener('pointerup', () => {
 // ===== Clock =====
 function clockColor() { return cfg.clock.color === 'theme' ? th().p : cfg.clock.color; }
 
-let lastClockMin = -1;
+let lastClockMin = -1, lastClockStr = '';
 function tickClock() {
   const k = cfg.clock;
   $('clock').style.display = k.on ? '' : 'none';
@@ -4102,21 +4125,35 @@ function tickClock() {
   let t = (k.h24 ? pad(h) : h) + ':' + pad(d.getMinutes());
   if (k.secs) t += ':' + pad(d.getSeconds());
   // wave animation needs each character in its own span
-  const body = k.anim === 'wave' ? t.split('').map((ch, i) => '<span style="--i:' + i + '">' + ch + '</span>').join('') : t;
-  $('clockTime').innerHTML = body + (ampm ? '<small>' + ampm + '</small>' : '');
+  const glassClock = dashGlassClock();
+  if (glassClock) {
+    // glass clock: each digit in its own span; changed digits drop in with a blur
+    const prev = lastClockStr;
+    $('clockTime').innerHTML = t.split('').map((ch, i) => ch === ':' ? '<span class="gc">:</span>'
+      : '<span class="gd' + (prev && prev[i] !== ch ? ' in' : '') + '">' + ch + '</span>').join('') + (ampm ? '<small>' + ampm + '</small>' : '');
+    lastClockStr = t;
+  } else {
+    const body = k.anim === 'wave' ? t.split('').map((ch, i) => '<span style="--i:' + i + '">' + ch + '</span>').join('') : t;
+    $('clockTime').innerHTML = body + (ampm ? '<small>' + ampm + '</small>' : '');
+    lastClockStr = '';
+  }
   // tick flip: flip the digits whenever the minute changes
-  if (k.anim === 'flip' && lastClockMin !== d.getMinutes() && lastClockMin !== -1) {
+  if (!glassClock && k.anim === 'flip' && lastClockMin !== d.getMinutes() && lastClockMin !== -1) {
     $('clockTime').classList.remove('flip'); void $('clockTime').offsetWidth; $('clockTime').classList.add('flip');
   }
+  if (lastClockMin !== d.getMinutes()) setTimeout(layoutDash, 50);
   lastClockMin = d.getMinutes();
   $('clockDate').style.display = k.date ? '' : 'none';
+  $('clockDate').classList.toggle('off', !k.date);
   if (k.date) $('clockDate').textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
 function styleClock() {
   const k = cfg.clock;
   const el = $('clock');
-  el.className = 'pos-' + k.pos + ' f-' + k.font + (k.glow ? ' glow' : '') + ' ca-' + (k.anim || 'none') + ' au-' + (k.aura || 'none');
+  const g = dashGlassClock();
+  el.className = 'pos-' + k.pos + ' f-' + k.font + (k.glow && !g ? ' glow' : '') + ' ca-' + (g ? 'none' : (k.anim || 'none')) + ' au-' + (k.aura || 'none') + (g ? ' gclock' : '');
+  lastClockStr = '';
   el.style.setProperty('--c', clockColor());
   el.style.setProperty('--c2', th().a);
   el.style.setProperty('--cs', k.size);
@@ -5041,7 +5078,7 @@ window.onUpdate = function (type, text) {
 // Mirrors the Command Center web app's Home tab. Kept in its own storage key so
 // favorites and looks don't carry your list and miles around.
 const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx2';
-const DASH_DEFAULTS = { on: false, pos: 'mid', dense: false, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
+const DASH_DEFAULTS = { on: false, pos: 'mid', dense: false, gclock: true, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
   cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1 } };
 const COIN_IDS = { xrp: 'ripple', hbar: 'hedera-hashgraph', btc: 'bitcoin', eth: 'ethereum', sol: 'solana', doge: 'dogecoin', ada: 'cardano', xlm: 'stellar', link: 'chainlink', ltc: 'litecoin', dot: 'polkadot', avax: 'avalanche-2', shib: 'shiba-inu', bnb: 'binancecoin', sui: 'sui' };
 const CC_URL = 'https://claude.ai/artifact/8P38KRZjgFbQUCc8vNc6ND';
@@ -5078,12 +5115,39 @@ function dashClockHTML() {
   const n = new Date(), hm = n.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: !cfg.clock.h24 }).split(' ');
   return dashEsc(hm[0]) + (hm[1] ? '<small>' + dashEsc(hm[1]) + '</small>' : '');
 }
+function dashGlassClock() { try { return !!(dash && dash.on && dash.gclock && !isAgent); } catch (e) { return false; } }
+// Keep the cards clear of Nova's clock: move them below (or above) it, and shrink them to fit if needed
+function layoutDash() {
+  const el = $('dash'); if (!el) return;
+  try { if (!dash) return; } catch (e) { return; }
+  el.style.top = el.style.bottom = el.style.transform = el.style.transformOrigin = '';
+  if (!el.classList.contains('on') || !el.children.length) return;
+  const ck = $('clock'), vh = window.innerHeight, pad = 16, botSafe = isWall ? Math.round(vh * 0.11) : 120;
+  const clockOn = cfg.clock && cfg.clock.on && ck && ck.style.display !== 'none' && !document.body.classList.contains('drawer-open');
+  let r = el.getBoundingClientRect();
+  if (!clockOn) {
+    if (r.height > vh - 40 - botSafe) { el.style.top = '40px'; el.style.bottom = 'auto'; el.style.transform = 'scale(' + ((vh - 40 - botSafe) / r.height).toFixed(3) + ')'; el.style.transformOrigin = 'top center'; }
+    return;
+  }
+  const c = ck.getBoundingClientRect();
+  if (r.top >= c.bottom + pad || r.bottom <= c.top - pad) return;
+  const clockUp = (c.top + c.bottom) / 2 < vh / 2;
+  let avail;
+  if (clockUp) { el.style.top = Math.round(c.bottom + pad) + 'px'; el.style.bottom = 'auto'; avail = vh - (c.bottom + pad) - botSafe; el.style.transformOrigin = 'top center'; }
+  else { el.style.bottom = Math.round(vh - c.top + pad) + 'px'; el.style.top = 'auto'; avail = c.top - pad - 40; el.style.transformOrigin = 'bottom center'; }
+  el.style.transform = 'none';
+  r = el.getBoundingClientRect();
+  if (r.height > avail && avail > 120) el.style.transform = 'scale(' + (avail / r.height).toFixed(3) + ')';
+}
+addEventListener('resize', () => setTimeout(layoutDash, 80));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => setTimeout(layoutDash, 50));
+
 function renderDash() {
   const el = $('dash'); if (!el) return;
   el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos + (dash.dense ? ' dense' : '');
   el.style.setProperty('--dop', dash.op); el.style.setProperty('--dblur', dash.blur + 'px'); el.style.setProperty('--drad', dash.rad + 'px');
   el.style.setProperty('--da', th().a);
-  if (!dash.on) { el.innerHTML = ''; return; }
+  if (!dash.on) { el.innerHTML = ''; layoutDash(); return; }
   const C = dash.cards, px = readJson(DASH_PX_KEY).data || {}, out = [];
   if (C.greet) out.push('<div class="dcard solid"><div class="dhead"><span class="dlbl">Colin\'s world</span><div class="davs">' + DASH_APPS.map(e => '<span>' + e + '</span>').join('') + '</div></div>' +
     '<div class="dgreet">' + dashGreet() + ', Colin. Everything\'s <em>better</em> in one place.</div><div class="dsub">Your apps, the WRX build, crypto and the channel, all at a glance.</div></div>');
@@ -5119,6 +5183,7 @@ function renderDash() {
   el.innerHTML = out.join('');
   el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
   el.querySelectorAll('[data-n]').forEach(dashCount);
+  layoutDash();
 }
 setInterval(() => { const c = $('dashClock'); if (c && !paused) c.innerHTML = dashClockHTML(); }, 15000);
 // Live prices with a 7-day chart, cached so the wallpaper and the app share one fetch
@@ -5159,7 +5224,7 @@ function renderDashUI() {
   if (c.t) $('dashPxNote').textContent = 'Tickers separated by commas (xrp, hbar, btc, eth, sol…). Prices and 7-day charts from CoinGecko, last updated ' + new Date(c.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
 }
 function buildDashUI() {
-  document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); refreshPrices(true); });
+  document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); styleClock(); refreshPrices(true); });
   document.querySelectorAll('[data-dash-pos]').forEach(b => b.onclick = () => { dash.pos = b.dataset.dashPos; saveDash(); });
   document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); });
   document.querySelectorAll('[data-sprite]').forEach(b => b.onclick = () => { cfg.sprite = b.dataset.sprite === '1'; saveCfg(); updateUI(); renderDashUI(); });
@@ -5183,7 +5248,7 @@ function buildDashUI() {
 }
 
 window.syncConfig = function () {
-  dash = loadDash(); renderDash();
+  dash = loadDash(); renderDash(); setTimeout(layoutDash, 60);
   const old = cfg;
   cfg = loadCfg();
   if (cfg.particles !== old.particles) buildParticles();
