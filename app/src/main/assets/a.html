@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <title>Nova Apex Studio</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}
@@ -177,32 +178,59 @@ body.drawer-open #clock,body.drawer-open .hud-top,body.drawer-open #hotkeys,body
 
 body.wallpaper .hud-top,body.wallpaper .quick-dock,body.wallpaper .drawer,body.wallpaper #drawerToggle,
 body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
-/* ===== Glass dashboard cards (DASH tab) ===== */
-#dash{position:fixed;left:14px;right:14px;z-index:6;display:none;flex-direction:column;gap:10px;pointer-events:none;max-width:520px;margin:0 auto;}
-#dash.on{display:flex;}
+/* ===== Glass dashboard cards (DASH tab) — styled like the Command Center web app ===== */
+#dash{position:fixed;left:14px;right:14px;z-index:6;display:none;grid-template-columns:1fr 1fr;gap:10px;pointer-events:none;max-width:520px;margin:0 auto;font-family:"IBM Plex Sans",-apple-system,Roboto,sans-serif;}
+#dash.on{display:grid;}
 #dash.pos-top{top:150px;}
 #dash.pos-mid{top:50%;transform:translateY(-50%);}
 #dash.pos-bottom{bottom:150px;}
-body.wallpaper #dash.pos-bottom{bottom:70px;}
-body.agent #dash{display:none;}
-.dcard{background:rgba(15,23,42,var(--dop,0.45));-webkit-backdrop-filter:blur(var(--dblur,14px)) saturate(1.4);backdrop-filter:blur(var(--dblur,14px)) saturate(1.4);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:12px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 14px 30px rgba(0,0,0,0.35);color:#f1f5f9;animation:dIn .6s cubic-bezier(.2,.8,.2,1) both;}
-.dcard:nth-child(2){animation-delay:.08s}.dcard:nth-child(3){animation-delay:.16s}.dcard:nth-child(4){animation-delay:.24s}
-@keyframes dIn{from{opacity:0;transform:translateY(14px) scale(.97);}}
-.drow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
-.dlbl{font-size:10px;letter-spacing:1.2px;font-weight:800;color:var(--p);text-transform:uppercase;}
-.dbig{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-top:2px;}
-.dch{font-size:11px;font-weight:700;}
-.dch.up{color:#4ade80;}.dch.down{color:#f87171;}
-.dtodo div{font-size:13px;padding:3px 0;display:flex;gap:8px;align-items:center;}
-.dtodo i{width:12px;height:12px;border-radius:4px;border:2px solid var(--p);flex:none;}
-.dtodo .done{opacity:.5;text-decoration:line-through;}
-.dtodo .done i{background:var(--p);}
-.dbar{height:6px;border-radius:6px;background:rgba(255,255,255,0.12);overflow:hidden;margin-top:8px;}
-.dbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--p),#2dd4bf);transition:width .8s;}
+#dash.pos-full{top:58px;}
+body.wallpaper #dash.pos-bottom{bottom:60px;}
+body.wallpaper #dash.pos-full{top:40px;}
+#dash.dense{gap:8px;}
+#dash.dense .dcard{padding:10px 12px;border-radius:calc(var(--drad,22px) - 4px);}
+.dcard{position:relative;grid-column:span 2;background:rgba(17,31,24,var(--dop,0.45));-webkit-backdrop-filter:blur(var(--dblur,14px)) saturate(1.5);backdrop-filter:blur(var(--dblur,14px)) saturate(1.5);border:1px solid rgba(255,255,255,0.12);border-radius:var(--drad,22px);padding:14px 16px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),0 22px 44px -30px rgba(0,0,0,0.6);color:#e3efe7;animation:dIn .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms);overflow:hidden;}
+.dcard.half{grid-column:span 1;}
+.dcard.solid{background:linear-gradient(135deg,color-mix(in srgb,var(--p) 34%,rgba(17,31,24,0.85)),color-mix(in srgb,var(--da,#2dd4bf) 22%,rgba(17,31,24,0.85)));}
+@keyframes dIn{from{opacity:0;transform:translateY(16px) scale(.97);}}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+.dlbl{font:500 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:1.4px;color:rgba(227,239,231,0.62);text-transform:uppercase;}
+.dh3{font:700 15px "Sora",-apple-system,sans-serif;color:#e3efe7;}
+.dgreet{font:700 20px/1.2 "Sora",-apple-system,sans-serif;margin:4px 0 4px;}
+.dgreet em{font-family:Georgia,serif;font-weight:400;font-style:italic;color:var(--p);}
+.dsub{font-size:12px;color:rgba(227,239,231,0.72);}
+.davs{display:flex;}
+.davs span{width:28px;height:28px;border-radius:50%;display:grid;place-content:center;font-size:14px;background:#111f18;border:2px solid color-mix(in srgb,var(--p) 50%,#111f18);margin-left:-7px;}
+.davs span:first-child{margin-left:0;}
+.dbig{font:800 26px/1.1 "Sora",-apple-system,sans-serif;letter-spacing:-0.5px;margin:4px 0 6px;font-variant-numeric:tabular-nums;}
+.dclock{font:800 40px/1 "Sora",-apple-system,sans-serif;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;}
+.dclock small{font-size:15px;color:rgba(227,239,231,0.6);font-weight:600;margin-left:4px;}
+.dchip{display:inline-flex;align-items:center;gap:4px;font:500 10px "JetBrains Mono",monospace;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--p) 16%,transparent);color:var(--p);border:1px solid color-mix(in srgb,var(--p) 32%,transparent);}
+.dchip.down{background:rgba(239,68,68,0.16);color:#f87171;border-color:rgba(239,68,68,0.35);}
+.dchip.sky{background:color-mix(in srgb,var(--da,#2dd4bf) 16%,transparent);color:var(--da,#2dd4bf);border-color:color-mix(in srgb,var(--da,#2dd4bf) 32%,transparent);}
+.dweek{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;}
+.dweek div{display:grid;gap:2px;padding:6px 0;border-radius:12px;font-size:10px;color:rgba(227,239,231,0.6);}
+.dweek b{font:700 14px "Sora",sans-serif;color:#e3efe7;}
+.dweek .today{background:var(--p);color:rgba(0,0,0,0.6);box-shadow:0 8px 20px -8px var(--p);}
+.dweek .today b{color:#06140c;}
+.dspark{display:block;width:100%;height:34px;margin-top:6px;overflow:visible;}
+.dspark path.l{fill:none;stroke:var(--p);stroke-width:2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:dDraw 1.6s .3s cubic-bezier(.2,.8,.2,1) forwards;}
+.dspark path.a{fill:var(--p);opacity:0;animation:dFade 1s 1.1s forwards;}
+@keyframes dDraw{to{stroke-dashoffset:0;}}
+@keyframes dFade{to{opacity:.14;}}
+.dtodo div{font-size:13px;padding:5px 0;display:flex;gap:9px;align-items:center;border-bottom:1px dashed rgba(255,255,255,0.08);}
+.dtodo div:last-child{border-bottom:0;}
+.dtodo i{width:15px;height:15px;border-radius:5px;border:2px solid rgba(227,239,231,0.3);flex:none;}
+.dtodo .done{color:rgba(227,239,231,0.5);text-decoration:line-through;}
+.dtodo .done i{background:var(--p);border-color:var(--p);}
+.dbar{height:7px;border-radius:7px;background:rgba(255,255,255,0.1);overflow:hidden;margin-top:8px;}
+.dbar i{display:block;height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,var(--da,#2dd4bf),var(--p));animation:dGrow 1.1s .3s cubic-bezier(.2,.8,.2,1) forwards;}
+@keyframes dGrow{to{width:var(--w);}}
 .dash-list .row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.08);font-size:13px;color:#cbd5e1;}
 .dash-list .row span{flex:1;}
 .dash-list .row.done span{text-decoration:line-through;opacity:.5;}
 .dash-mini{padding:6px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.12);background:rgba(30,41,59,0.6);color:#cbd5e1;font-size:12px;font-weight:700;}
+@media (prefers-reduced-motion:reduce){.dcard,.dspark path,.dbar i{animation:none!important;stroke-dashoffset:0;opacity:1;width:var(--w);}}
 </style>
 </head>
 <body>
@@ -562,6 +590,12 @@ body.agent #dash{display:none;}
       <button class="opt-btn" data-dash-t="on">Show glass cards</button>
       <button class="opt-btn" id="dashOpenCC">Open Command Center ↗</button>
     </div>
+    <div class="sec-label">Nova sprite</div>
+    <div class="grid-2">
+      <button class="opt-btn" data-sprite="1">Show Nova</button>
+      <button class="opt-btn" data-sprite="0">Hide Nova</button>
+    </div>
+    <div class="note">Hide Nova removes the glowing core, its face and the arcs around it, so only the background and your cards show. Tapping the wallpaper still works.</div>
     <div class="note">Frosted cards float on your wallpaper and in the app. For the matching background, pick a scene from the Glass group in LOOK.</div>
     <div class="sec-label">Position</div>
     <div class="grid-3">
@@ -569,8 +603,15 @@ body.agent #dash{display:none;}
       <button class="opt-btn" data-dash-pos="mid">Middle</button>
       <button class="opt-btn" data-dash-pos="bottom">Bottom</button>
     </div>
+    <div class="grid-2">
+      <button class="opt-btn" data-dash-pos="full">Full screen</button>
+      <button class="opt-btn" data-dash-t="dense">Compact cards</button>
+    </div>
     <div class="sec-label">Cards</div>
     <div class="grid-2">
+      <button class="opt-btn" data-dash-card="greet">Welcome card</button>
+      <button class="opt-btn" data-dash-card="clock">Clock card</button>
+      <button class="opt-btn" data-dash-card="week">Week calendar</button>
       <button class="opt-btn" data-dash-card="prices">Crypto prices</button>
       <button class="opt-btn" data-dash-card="todo">Today's list</button>
       <button class="opt-btn" data-dash-card="oil">WRX oil change</button>
@@ -579,6 +620,8 @@ body.agent #dash{display:none;}
     <div class="sec-label">Glass look</div>
     <div class="slider-row"><span>See-through</span><input type="range" id="rngDashOp" min="0.1" max="0.9" step="0.05"><b id="valDashOp"></b></div>
     <div class="slider-row"><span>Blur</span><input type="range" id="rngDashBlur" min="0" max="30" step="1"><b id="valDashBlur"></b></div>
+    <div class="slider-row"><span>Roundness</span><input type="range" id="rngDashRad" min="6" max="32" step="1"><b id="valDashRad"></b></div>
+    <div class="note">Tip: turn off Nova's own clock in TEXT if you use the clock card.</div>
     <div class="sec-label">Crypto</div>
     <input class="inp" id="dashCoins" placeholder="xrp, hbar" autocomplete="off">
     <div class="note" id="dashPxNote">Tickers separated by commas (xrp, hbar, btc, eth, sol…). Live prices from CoinGecko, refreshed every 10 minutes.</div>
@@ -3955,9 +3998,11 @@ function render(dt) {
   if (L.fireworks) drawFireworks(t, k);
   if (L.lightning) drawLightning(t, k);
   // only the inner core and its face squish, hop and wiggle; the layers around it stay steady
-  drawArcs(t, k, cx, cy);
-  drawEmp(t, cx, cy, k);
-  P(() => { drawIdleGlow(t, cx, cy); drawCore(t, cx, cy); drawCoreInner(t, cx, cy); drawFace(t, cx, cy); });
+  if (cfg.sprite !== false) {
+    drawArcs(t, k, cx, cy);
+    drawEmp(t, cx, cy, k);
+    P(() => { drawIdleGlow(t, cx, cy); drawCore(t, cx, cy); drawCoreInner(t, cx, cy); drawFace(t, cx, cy); });
+  }
   ctx.restore();
   // screen-fixed HUD (not moved by the camera)
   if (L.hudpanels) drawHudPanels(t, k);
@@ -4993,11 +5038,14 @@ window.onUpdate = function (type, text) {
 
 // ===== Sync with the wallpaper =====
 // ===== Glass dashboard (DASH tab) =====
-// Kept in its own storage key so favorites and looks don't carry your list and miles around
-const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx';
-const DASH_DEFAULTS = { on: false, pos: 'mid', op: 0.45, blur: 14, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 }, cards: { prices: 1, todo: 1, oil: 1, goal: 1 } };
+// Mirrors the Command Center web app's Home tab. Kept in its own storage key so
+// favorites and looks don't carry your list and miles around.
+const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx2';
+const DASH_DEFAULTS = { on: false, pos: 'mid', dense: false, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
+  cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1 } };
 const COIN_IDS = { xrp: 'ripple', hbar: 'hedera-hashgraph', btc: 'bitcoin', eth: 'ethereum', sol: 'solana', doge: 'dogecoin', ada: 'cardano', xlm: 'stellar', link: 'chainlink', ltc: 'litecoin', dot: 'polkadot', avax: 'avalanche-2', shib: 'shiba-inu', bnb: 'binancecoin', sui: 'sui' };
 const CC_URL = 'https://claude.ai/artifact/8P38KRZjgFbQUCc8vNc6ND';
+const DASH_APPS = ['🌌', '🫧', '🧭', '📺', '🏎️', '🐾'];
 function loadDash() {
   const d = Object.assign({}, DASH_DEFAULTS, readJson(DASH_KEY));
   d.cards = Object.assign({}, DASH_DEFAULTS.cards, d.cards || {});
@@ -5010,35 +5058,70 @@ function saveDash() { try { localStorage.setItem(DASH_KEY, JSON.stringify(dash))
 function dashTickers() { return dash.coins.split(/[,\s]+/).map(x => x.trim().toLowerCase()).filter(Boolean).slice(0, 4); }
 function fmtPx(v) { return v >= 100 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : v >= 1 ? '$' + v.toFixed(2) : '$' + v.toFixed(4); }
 function dashEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function dashGreet() { const h = new Date().getHours(); return h < 5 ? 'Burning the midnight oil' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; }
+function dashSpark(arr) {
+  if (!arr || arr.length < 2) return '';
+  const step = Math.max(1, Math.floor(arr.length / 40)), a = arr.filter((_, i) => i % step === 0);
+  const w = 160, h = 34, mn = Math.min(...a), mx = Math.max(...a);
+  const d = a.map((v, i) => (i ? 'L' : 'M') + (i / (a.length - 1) * w).toFixed(1) + ' ' + (h - 3 - (v - mn) / (mx - mn || 1) * (h - 6)).toFixed(1)).join(' ');
+  return '<svg class="dspark" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none"><path class="a" d="' + d + ' L' + w + ' ' + h + ' L0 ' + h + ' Z"/><path class="l" pathLength="1" vector-effect="non-scaling-stroke" d="' + d + '"/></svg>';
+}
+// numbers count up from zero each time the cards appear, like the web app
+function dashCount(el) {
+  const to = parseFloat(el.dataset.n), dec = +el.dataset.dec || 0, pre = el.dataset.pre || '', suf = el.dataset.suf || '';
+  const f = v => pre + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
+  if (!isFinite(to) || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = f(to || 0); return; }
+  const t0 = performance.now();
+  (function step(t) { const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 3); el.textContent = f(to * e); if (k < 1) requestAnimationFrame(step); })(t0);
+}
+function dashClockHTML() {
+  const n = new Date(), hm = n.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: !cfg.clock.h24 }).split(' ');
+  return dashEsc(hm[0]) + (hm[1] ? '<small>' + dashEsc(hm[1]) + '</small>' : '');
+}
 function renderDash() {
   const el = $('dash'); if (!el) return;
-  el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos;
-  el.style.setProperty('--dop', dash.op); el.style.setProperty('--dblur', dash.blur + 'px');
+  el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos + (dash.dense ? ' dense' : '');
+  el.style.setProperty('--dop', dash.op); el.style.setProperty('--dblur', dash.blur + 'px'); el.style.setProperty('--drad', dash.rad + 'px');
+  el.style.setProperty('--da', th().a);
   if (!dash.on) { el.innerHTML = ''; return; }
-  const px = readJson(DASH_PX_KEY).data || {}, out = [];
-  if (dash.cards.prices) {
-    const tk = dashTickers();
-    if (tk.length) out.push('<div class="dcard"><div class="drow">' + tk.map(t => {
-      const p = px[COIN_IDS[t] || t];
-      return '<div><div class="dlbl">' + dashEsc(t.toUpperCase()) + '</div><div class="dbig">' + (p ? fmtPx(p.usd) : '…') + '</div>' +
-        (p && p.usd_24h_change != null ? '<div class="dch ' + (p.usd_24h_change >= 0 ? 'up">▲ ' : 'down">▼ ') + Math.abs(p.usd_24h_change).toFixed(2) + '%</div>' : '') + '</div>';
-    }).join('') + '</div></div>');
+  const C = dash.cards, px = readJson(DASH_PX_KEY).data || {}, out = [];
+  if (C.greet) out.push('<div class="dcard solid"><div class="dhead"><span class="dlbl">Colin\'s world</span><div class="davs">' + DASH_APPS.map(e => '<span>' + e + '</span>').join('') + '</div></div>' +
+    '<div class="dgreet">' + dashGreet() + ', Colin. Everything\'s <em>better</em> in one place.</div><div class="dsub">Your apps, the WRX build, crypto and the channel, all at a glance.</div></div>');
+  const n = new Date();
+  if (C.clock) out.push('<div class="dcard ' + (C.week ? 'half' : '') + '"><div class="dhead"><span class="dlbl">New Orleans</span></div><div class="dclock" id="dashClock">' + dashClockHTML() + '</div><div class="dsub" style="margin-top:6px">' + n.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) + '</div></div>');
+  if (C.week) {
+    const st = new Date(n); st.setDate(n.getDate() - n.getDay()); const days = [];
+    for (let i = 0; i < 7; i++) { const d = new Date(st); d.setDate(st.getDate() + i); days.push(d); }
+    const wide = !C.clock;
+    out.push('<div class="dcard ' + (wide ? '' : 'half') + '"><div class="dhead"><span class="dh3">' + days[3].toLocaleDateString('en-US', { month: wide ? 'long' : 'short', year: 'numeric' }) + '</span></div><div class="dweek"' + (wide ? '' : ' style="gap:1px"') + '>' +
+      days.map(d => '<div class="' + (d.toDateString() === n.toDateString() ? 'today' : '') + '">' + d.toLocaleDateString('en-US', { weekday: 'narrow' }) + '<b>' + d.getDate() + '</b></div>').join('') + '</div></div>');
   }
-  if (dash.cards.todo && dash.todos.length) {
+  if (C.prices) {
+    const tk = dashTickers();
+    tk.forEach(t => {
+      const p = px[COIN_IDS[t] || t], half = tk.length > 1;
+      out.push('<div class="dcard ' + (half ? 'half' : '') + '"><span class="dlbl">' + dashEsc(t.toUpperCase()) + ' price</span>' +
+        (p ? '<div class="dbig" data-n="' + p.p + '" data-dec="' + (p.p >= 100 ? 0 : p.p >= 1 ? 2 : 4) + '" data-pre="$">$0</div><span class="dchip ' + (p.c >= 0 ? '' : 'down') + '">' + (p.c >= 0 ? '▲ ' : '▼ ') + Math.abs(p.c).toFixed(2) + '% 24h</span>' + dashSpark(p.s)
+           : '<div class="dbig">…</div><span class="dchip sky">loading</span>') + '</div>');
+    });
+  }
+  if (C.todo && dash.todos.length) {
     const d = dash.todos.filter(x => x.d).length;
-    out.push('<div class="dcard"><div class="dlbl">Today · ' + d + '/' + dash.todos.length + '</div><div class="dtodo">' +
+    out.push('<div class="dcard"><div class="dhead"><span class="dh3">Today\'s focus</span><span class="dlbl">' + d + '/' + dash.todos.length + ' done</span></div><div class="dtodo">' +
       dash.todos.slice(0, 5).map(x => '<div class="' + (x.d ? 'done' : '') + '"><i></i>' + dashEsc(x.t) + '</div>').join('') + '</div></div>');
   }
-  const o = dash.oil, now = +o.now, last = +o.last, every = +o.every || 5000;
-  if (dash.cards.oil && now && last) {
+  const o = dash.oil, now = +o.now, last = +o.last, every = +o.every || 5000, showOil = C.oil && now && last, showGoal = C.goal && dash.goal;
+  if (showOil) {
     const left = every - (now - last), pct = Math.max(0, Math.min(100, (now - last) / every * 100));
-    out.push('<div class="dcard"><div class="dlbl">WRX oil change</div><div class="dbig" style="color:' + (left < 0 ? '#f87171' : left < 500 ? '#facc15' : '#f1f5f9') + '">' +
-      Math.abs(left).toLocaleString() + ' mi ' + (left < 0 ? 'overdue' : 'left') + '</div><div class="dbar"><i style="width:' + pct + '%"></i></div></div>');
+    out.push('<div class="dcard ' + (showGoal ? 'half' : '') + '"><span class="dlbl">WRX oil change</span><div class="dbig" style="color:' + (left < 0 ? '#f87171' : left < 500 ? '#facc15' : '#e3efe7') + '"><span data-n="' + Math.abs(left) + '">0</span><span style="font-size:13px;opacity:.6;font-weight:600"> mi ' + (left < 0 ? 'overdue' : 'left') + '</span></div><div class="dbar"><i style="--w:' + pct + '%"></i></div></div>');
   }
-  if (dash.cards.goal && dash.goal) out.push('<div class="dcard"><div class="dlbl">Goal</div><div style="font-size:15px;font-weight:700;margin-top:2px">' + dashEsc(dash.goal) + '</div></div>');
+  if (showGoal) out.push('<div class="dcard ' + (showOil ? 'half' : '') + '"><span class="dlbl">Goal</span><div class="dh3" style="margin-top:6px;line-height:1.3">' + dashEsc(dash.goal) + '</div></div>');
   el.innerHTML = out.join('');
+  el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
+  el.querySelectorAll('[data-n]').forEach(dashCount);
 }
-// Live prices, cached so the wallpaper and the app share one fetch
+setInterval(() => { const c = $('dashClock'); if (c && !paused) c.innerHTML = dashClockHTML(); }, 15000);
+// Live prices with a 7-day chart, cached so the wallpaper and the app share one fetch
 let dashFetching = false;
 function refreshPrices(force) {
   if (!dash.on || !dash.cards.prices || dashFetching || isAgent) return;
@@ -5046,11 +5129,13 @@ function refreshPrices(force) {
   if (!ids) return;
   if (!force && cache.t && Date.now() - cache.t < 10 * 60 * 1000 && cache.ids === ids) return;
   dashFetching = true;
-  httpGet('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids) + '&vs_currencies=usd&include_24hr_change=true', { 'Accept': 'application/json' }).then(r => {
+  httpGet('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=true&ids=' + encodeURIComponent(ids), { 'Accept': 'application/json' }).then(r => {
     dashFetching = false;
     try {
-      const data = JSON.parse(r.body);
-      if (r.status === 200 && data && typeof data === 'object') {
+      const list = JSON.parse(r.body);
+      if (r.status === 200 && Array.isArray(list)) {
+        const data = {};
+        list.forEach(c => data[c.id] = { p: c.current_price, c: c.price_change_percentage_24h || 0, s: (c.sparkline_in_7d && c.sparkline_in_7d.price || []).map(v => +v.toPrecision(5)) });
         localStorage.setItem(DASH_PX_KEY, JSON.stringify({ t: Date.now(), ids: ids, data: data }));
         renderDash(); renderDashUI();
       }
@@ -5064,19 +5149,23 @@ function renderDashUI() {
   act('[data-dash-t]', b => !!dash[b.dataset.dashT]);
   act('[data-dash-pos]', b => b.dataset.dashPos === dash.pos);
   act('[data-dash-card]', b => !!dash.cards[b.dataset.dashCard]);
+  act('[data-sprite]', b => (b.dataset.sprite === '1') === (cfg.sprite !== false));
   $('rngDashOp').value = dash.op; $('valDashOp').textContent = Math.round((1 - dash.op) * 100) + '%';
   $('rngDashBlur').value = dash.blur; $('valDashBlur').textContent = dash.blur + 'px';
+  $('rngDashRad').value = dash.rad; $('valDashRad').textContent = dash.rad + 'px';
   [['dashCoins', dash.coins], ['dashGoal', dash.goal], ['dashOilNow', dash.oil.now], ['dashOilLast', dash.oil.last], ['dashOilEvery', dash.oil.every]].forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v; });
   $('dashTodoList').innerHTML = dash.todos.length ? dash.todos.map((x, i) => '<div class="row ' + (x.d ? 'done' : '') + '"><button class="dash-mini" data-dtodo="' + i + '">' + (x.d ? '✓' : '○') + '</button><span>' + dashEsc(x.t) + '</span><button class="dash-mini" data-ddel="' + i + '">✕</button></div>').join('') : '<div class="note">Nothing on the list yet.</div>';
   const c = readJson(DASH_PX_KEY);
-  if (c.t) $('dashPxNote').textContent = 'Tickers separated by commas (xrp, hbar, btc, eth, sol…). Prices from CoinGecko, last updated ' + new Date(c.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
+  if (c.t) $('dashPxNote').textContent = 'Tickers separated by commas (xrp, hbar, btc, eth, sol…). Prices and 7-day charts from CoinGecko, last updated ' + new Date(c.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
 }
 function buildDashUI() {
   document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); refreshPrices(true); });
   document.querySelectorAll('[data-dash-pos]').forEach(b => b.onclick = () => { dash.pos = b.dataset.dashPos; saveDash(); });
   document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); });
+  document.querySelectorAll('[data-sprite]').forEach(b => b.onclick = () => { cfg.sprite = b.dataset.sprite === '1'; saveCfg(); updateUI(); renderDashUI(); });
   $('rngDashOp').oninput = e => { dash.op = parseFloat(e.target.value); saveDash(); };
   $('rngDashBlur').oninput = e => { dash.blur = parseInt(e.target.value, 10); saveDash(); };
+  $('rngDashRad').oninput = e => { dash.rad = parseInt(e.target.value, 10); saveDash(); };
   $('dashCoins').onchange = e => { dash.coins = e.target.value; saveDash(); refreshPrices(true); };
   $('dashGoal').oninput = e => { dash.goal = e.target.value; saveDash(); };
   [['dashOilNow', 'now'], ['dashOilLast', 'last'], ['dashOilEvery', 'every']].forEach(([id, k]) => $(id).onchange = e => { dash.oil[k] = e.target.value; saveDash(); });
