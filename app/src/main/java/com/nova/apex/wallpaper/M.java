@@ -425,6 +425,19 @@ public class M extends Activity {
             });
         }
 
+        // Opens a web link (like the Command Center dashboard) in the phone's browser
+        @JavascriptInterface
+        public void openUrl(String url) {
+            runOnUiThread(() -> {
+                try {
+                    if (url == null || !url.startsWith("https://")) return;
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                } catch (Exception e) {
+                    Toast.makeText(M.this, "Couldn't open the link", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
         @JavascriptInterface
         public void showToast(String msg) {
             runOnUiThread(() -> Toast.makeText(M.this, msg, Toast.LENGTH_SHORT).show());
