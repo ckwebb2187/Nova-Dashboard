@@ -177,6 +177,32 @@ body.drawer-open #clock,body.drawer-open .hud-top,body.drawer-open #hotkeys,body
 
 body.wallpaper .hud-top,body.wallpaper .quick-dock,body.wallpaper .drawer,body.wallpaper #drawerToggle,
 body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
+/* ===== Glass dashboard cards (DASH tab) ===== */
+#dash{position:fixed;left:14px;right:14px;z-index:6;display:none;flex-direction:column;gap:10px;pointer-events:none;max-width:520px;margin:0 auto;}
+#dash.on{display:flex;}
+#dash.pos-top{top:150px;}
+#dash.pos-mid{top:50%;transform:translateY(-50%);}
+#dash.pos-bottom{bottom:150px;}
+body.wallpaper #dash.pos-bottom{bottom:70px;}
+body.agent #dash{display:none;}
+.dcard{background:rgba(15,23,42,var(--dop,0.45));-webkit-backdrop-filter:blur(var(--dblur,14px)) saturate(1.4);backdrop-filter:blur(var(--dblur,14px)) saturate(1.4);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:12px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 14px 30px rgba(0,0,0,0.35);color:#f1f5f9;animation:dIn .6s cubic-bezier(.2,.8,.2,1) both;}
+.dcard:nth-child(2){animation-delay:.08s}.dcard:nth-child(3){animation-delay:.16s}.dcard:nth-child(4){animation-delay:.24s}
+@keyframes dIn{from{opacity:0;transform:translateY(14px) scale(.97);}}
+.drow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+.dlbl{font-size:10px;letter-spacing:1.2px;font-weight:800;color:var(--p);text-transform:uppercase;}
+.dbig{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-top:2px;}
+.dch{font-size:11px;font-weight:700;}
+.dch.up{color:#4ade80;}.dch.down{color:#f87171;}
+.dtodo div{font-size:13px;padding:3px 0;display:flex;gap:8px;align-items:center;}
+.dtodo i{width:12px;height:12px;border-radius:4px;border:2px solid var(--p);flex:none;}
+.dtodo .done{opacity:.5;text-decoration:line-through;}
+.dtodo .done i{background:var(--p);}
+.dbar{height:6px;border-radius:6px;background:rgba(255,255,255,0.12);overflow:hidden;margin-top:8px;}
+.dbar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--p),#2dd4bf);transition:width .8s;}
+.dash-list .row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.08);font-size:13px;color:#cbd5e1;}
+.dash-list .row span{flex:1;}
+.dash-list .row.done span{text-decoration:line-through;opacity:.5;}
+.dash-mini{padding:6px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.12);background:rgba(30,41,59,0.6);color:#cbd5e1;font-size:12px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -185,6 +211,7 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
 <div id="scan"></div>
 
 <div id="clock"><div id="clockAura"></div><div id="clockTime"></div><div id="clockDate"></div></div>
+<div id="dash"></div>
 
 <div class="hud-top">
   <div class="pill" id="statePill"><span class="dot" id="stateDot"></span><span id="stateLabel">IDLE</span></div>
@@ -211,6 +238,7 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
     <button data-tab="clock">TEXT</button>
     <button data-tab="ai">AI</button>
     <button data-tab="voice">VOICE</button>
+    <button data-tab="dash">DASH</button>
     <button data-tab="app">APP</button>
   </div>
 
@@ -527,6 +555,47 @@ body.wallpaper #hotkeys,body.wallpaper #askBar{display:none;}
     <div class="note">Say or type a phrase to run its action. Check "Hotkey" to also get a tap button on the main screen. Anything that doesn't match a command goes to the AI.</div>
   </div>
 
+  <!-- DASH -->
+  <div class="tab" id="tab-dash">
+    <div class="sec-label">Glass dashboard</div>
+    <div class="grid-2">
+      <button class="opt-btn" data-dash-t="on">Show glass cards</button>
+      <button class="opt-btn" id="dashOpenCC">Open Command Center ↗</button>
+    </div>
+    <div class="note">Frosted cards float on your wallpaper and in the app. For the matching background, pick a scene from the Glass group in LOOK.</div>
+    <div class="sec-label">Position</div>
+    <div class="grid-3">
+      <button class="opt-btn" data-dash-pos="top">Top</button>
+      <button class="opt-btn" data-dash-pos="mid">Middle</button>
+      <button class="opt-btn" data-dash-pos="bottom">Bottom</button>
+    </div>
+    <div class="sec-label">Cards</div>
+    <div class="grid-2">
+      <button class="opt-btn" data-dash-card="prices">Crypto prices</button>
+      <button class="opt-btn" data-dash-card="todo">Today's list</button>
+      <button class="opt-btn" data-dash-card="oil">WRX oil change</button>
+      <button class="opt-btn" data-dash-card="goal">Goal / note</button>
+    </div>
+    <div class="sec-label">Glass look</div>
+    <div class="slider-row"><span>See-through</span><input type="range" id="rngDashOp" min="0.1" max="0.9" step="0.05"><b id="valDashOp"></b></div>
+    <div class="slider-row"><span>Blur</span><input type="range" id="rngDashBlur" min="0" max="30" step="1"><b id="valDashBlur"></b></div>
+    <div class="sec-label">Crypto</div>
+    <input class="inp" id="dashCoins" placeholder="xrp, hbar" autocomplete="off">
+    <div class="note" id="dashPxNote">Tickers separated by commas (xrp, hbar, btc, eth, sol…). Live prices from CoinGecko, refreshed every 10 minutes.</div>
+    <div class="sec-label">Today's list</div>
+    <div style="display:flex;gap:8px"><input class="inp" id="dashTodoIn" placeholder="Add something…" maxlength="60" autocomplete="off"><button class="dash-mini" id="dashTodoAdd">Add</button></div>
+    <div class="dash-list" id="dashTodoList"></div>
+    <div class="sec-label">WRX oil change</div>
+    <div class="grid-3">
+      <input class="inp" id="dashOilNow" type="number" inputmode="numeric" placeholder="Miles now">
+      <input class="inp" id="dashOilLast" type="number" inputmode="numeric" placeholder="Last change">
+      <input class="inp" id="dashOilEvery" type="number" inputmode="numeric" placeholder="Every">
+    </div>
+    <button class="opt-btn" id="dashOilDone" style="width:100%;margin-top:8px">✓ Changed it today</button>
+    <div class="sec-label">Goal / note</div>
+    <input class="inp" id="dashGoal" placeholder="e.g. Fix the cooling fan" maxlength="80" autocomplete="off">
+  </div>
+
   <!-- APP -->
   <div class="tab" id="tab-app">
     <div class="sec-label">Updates</div>
@@ -589,7 +658,9 @@ const THEMES = {
   blood:     { p: '#ef4444', a: '#7f1d1d' },
   ocean:     { p: '#0ea5e9', a: '#14b8a6' },
   sakura:    { p: '#f9a8d4', a: '#fbcfe8' },
-  cyber:     { p: '#fde047', a: '#ec4899' }
+  cyber:     { p: '#fde047', a: '#ec4899' },
+  // Glass dashboard
+  glassmint: { p: '#3ddc84', a: '#2dd4bf' }
 };
 const STATES = {
   idle:      { label: 'IDLE',      rate: 0.6, dot: '#10b981' },
@@ -613,7 +684,8 @@ const LAYERS = {
   quarkrings: 'Quark rings', plasmatorus: 'Plasma torus', dnaring: 'DNA ring', cellrings: 'Cell rings',
   synapsering: 'Synapse ring', decayrings: 'Decay rings', orbitals: 'Electron orbitals',
   beadring: 'Bead chain', hexband: 'Hex band', saturn: 'Saturn disc', boltring: 'Lightning ring', triring: 'Tri rings',
-  godrays: 'Light rays', skyline: 'Neon city', rainfall: 'Rainstorm', petals: 'Sakura petals', crystals: 'Crystal cave', clouds: 'Drifting clouds'
+  godrays: 'Light rays', skyline: 'Neon city', rainfall: 'Rainstorm', petals: 'Sakura petals', crystals: 'Crystal cave', clouds: 'Drifting clouds',
+  glassblobs: 'Glass blobs', glassnet: 'Glass network'
 };
 // Each scene lists the layers it turns on; everything else is off
 const SCENE_LIST = [
@@ -664,6 +736,10 @@ const SCENE_LIST = [
   ['stormcity', 'Storm City', 'skyline lightning rainfall', 'Habitats'],
   ['deepocean', 'Deep Ocean', 'godrays ocean bubbles', 'Habitats', 'jelly'],
   ['skyrealm', 'Sky Realm', 'clouds godrays petals', 'Habitats'],
+  ['glassdash', 'Glass Dashboard', 'glassblobs fireflies', 'Glass'],
+  ['glassnet', 'Glass Network', 'glassblobs glassnet', 'Glass'],
+  ['glassbubble', 'Glass Bubbles', 'glassblobs bubbles', 'Glass'],
+  ['glassaurora', 'Glass Aurora', 'glassblobs aurora fireflies', 'Glass'],
   ['neural', 'Neural Atom', 'sphere'],
   ['quantum', 'Quantum', 'orbits wave'],
   ['reactor', 'Arc Reactor', 'rings wave'],
@@ -1889,6 +1965,48 @@ function drawClouds(t, k) {
     ctx.globalAlpha = 0.28;
     for (let j = 0; j < 3; j++) ctx.drawImage(blobSprites.list[c.c], c.x - c.s / 2 + j * c.s * 0.3, c.y - c.s * 0.3 + Math.sin(j * 2) * c.s * 0.1, c.s, c.s * 0.6);
   }
+  ctx.globalAlpha = 1;
+}
+
+// ===== Glass layers =====
+// Big soft color blobs that drift slowly behind everything (the frosted-glass look)
+let glassSprites = null, glassList = [], netList = [];
+function drawGlassBlobs(t, k) {
+  if (!glassSprites || glassSprites.theme !== themeKey()) glassSprites = { theme: themeKey(), list: [blobSprite(t.p), blobSprite(t.a), blobSprite('#2dd4bf')] };
+  if (glassList.length && glassList.W !== W) glassList = [];
+  while (glassList.length < 4) {
+    const i = glassList.length;
+    glassList.push({ x: W * (0.15 + Math.random() * 0.7), y: H * (0.1 + i * 0.27), s: Math.max(W, H) * (0.55 + Math.random() * 0.35), a: Math.random() * 6, v: 0.6 + Math.random() * 0.6, c: i % 3 });
+    glassList.W = W;
+  }
+  for (const b of glassList) {
+    b.a += 0.0025 * k * b.v;
+    const x = b.x + Math.sin(b.a) * W * 0.2, y = b.y + Math.cos(b.a * 0.8) * H * 0.12;
+    ctx.globalAlpha = 0.34;
+    ctx.drawImage(glassSprites.list[b.c], x - b.s / 2, y - b.s / 2, b.s, b.s);
+  }
+  ctx.globalAlpha = 1;
+}
+// Drifting dots linked by faint lines, like the Command Center background
+function drawGlassNet(t, k) {
+  const n = Math.max(20, Math.min(70, Math.round(W * H / 14000)));
+  if (netList.length > n) netList.length = n;
+  while (netList.length < n) netList.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35 });
+  const L = Math.min(140, Math.max(70, Math.sqrt(W * H) / 5));
+  for (const p of netList) {
+    p.x += p.vx * k; p.y += p.vy * k;
+    if (p.x < 0 || p.x > W) p.vx *= -1;
+    if (p.y < 0 || p.y > H) p.vy *= -1;
+  }
+  ctx.strokeStyle = t.p; ctx.lineWidth = 1;
+  for (let i = 0; i < netList.length; i++) for (let j = i + 1; j < netList.length; j++) {
+    const a = netList[i], b = netList[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (d >= L) continue;
+    ctx.globalAlpha = (1 - d / L) * 0.35;
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  ctx.fillStyle = t.p; ctx.globalAlpha = 0.6;
+  for (const p of netList) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, Math.PI * 2); ctx.fill(); }
   ctx.globalAlpha = 1;
 }
 
@@ -3772,6 +3890,7 @@ function render(dt) {
   const L = cfg.layers;
   updatePersona(dt, R);
   const P = fn => personaWrap(cx, cy, fn);
+  if (L.glassblobs) drawGlassBlobs(t, k);
   if (L.clouds) drawClouds(t, k);
   if (L.godrays) drawGodRays(t, k);
   if (L.aurora) drawAurora(t);
@@ -3786,6 +3905,7 @@ function render(dt) {
   if (L.meteors) drawMeteors(t, k);
   if (L.bubbles) drawBubbles(t, k);
   if (L.fireflies) drawFireflies(t, k);
+  if (L.glassnet) drawGlassNet(t, k);
   if (L.lasers) drawLasers(t);
   if (L.skyline) drawSkyline(t, k);
   if (L.crystals) drawCrystals(t, k);
@@ -4872,7 +4992,109 @@ window.onUpdate = function (type, text) {
 };
 
 // ===== Sync with the wallpaper =====
+// ===== Glass dashboard (DASH tab) =====
+// Kept in its own storage key so favorites and looks don't carry your list and miles around
+const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx';
+const DASH_DEFAULTS = { on: false, pos: 'mid', op: 0.45, blur: 14, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 }, cards: { prices: 1, todo: 1, oil: 1, goal: 1 } };
+const COIN_IDS = { xrp: 'ripple', hbar: 'hedera-hashgraph', btc: 'bitcoin', eth: 'ethereum', sol: 'solana', doge: 'dogecoin', ada: 'cardano', xlm: 'stellar', link: 'chainlink', ltc: 'litecoin', dot: 'polkadot', avax: 'avalanche-2', shib: 'shiba-inu', bnb: 'binancecoin', sui: 'sui' };
+const CC_URL = 'https://claude.ai/artifact/8P38KRZjgFbQUCc8vNc6ND';
+function loadDash() {
+  const d = Object.assign({}, DASH_DEFAULTS, readJson(DASH_KEY));
+  d.cards = Object.assign({}, DASH_DEFAULTS.cards, d.cards || {});
+  d.oil = Object.assign({}, DASH_DEFAULTS.oil, d.oil || {});
+  if (!Array.isArray(d.todos)) d.todos = [];
+  return d;
+}
+let dash = loadDash();
+function saveDash() { try { localStorage.setItem(DASH_KEY, JSON.stringify(dash)); } catch (e) {} renderDash(); renderDashUI(); }
+function dashTickers() { return dash.coins.split(/[,\s]+/).map(x => x.trim().toLowerCase()).filter(Boolean).slice(0, 4); }
+function fmtPx(v) { return v >= 100 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : v >= 1 ? '$' + v.toFixed(2) : '$' + v.toFixed(4); }
+function dashEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function renderDash() {
+  const el = $('dash'); if (!el) return;
+  el.className = (dash.on && !isAgent ? 'on ' : '') + 'pos-' + dash.pos;
+  el.style.setProperty('--dop', dash.op); el.style.setProperty('--dblur', dash.blur + 'px');
+  if (!dash.on) { el.innerHTML = ''; return; }
+  const px = readJson(DASH_PX_KEY).data || {}, out = [];
+  if (dash.cards.prices) {
+    const tk = dashTickers();
+    if (tk.length) out.push('<div class="dcard"><div class="drow">' + tk.map(t => {
+      const p = px[COIN_IDS[t] || t];
+      return '<div><div class="dlbl">' + dashEsc(t.toUpperCase()) + '</div><div class="dbig">' + (p ? fmtPx(p.usd) : '…') + '</div>' +
+        (p && p.usd_24h_change != null ? '<div class="dch ' + (p.usd_24h_change >= 0 ? 'up">▲ ' : 'down">▼ ') + Math.abs(p.usd_24h_change).toFixed(2) + '%</div>' : '') + '</div>';
+    }).join('') + '</div></div>');
+  }
+  if (dash.cards.todo && dash.todos.length) {
+    const d = dash.todos.filter(x => x.d).length;
+    out.push('<div class="dcard"><div class="dlbl">Today · ' + d + '/' + dash.todos.length + '</div><div class="dtodo">' +
+      dash.todos.slice(0, 5).map(x => '<div class="' + (x.d ? 'done' : '') + '"><i></i>' + dashEsc(x.t) + '</div>').join('') + '</div></div>');
+  }
+  const o = dash.oil, now = +o.now, last = +o.last, every = +o.every || 5000;
+  if (dash.cards.oil && now && last) {
+    const left = every - (now - last), pct = Math.max(0, Math.min(100, (now - last) / every * 100));
+    out.push('<div class="dcard"><div class="dlbl">WRX oil change</div><div class="dbig" style="color:' + (left < 0 ? '#f87171' : left < 500 ? '#facc15' : '#f1f5f9') + '">' +
+      Math.abs(left).toLocaleString() + ' mi ' + (left < 0 ? 'overdue' : 'left') + '</div><div class="dbar"><i style="width:' + pct + '%"></i></div></div>');
+  }
+  if (dash.cards.goal && dash.goal) out.push('<div class="dcard"><div class="dlbl">Goal</div><div style="font-size:15px;font-weight:700;margin-top:2px">' + dashEsc(dash.goal) + '</div></div>');
+  el.innerHTML = out.join('');
+}
+// Live prices, cached so the wallpaper and the app share one fetch
+let dashFetching = false;
+function refreshPrices(force) {
+  if (!dash.on || !dash.cards.prices || dashFetching || isAgent) return;
+  const cache = readJson(DASH_PX_KEY), ids = dashTickers().map(t => COIN_IDS[t] || t).join(',');
+  if (!ids) return;
+  if (!force && cache.t && Date.now() - cache.t < 10 * 60 * 1000 && cache.ids === ids) return;
+  dashFetching = true;
+  httpGet('https://api.coingecko.com/api/v3/simple/price?ids=' + encodeURIComponent(ids) + '&vs_currencies=usd&include_24hr_change=true', { 'Accept': 'application/json' }).then(r => {
+    dashFetching = false;
+    try {
+      const data = JSON.parse(r.body);
+      if (r.status === 200 && data && typeof data === 'object') {
+        localStorage.setItem(DASH_PX_KEY, JSON.stringify({ t: Date.now(), ids: ids, data: data }));
+        renderDash(); renderDashUI();
+      }
+    } catch (e) {}
+  });
+}
+setInterval(() => { if (!paused) refreshPrices(false); }, 60 * 1000);
+function renderDashUI() {
+  if (isWall || isAgent || !$('tab-dash')) return;
+  const act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
+  act('[data-dash-t]', b => !!dash[b.dataset.dashT]);
+  act('[data-dash-pos]', b => b.dataset.dashPos === dash.pos);
+  act('[data-dash-card]', b => !!dash.cards[b.dataset.dashCard]);
+  $('rngDashOp').value = dash.op; $('valDashOp').textContent = Math.round((1 - dash.op) * 100) + '%';
+  $('rngDashBlur').value = dash.blur; $('valDashBlur').textContent = dash.blur + 'px';
+  [['dashCoins', dash.coins], ['dashGoal', dash.goal], ['dashOilNow', dash.oil.now], ['dashOilLast', dash.oil.last], ['dashOilEvery', dash.oil.every]].forEach(([id, v]) => { if (document.activeElement !== $(id)) $(id).value = v; });
+  $('dashTodoList').innerHTML = dash.todos.length ? dash.todos.map((x, i) => '<div class="row ' + (x.d ? 'done' : '') + '"><button class="dash-mini" data-dtodo="' + i + '">' + (x.d ? '✓' : '○') + '</button><span>' + dashEsc(x.t) + '</span><button class="dash-mini" data-ddel="' + i + '">✕</button></div>').join('') : '<div class="note">Nothing on the list yet.</div>';
+  const c = readJson(DASH_PX_KEY);
+  if (c.t) $('dashPxNote').textContent = 'Tickers separated by commas (xrp, hbar, btc, eth, sol…). Prices from CoinGecko, last updated ' + new Date(c.t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
+}
+function buildDashUI() {
+  document.querySelectorAll('[data-dash-t]').forEach(b => b.onclick = () => { dash[b.dataset.dashT] = !dash[b.dataset.dashT]; saveDash(); refreshPrices(true); });
+  document.querySelectorAll('[data-dash-pos]').forEach(b => b.onclick = () => { dash.pos = b.dataset.dashPos; saveDash(); });
+  document.querySelectorAll('[data-dash-card]').forEach(b => b.onclick = () => { const k = b.dataset.dashCard; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); });
+  $('rngDashOp').oninput = e => { dash.op = parseFloat(e.target.value); saveDash(); };
+  $('rngDashBlur').oninput = e => { dash.blur = parseInt(e.target.value, 10); saveDash(); };
+  $('dashCoins').onchange = e => { dash.coins = e.target.value; saveDash(); refreshPrices(true); };
+  $('dashGoal').oninput = e => { dash.goal = e.target.value; saveDash(); };
+  [['dashOilNow', 'now'], ['dashOilLast', 'last'], ['dashOilEvery', 'every']].forEach(([id, k]) => $(id).onchange = e => { dash.oil[k] = e.target.value; saveDash(); });
+  $('dashOilDone').onclick = () => { if (!dash.oil.now) { if (hasNative('showToast')) Android.showToast('Enter your current miles first'); return; } dash.oil.last = dash.oil.now; saveDash(); if (hasNative('showToast')) Android.showToast('Oil change logged'); };
+  const add = () => { const v = $('dashTodoIn').value.trim(); if (!v) return; dash.todos.push({ t: v, d: false }); $('dashTodoIn').value = ''; saveDash(); };
+  $('dashTodoAdd').onclick = add;
+  $('dashTodoIn').onkeydown = e => { if (e.key === 'Enter') add(); };
+  $('dashTodoList').onclick = e => {
+    const t = e.target.closest('[data-dtodo]'), d = e.target.closest('[data-ddel]');
+    if (t) { const x = dash.todos[+t.dataset.dtodo]; x.d = !x.d; saveDash(); }
+    if (d) { dash.todos.splice(+d.dataset.ddel, 1); saveDash(); }
+  };
+  $('dashOpenCC').onclick = () => { if (hasNative('openUrl')) Android.openUrl(CC_URL); else window.open(CC_URL, '_blank'); };
+  renderDashUI();
+}
+
 window.syncConfig = function () {
+  dash = loadDash(); renderDash();
   const old = cfg;
   cfg = loadCfg();
   if (cfg.particles !== old.particles) buildParticles();
@@ -4891,7 +5113,10 @@ buildHud();
 buildCell();
 buildSnow();
 if (!isWall) buildUI();
+if (!isWall && !isAgent) buildDashUI();
 updateUI();
+renderDash();
+setTimeout(() => refreshPrices(false), 1500);
 if (!isAgent) {
   setInterval(tickClock, 1000);
   startLoop();
