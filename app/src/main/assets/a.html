@@ -434,6 +434,21 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
 #dash.ldp,#dash.ldp *{animation-play-state:paused!important;}
 /* Phone fit: hidden cards, and tighter sizes on narrow screens like the Galaxy S24+ (412 wide) */
 #dash .ldhide{display:none!important;}
+.ldord{display:flex;flex-direction:column;gap:6px;}
+.ldord .or{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(30,41,59,.55);border:1px solid rgba(255,255,255,.08);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,opacity .25s,background .25s;}
+.ldord .or.off{opacity:.5;}
+.ldord .or.drag{transform:scale(1.03);background:color-mix(in srgb,var(--p) 18%,rgba(30,41,59,.9));box-shadow:0 10px 26px -10px var(--p);z-index:2;position:relative;}
+.ldord .or.bump{animation:ldOrdBump .45s ease;}
+@keyframes ldOrdBump{0%{background:color-mix(in srgb,var(--p) 30%,rgba(30,41,59,.6));}100%{background:rgba(30,41,59,.55);}}
+.ldord .hd{touch-action:none;cursor:grab;font-size:18px;line-height:1;color:var(--p);padding:4px 6px;user-select:none;-webkit-user-select:none;}
+.ldord .nm{flex:1;font-size:13px;color:#e2e8f0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ldord .nm b{color:var(--p);font-weight:700;margin-right:6px;font-size:11px;}
+.ldord .sw{width:38px;height:22px;border-radius:99px;border:1px solid rgba(255,255,255,.15);background:rgba(15,23,42,.8);position:relative;flex:none;padding:0;transition:background .25s;}
+.ldord .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#94a3b8;transition:transform .25s cubic-bezier(.2,.8,.2,1),background .25s;}
+.ldord .sw.on{background:color-mix(in srgb,var(--p) 45%,transparent);}
+.ldord .sw.on::after{transform:translateX(16px);background:#fff;}
+.ldord .ar{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.6);color:#cbd5e1;font-size:12px;padding:0;flex:none;}
+.ldord .ar:disabled{opacity:.25;}
 .ldmore{grid-column:span 2;justify-self:center;font:500 10px "JetBrains Mono",monospace;color:rgba(227,239,231,.75);background:rgba(17,31,24,.7);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:5px 12px;text-align:center;}
 #dash{width:auto;box-sizing:border-box;}
 .dcard{min-width:0;box-sizing:border-box;overflow-wrap:anywhere;}
@@ -885,6 +900,10 @@ body:not(.wallpaper) #dash .ldtap{pointer-events:auto;cursor:pointer;-webkit-tap
       <button class="opt-btn" data-dash-card="pins">Pinned links</button>
       <button class="opt-btn" data-dash-card="cap">Syllabus cap</button>
     </div>
+    <div class="sec-label">Card order</div>
+    <div class="note">Drag a card by its handle, or use the arrows. The switch turns a card on or off. Your order shows on the wallpaper and in the app, and if the screen can't fit everything, cards at the bottom of your list are left out first.</div>
+    <div class="ldord" id="ldOrder"></div>
+    <button class="opt-btn" id="ldOrderReset" style="width:100%;margin-top:8px">↺ Reset order</button>
     <div class="sec-label">Motion</div>
     <div class="grid-3">
       <button class="opt-btn" data-ld-motion="full">Full</button>
@@ -5339,6 +5358,22 @@ window.onUpdate = function (type, text) {
 // Mirrors the Command Center web app's Home tab. Kept in its own storage key so
 // favorites and looks don't carry your list and miles around.
 const DASH_KEY = 'novaDash', DASH_PX_KEY = 'novaDashPx2';
+// Card order: the default is the order the cards were built in; dash.order holds Colin's own order from DASH
+const LD_ORDER_DEFAULT = ['prompt', 'greet', 'sky', 'wx', 'goals', 'wrx', 'clock', 'week', 'prices', 'todo', 'watch', 'pc', 'yt', 'areas', 'cap', 'pins', 'vinyl', 'oil', 'goal'];
+const LD_CARD_NAMES = { prompt: 'Typing prompt', greet: 'Welcome card', sky: 'Living sky clock', wx: 'Weather', goals: 'Goals bar', wrx: 'WRX build & fixes', clock: 'Clock card', week: 'Week calendar', prices: 'Crypto prices', todo: "Today's list", watch: 'Crypto watch list', pc: 'Gaming PC setup', yt: 'YouTube pipeline', areas: 'Progress by area', cap: 'Syllabus cap', pins: 'Pinned links', vinyl: 'Obsidian Dominion vinyl', oil: 'WRX oil change', goal: 'Goal / note' };
+function ldOrderList() { const o = (dash.order || []).filter(k => LD_ORDER_DEFAULT.indexOf(k) >= 0); return o.concat(LD_ORDER_DEFAULT.filter(k => o.indexOf(k) < 0)); }
+// Put the built cards in Colin's order; half-width cards that lose their partner go full width
+function ldSortCards(cards) {
+  if (dash.order && dash.order.length) {
+    const ord = ldOrderList();
+    cards = cards.map((c, i) => ({ c, i, r: ord.indexOf(c.k) })).sort((a, b) => (a.r - b.r) || (a.i - b.i)).map(x => x.c);
+  }
+  let run = [];
+  const close = () => { if (run.length % 2) { const c = run[run.length - 1]; c.h = c.h.replace(/(<div[^>]*class="dcard[^"]*?) half\b/, '$1'); } run = []; };
+  cards.forEach(c => { if (/^<div[^>]*class="dcard[^"]*\bhalf\b/.test(c.h)) run.push(c); else close(); });
+  close();
+  return cards;
+}
 const LD_LIVING = { prompt: 1, greet: 0, sky: 1, clock: 0, week: 0, wx: 1, goals: 1, wrx: 1, prices: 1, todo: 0, watch: 0, pc: 0, yt: 0, areas: 0, pins: 0, vinyl: 1, cap: 0, oil: 0, goal: 0 };
 const DASH_DEFAULTS = { motion: 'full', speed: 1, wxCity: 'New Orleans', wxLat: 29.955, wxLon: -90.075, pins: ['a-homebase', 'a-fbo', 'a-career', 'a-tune'], checks: { 'g-tune': 1, 'g-cmc1': 1 }, win: null, ldv: 0, on: false, pos: 'mid', dense: false, gclock: true, lockAnim: true, lockCards: false, lockClock: false, lockDim: 0.3, op: 0.45, blur: 14, rad: 22, coins: 'xrp, hbar', goal: '', todos: [], oil: { now: '', last: '', every: 5000 },
   cards: { greet: 1, clock: 0, week: 1, prices: 1, todo: 1, oil: 1, goal: 1, prompt: 1, sky: 1, wx: 1, goals: 1, wrx: 1, areas: 0, watch: 0, pc: 0, yt: 0, pins: 0, vinyl: 1, cap: 0 } };
@@ -5352,6 +5387,7 @@ function loadDash() {
   if (!Array.isArray(d.todos)) d.todos = [];
   d.checks = Object.assign({}, d.checks || {});
   d.pins = Array.isArray(d.pins) ? d.pins.slice() : DASH_DEFAULTS.pins.slice();
+  d.order = Array.isArray(d.order) ? d.order.filter(k => LD_ORDER_DEFAULT.indexOf(k) >= 0) : [];
   if (['full', 'calm', 'off'].indexOf(d.motion) < 0) d.motion = 'full';
   // first run of this version: switch to the living layout once (Classic in DASH brings the old one back)
   if (!d.ldv) { Object.assign(d.cards, LD_LIVING); d.ldv = 1; }
@@ -5398,7 +5434,9 @@ function ldFit(el, avail) {
   el.style.transform = 'none';
   let h = el.getBoundingClientRect().height, hidden = 0;
   if (h > avail && avail > 120) {
-    const cards = [...el.querySelectorAll('.dcard')].sort((a, b) => LD_HIDE_ORDER.indexOf(b.dataset.c || '') - LD_HIDE_ORDER.indexOf(a.dataset.c || ''));
+    // With his own order, the cards at the bottom of it go first; otherwise the least important ones do
+    const cards = (dash.order && dash.order.length) ? [...el.querySelectorAll('.dcard')].reverse()
+      : [...el.querySelectorAll('.dcard')].sort((a, b) => LD_HIDE_ORDER.indexOf(b.dataset.c || '') - LD_HIDE_ORDER.indexOf(a.dataset.c || ''));
     while (h * LD_MIN_SCALE > avail && hidden < cards.length - 1) { cards[hidden].classList.add('ldhide'); hidden++; h = el.getBoundingClientRect().height; }
     if (hidden && !isWall) {
       const m = document.createElement('div'); m.id = 'ldMore'; m.className = 'ldmore';
@@ -5491,7 +5529,7 @@ function renderDash() {
     out.push('<div class="dcard ' + (showGoal ? 'half' : '') + '"><span class="dlbl">WRX oil change</span><div class="dbig" style="color:' + (left < 0 ? '#f87171' : left < 500 ? '#facc15' : '#e3efe7') + '"><span data-n="' + Math.abs(left) + '">0</span><span style="font-size:13px;opacity:.6;font-weight:600"> mi ' + (left < 0 ? 'overdue' : 'left') + '</span></div><div class="dbar"><i style="--w:' + pct + '%"></i></div></div>');
   }
   if (showGoal) out.push('<div class="dcard ' + (showOil ? 'half' : '') + '"><span class="dlbl">Goal</span><div class="dh3" style="margin-top:6px;line-height:1.3">' + dashEsc(dash.goal) + '</div></div>');
-  el.innerHTML = out.map(h => h.replace('<div class="dcard', '<div data-c="' + ldCardKey(h) + '" class="dcard')).join('');
+  el.innerHTML = ldSortCards(out.map(h => { const k = ldCardKey(h); return { k, h: h.replace('<div class="dcard', '<div data-c="' + k + '" class="dcard') }; })).map(c => c.h).join('');
   el.querySelectorAll('.dcard').forEach((c, i) => c.style.setProperty('--i', i));
   el.querySelectorAll('[data-n]').forEach(x => dashCount(x, ldStill || dash.motion === 'off'));
   layoutDash();
@@ -5746,7 +5784,56 @@ document.addEventListener('click', e => {
 });
 (function () { const sp = window.setPaused; window.setPaused = function (b) { sp(b); const d = $('dash'); if (d) d.classList.toggle('ldp', !!b); }; })();
 
+function ldRenderOrder() {
+  const box = $('ldOrder'); if (!box || box.dataset.dragging) return;
+  const L = ldOrderList();
+  box.innerHTML = L.map((k, i) => '<div class="or' + (dash.cards[k] ? '' : ' off') + '" data-ok="' + k + '"><span class="hd" aria-label="Drag to reorder">⠿</span>' +
+    '<span class="nm"><b>' + (i + 1) + '</b>' + dashEsc(LD_CARD_NAMES[k] || k) + '</span>' +
+    '<button class="sw' + (dash.cards[k] ? ' on' : '') + '" data-osw="' + k + '" aria-label="On or off"></button>' +
+    '<button class="ar" data-oup="' + k + '"' + (i ? '' : ' disabled') + ' aria-label="Move up">▲</button>' +
+    '<button class="ar" data-odn="' + k + '"' + (i < L.length - 1 ? '' : ' disabled') + ' aria-label="Move down">▼</button></div>').join('');
+}
+function ldMoveCard(k, d) {
+  const L = ldOrderList(), i = L.indexOf(k), j = i + d;
+  if (i < 0 || j < 0 || j >= L.length) return;
+  L.splice(i, 1); L.splice(j, 0, k); dash.order = L; saveDash();
+  const r = document.querySelector('#ldOrder [data-ok="' + k + '"]'); if (r) r.classList.add('bump');
+}
+function ldBuildOrderUI() {
+  const box = $('ldOrder'); if (!box) return;
+  box.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.osw) { const k = b.dataset.osw; dash.cards[k] = dash.cards[k] ? 0 : 1; saveDash(); if (k === 'prices') refreshPrices(true); if (k === 'wx') refreshWx(true); }
+    else if (b.dataset.oup) ldMoveCard(b.dataset.oup, -1);
+    else if (b.dataset.odn) ldMoveCard(b.dataset.odn, 1);
+  };
+  // Drag by the handle: the row follows the finger and the others make room
+  let drag = null;
+  box.addEventListener('pointerdown', e => {
+    const hd = e.target.closest('.hd'); if (!hd) return;
+    const row = hd.closest('.or'); e.preventDefault();
+    try { hd.setPointerCapture(e.pointerId); } catch (x) {}
+    drag = { row, id: e.pointerId }; box.dataset.dragging = '1'; row.classList.add('drag');
+  });
+  box.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const rows = [...box.querySelectorAll('.or')].filter(r => r !== drag.row);
+    const after = rows.find(r => { const b = r.getBoundingClientRect(); return e.clientY < b.top + b.height / 2; });
+    if (after) { if (after !== drag.row.nextSibling) box.insertBefore(drag.row, after); }
+    else if (drag.row !== box.lastElementChild) box.appendChild(drag.row);
+  });
+  const end = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag.row.classList.remove('drag'); const k = drag.row.dataset.ok; drag = null; delete box.dataset.dragging;
+    const L = [...box.querySelectorAll('.or')].map(r => r.dataset.ok);
+    if (L.join() !== ldOrderList().join()) { dash.order = L; saveDash(); ldToast('Moved ' + (LD_CARD_NAMES[k] || k)); }
+    else ldRenderOrder();
+  };
+  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+  $('ldOrderReset').onclick = () => { dash.order = []; saveDash(); ldToast('Card order reset'); };
+}
 function ldRenderUI() {
+  ldRenderOrder();
   const act = (sel, fn) => document.querySelectorAll(sel).forEach(b => b.classList.toggle('act', fn(b)));
   act('[data-ld-motion]', b => b.dataset.ldMotion === dash.motion);
   act('[data-ld-pin]', b => dash.pins.indexOf(b.dataset.ldPin) >= 0);
@@ -5764,6 +5851,7 @@ function ldBuildUI() {
   document.querySelectorAll('[data-ld-preset]').forEach(b => b.onclick = () => { Object.assign(dash.cards, LD_PRESETS[b.dataset.ldPreset]); dash.on = true; saveDash(); refreshPrices(true); refreshWx(false); ldToast('Layout: ' + b.textContent.trim()); });
   $('rngLdSpeed').oninput = e => { dash.speed = parseFloat(e.target.value); saveDash(); };
   $('ldWxCity').onchange = e => ldFindCity(e.target.value);
+  ldBuildOrderUI();
   $('ldPinGrid').innerHTML = LD_PINS.map(p => '<button class="opt-btn" data-ld-pin="' + p[0] + '">' + p[1] + ' ' + dashEsc(p[2]) + '</button>').join('');
   document.querySelectorAll('[data-ld-pin]').forEach(b => b.onclick = () => { const k = b.dataset.ldPin, i = dash.pins.indexOf(k); if (i >= 0) dash.pins.splice(i, 1); else dash.pins.push(k); saveDash(); });
 }
