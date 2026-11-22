@@ -104,6 +104,17 @@ public class S extends WallpaperService {
                     } catch (Exception ignored) {
                     }
                 }
+
+                // Shift strip on the wallpaper: reads only if Calendar was already allowed in the app
+                @JavascriptInterface
+                public String getShifts(int days, String work, String off, String wknd) {
+                    return Cal.shifts(S.this, days, work, off, wknd);
+                }
+
+                @JavascriptInterface
+                public String calendarStatus() {
+                    return Cal.allowed(S.this) ? "granted" : "ask";
+                }
             }, "Android");
             wv.loadUrl("file:///android_asset/a.html?mode=wallpaper");
             walls.add(wv);
