@@ -5405,14 +5405,29 @@ function ldFit(el, avail) {
       m.textContent = '+' + hidden + (hidden === 1 ? ' card' : ' cards') + " didn't fit. " + (cfg.clock && cfg.clock.on && dash.cards.sky ? "Turn off Nova's clock in TEXT (the sky card has the time) or switch cards off in DASH." : 'Switch some off in DASH or use Compact cards.');
       el.appendChild(m); h = el.getBoundingClientRect().height;
     }
-    if (h > avail) el.style.transform = 'scale(' + Math.max(0.5, avail / h).toFixed(3) + ')';
+    if (h > avail) ldScale(el, avail);
   }
+}
+// Shrink to fit but keep the cards edge to edge: widen the box by 1/scale so the scaled cards still span the screen
+function ldScale(el, avail) {
+  const full = el.getBoundingClientRect().width;
+  let s = 1;
+  for (let i = 0; i < 3; i++) {
+    const h = el.getBoundingClientRect().height;
+    if (h <= avail / s) break;
+    s = Math.max(0.5, Math.min(s, avail / h));
+    const w = full / s;
+    el.style.left = '50%'; el.style.right = 'auto'; el.style.maxWidth = 'none';
+    el.style.width = w + 'px'; el.style.marginLeft = (-w / 2) + 'px';
+  }
+  if (s < 1) el.style.transform = 'scale(' + s.toFixed(3) + ')';
 }
 // Keep the cards clear of Nova's clock, the status bar and camera, and the dock and gesture bar
 function layoutDash() {
   const el = $('dash'); if (!el) return;
   try { if (!dash) return; } catch (e) { return; }
   el.style.top = el.style.bottom = el.style.transform = el.style.transformOrigin = '';
+  el.style.left = el.style.right = el.style.width = el.style.maxWidth = el.style.marginLeft = '';
   el.querySelectorAll('.ldhide').forEach(c => c.classList.remove('ldhide'));
   const more = $('ldMore'); if (more) more.remove();
   if (!el.classList.contains('on') || !el.querySelector('.dcard')) return;
