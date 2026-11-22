@@ -1,6 +1,9 @@
 package com.nova.apex.wallpaper;
 
+import android.app.KeyguardManager;
 import android.app.Presentation;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -43,10 +46,43 @@ public class S extends WallpaperService {
         private int w = 1080, ht = 2400;
         private final Runnable drawLoop = this::drawFrame;
 
+        // Lock screen -> home: tells the page when the phone is locked or was just unlocked,
+        // so the cards and clock can animate in as you unlock (no duplicate clock on the lock screen)
+        private final BroadcastReceiver lockRx = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent i) {
+                if (Intent.ACTION_USER_PRESENT.equals(i.getAction())) sendLock(false, true);
+                else if (Intent.ACTION_SCREEN_OFF.equals(i.getAction())) sendLock(true, false);
+            }
+        };
+        private boolean lockRxOn = false;
+
+        private boolean isLocked() {
+            try {
+                KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                return km != null && km.isKeyguardLocked();
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        private void sendLock(boolean locked, boolean animate) {
+            if (v == null) return;
+            v.evaluateJavascript("window.setLock&&setLock(" + locked + "," + animate + ")", null);
+        }
+
         @Override
         public void onCreate(SurfaceHolder sh) {
             super.onCreate(sh);
             setTouchEventsEnabled(true);
+            try {
+                IntentFilter f = new IntentFilter();
+                f.addAction(Intent.ACTION_USER_PRESENT);
+                f.addAction(Intent.ACTION_SCREEN_OFF);
+                registerReceiver(lockRx, f);
+                lockRxOn = true;
+            } catch (Exception ignored) {
+            }
         }
 
         private WebView makeWebView(Context c) {
@@ -173,6 +209,7 @@ public class S extends WallpaperService {
             if (b) {
                 v.onResume();
                 v.evaluateJavascript("window.syncConfig&&syncConfig();window.setPaused&&setPaused(false)", null);
+                sendLock(isLocked(), false);
                 if (fallback) startDrawLoop();
             } else {
                 // Stop animating while hidden so the wallpaper doesn't drain the battery
@@ -190,6 +227,10 @@ public class S extends WallpaperService {
         @Override
         public void onDestroy() {
             h.removeCallbacks(drawLoop);
+            if (lockRxOn) {
+                try { unregisterReceiver(lockRx); } catch (Exception ignored) { }
+                lockRxOn = false;
+            }
             releasePresentation();
             super.onDestroy();
         }
